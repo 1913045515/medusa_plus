@@ -1,0 +1,63 @@
+{
+  "name": "my-store",
+  "version": "0.0.1",
+  "description": "A starter for Medusa projects.",
+  "author": "Medusa (https://medusajs.com)",
+  "license": "MIT",
+  "keywords": [
+    "sqlite",
+    "postgres",
+    "typescript",
+    "ecommerce",
+    "headless",
+    "medusa"
+  ],
+  "scripts": {
+    "build": "medusa build",
+    "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:courses": "medusa exec ./src/scripts/seed-courses.ts",
+    "start": "medusa start",
+    "dev": "medusa develop",
+    "test:integration:http": "cross-env TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:integration:modules": "cross-env TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:unit": "cross-env TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
+    "spec:lint": "redocly lint openapi/store.yaml openapi/admin.yaml",
+    "spec:bundle:store": "redocly bundle openapi/store.yaml -o openapi/dist/store.bundle.yaml",
+    "spec:bundle:admin": "redocly bundle openapi/admin.yaml -o openapi/dist/admin.bundle.yaml",
+    "spec:bundle": "npm run spec:bundle:store && npm run spec:bundle:admin",
+    "spec:preview:store": "redocly preview openapi/store.yaml --port 8080",
+    "spec:preview:admin": "redocly preview openapi/admin.yaml --port 8081"
+  },
+  "dependencies": {
+    "@medusajs/admin-sdk": "2.13.1",
+    "@medusajs/cli": "2.13.1",
+    "@medusajs/framework": "2.13.1",
+    "@medusajs/medusa": "2.13.1"
+  },
+  "devDependencies": {
+    "@medusajs/test-utils": "2.13.1",
+    "@redocly/cli": "^2.22.1",
+    "@swc/core": "^1.7.28",
+    "@swc/jest": "^0.2.36",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20.12.11",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.2.25",
+    "@types/swagger-ui-express": "^4.1.8",
+    "cross-env": "^10.1.0",
+    "jest": "^29.7.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.14",
+    "yalc": "^1.0.0-pre.53",
+    "yaml": "^2.8.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@11.6.2"
+}

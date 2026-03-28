@@ -1,0 +1,33 @@
+Error:
+  type: object
+  description: 错误响应
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      example: Resource not found
+
+DeleteResponse:
+  type: object
+  required:
+    - id
+    - deleted
+  properties:
+    id:
+      type: string
+      example: course_demo_1
+    deleted:
+      type: boolean
+      example: true
+
+PlayUrlResponse:
+  type: object
+  description: 视频播放地址响应
+  required:
+    - video_url
+  properties:
+    video_url:
+      type: string
+      example: https://cdn.example.com/videos/lesson1.mp4
+      description: 视频播放地址

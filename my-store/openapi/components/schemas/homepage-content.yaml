@@ -1,0 +1,253 @@
+HomepageCta:
+  type: object
+  required: [label, href]
+  properties:
+    label:
+      type: string
+      example: 立即查看课程
+    href:
+      type: string
+      example: /courses
+
+HomepageHero:
+  type: object
+  required: [title, primary_cta]
+  properties:
+    eyebrow:
+      type: string
+      nullable: true
+      example: AI Cross-Stand
+    title:
+      type: string
+      example: 把商城与课程体验放到一个首页里
+    subtitle:
+      type: string
+      nullable: true
+      example: 商品成交与内容转化共用一个运营入口
+    description:
+      type: string
+      nullable: true
+      example: 在后台统一维护首页主视觉、卖点区块和精选课程，前台只负责稳定渲染。
+    background_image_url:
+      type: string
+      nullable: true
+      example: https://images.unsplash.com/photo-1498050108023-c5249f4df085
+    primary_cta:
+      $ref: '#/HomepageCta'
+    secondary_cta:
+      allOf:
+        - $ref: '#/HomepageCta'
+      nullable: true
+
+HomepageHighlightItem:
+  type: object
+  required: [id, title, description]
+  properties:
+    id:
+      type: string
+      example: highlight-1
+    title:
+      type: string
+      example: 后台统一维护
+    description:
+      type: string
+      example: 运营同学可以直接编辑首页文案和区块，无需改前端代码。
+    icon:
+      type: string
+      nullable: true
+      example: layout
+
+HomepageFeaturedCourseItem:
+  type: object
+  required: [id, title, description, href]
+  properties:
+    id:
+      type: string
+      example: featured-course-1
+    title:
+      type: string
+      example: React 商城实战课
+    description:
+      type: string
+      example: 用真实商城业务拆解前台页面、状态和数据流设计。
+    image_url:
+      type: string
+      nullable: true
+      example: https://images.unsplash.com/photo-1516321318423-f06f85e504b3
+    href:
+      type: string
+      example: /courses
+    badge:
+      type: string
+      nullable: true
+      example: 热门课程
+
+HomepageContent:
+  oneOf:
+    - $ref: '#/HomepageStructuredContent'
+    - $ref: '#/HomepageStaticTemplate'
+
+HomepageStructuredContent:
+  type: object
+  required: [render_mode, hero, highlights, featured_courses]
+  properties:
+    render_mode:
+      type: string
+      enum: [structured]
+      example: structured
+    hero:
+      $ref: '#/HomepageHero'
+    highlights:
+      type: array
+      items:
+        $ref: '#/HomepageHighlightItem'
+    featured_courses:
+      type: array
+      items:
+        $ref: '#/HomepageFeaturedCourseItem'
+
+HomepageStaticTemplateSource:
+  type: object
+  required: [html, css]
+  properties:
+    html:
+      type: string
+      example: <section class="cms-homepage"><h1>Campaign Landing</h1></section>
+    css:
+      type: string
+      example: .cms-homepage { background: #111827; color: #fff; }
+
+HomepageStaticTemplate:
+  type: object
+  required: [render_mode, template]
+  properties:
+    render_mode:
+      type: string
+      enum: [static_html]
+      example: static_html
+    template:
+      $ref: '#/HomepageStaticTemplateSource'
+
+HomepageContentAdminRecord:
+  type: object
+  required: [id, title, handle, status, is_active, content]
+  properties:
+    id:
+      type: string
+      example: homepage_main
+    title:
+      type: string
+      example: 春季活动首页
+    handle:
+      type: string
+      example: main
+    site_key:
+      type: string
+      example: us
+      description: 首页所属站点标识，用于区分不同国家站点或前台站点。
+    status:
+      type: string
+      enum: [draft, published]
+      example: published
+    is_active:
+      type: boolean
+      example: true
+    published_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: 2026-03-26T11:00:00.000Z
+    content:
+      $ref: '#/HomepageContent'
+    translations:
+      type: object
+      nullable: true
+      description: 多语言首页内容。key 为 locale，value 为该语言下的首页内容 payload。
+      additionalProperties:
+        $ref: '#/HomepageContent'
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+    created_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: 2026-03-26T09:00:00.000Z
+    updated_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: 2026-03-26T10:30:00.000Z
+
+CreateHomepageContentInput:
+  type: object
+  required: [title, handle]
+  properties:
+    title:
+      type: string
+      example: 春季活动首页
+    handle:
+      type: string
+      example: spring-campaign
+    site_key:
+      type: string
+      default: default
+      example: us
+    status:
+      type: string
+      enum: [draft, published]
+      example: draft
+    translations:
+      type: object
+      nullable: true
+      additionalProperties:
+        $ref: '#/HomepageContent'
+
+UpsertHomepageContentInput:
+  type: object
+  required: [id, content]
+  properties:
+    id:
+      type: string
+      example: homepage_1742989200_ab12cd
+    title:
+      type: string
+      example: 春季活动首页
+    handle:
+      type: string
+      example: spring-campaign
+    site_key:
+      type: string
+      example: us
+    status:
+      type: string
+      enum: [draft, published]
+      example: draft
+    is_active:
+      type: boolean
+      example: false
+    content:
+      $ref: '#/HomepageContent'
+    translations:
+      type: object
+      nullable: true
+      additionalProperties:
+        $ref: '#/HomepageContent'
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+
+HomepageContentListResponse:
+  type: object
+  required: [homepages, active_homepage_id]
+  properties:
+    homepages:
+      type: array
+      items:
+        $ref: '#/HomepageContentAdminRecord'
+    active_homepage_id:
+      type: string
+      nullable: true
+      example: homepage_1742989200_ab12cd

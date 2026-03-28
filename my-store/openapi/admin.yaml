@@ -1,0 +1,512 @@
+openapi: 3.0.3
+
+info:
+  title: Video Course Platform — Admin API
+  description: |
+    面向后台管理的 Admin API，需携带 Admin JWT Token。
+
+    **鉴权说明**
+    - 所有请求需在 `Authorization` Header 中携带 `Bearer <admin_jwt_token>`
+    - Token 通过 `POST /auth/user/emailpass` 获取
+
+    **数据来源**
+    > 当前使用静态 JSON 数据，接口签名与数据库模式完全兼容，后续切换 ORM 时零改动。
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: http://localhost:9000
+
+servers:
+  - url: http://localhost:9000
+    description: 本地开发环境
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Admin JWT Token，通过 POST /auth/user/emailpass 获取
+
+tags:
+  - name: Admin Courses
+    description: 课程管理（CRUD）
+  - name: Admin Lessons
+    description: 课时管理（CRUD）
+  - name: Admin Homepage Content
+    description: 首页静态模板管理
+
+paths:
+  /admin/homepage-content:
+    get:
+      tags: [Admin Homepage Content]
+      summary: 获取首页模板配置列表
+      operationId: admin-get-homepage-content
+      parameters:
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回首页模板列表和当前活动配置 ID
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/homepage-content.yaml#/HomepageContentListResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    post:
+      tags: [Admin Homepage Content]
+      summary: 创建新的首页模板草稿
+      operationId: admin-create-homepage-content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/homepage-content.yaml#/CreateHomepageContentInput'
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [homepage]
+                properties:
+                  homepage:
+                    $ref: './components/schemas/homepage-content.yaml#/HomepageContentAdminRecord'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    put:
+      tags: [Admin Homepage Content]
+      summary: 更新首页模板配置
+      operationId: admin-upsert-homepage-content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/homepage-content.yaml#/UpsertHomepageContentInput'
+      responses:
+        "200":
+          description: 保存成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [homepage]
+                properties:
+                  homepage:
+                    $ref: './components/schemas/homepage-content.yaml#/HomepageContentAdminRecord'
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/homepage-content/{id}/publish:
+    post:
+      tags: [Admin Homepage Content]
+      summary: 发布指定首页模板并切换为当前活动版本
+      operationId: admin-publish-homepage-content
+      parameters:
+        - name: id
+          in: path
+          description: 要发布为当前活动版本的首页配置 ID。
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 发布成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [homepage]
+                properties:
+                  homepage:
+                    $ref: './components/schemas/homepage-content.yaml#/HomepageContentAdminRecord'
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  # ── Courses ──────────────────────────────────────────────────────────────────
+
+  /admin/courses:
+    get:
+      tags: [Admin Courses]
+      summary: 获取所有课程
+      operationId: admin-list-courses
+      description: 返回所有课程（含 draft），无状态过滤。
+      parameters:
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课程列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [courses, count]
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      $ref: './components/schemas/course.yaml#/Course'
+                  count:
+                    type: integer
+                    example: 2
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    post:
+      tags: [Admin Courses]
+      summary: 创建课程
+      operationId: admin-create-course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/course.yaml#/CreateCourseInput'
+            example:
+              handle: typescript-basics
+              title: TypeScript 入门到精通
+              description: 从零开始学习 TypeScript 类型系统与工程实践。
+              thumbnail_url: https://via.placeholder.com/640x360?text=TypeScript
+              level: beginner
+              lessons_count: 0
+              status: draft
+              metadata: {}
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [course]
+                properties:
+                  course:
+                    $ref: './components/schemas/course.yaml#/Course'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/courses/{id}:
+    get:
+      tags: [Admin Courses]
+      summary: 获取课程详情
+      operationId: admin-get-course
+      parameters:
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课程
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [course]
+                properties:
+                  course:
+                    $ref: './components/schemas/course.yaml#/Course'
+        "404":
+          description: 课程不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+              example:
+                message: Course not found
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    put:
+      tags: [Admin Courses]
+      summary: 更新课程
+      operationId: admin-update-course
+      parameters:
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/course.yaml#/UpdateCourseInput'
+            example:
+              title: TypeScript 入门到精通（更新版）
+              status: published
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [course]
+                properties:
+                  course:
+                    $ref: './components/schemas/course.yaml#/Course'
+        "404":
+          description: 课程不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    delete:
+      tags: [Admin Courses]
+      summary: 删除课程
+      operationId: admin-delete-course
+      parameters:
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+      responses:
+        "200":
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/DeleteResponse'
+              example:
+                id: course_demo_1
+                deleted: true
+        "404":
+          description: 课程不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  # ── Course Lessons ────────────────────────────────────────────────────────────
+
+  /admin/courses/{id}/lessons:
+    get:
+      tags: [Admin Lessons]
+      summary: 获取课程的课时列表（含 video_url）
+      operationId: admin-list-course-lessons
+      description: 返回指定课程的所有课时，包含完整 `video_url` 字段。
+      parameters:
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课时列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lessons, count]
+                properties:
+                  lessons:
+                    type: array
+                    items:
+                      $ref: './components/schemas/lesson.yaml#/LessonAdmin'
+                  count:
+                    type: integer
+                    example: 4
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    post:
+      tags: [Admin Lessons]
+      summary: 为课程创建课时
+      operationId: admin-create-lesson
+      description: "`course_id` 由路径参数自动注入，无需在 Body 中传递。"
+      parameters:
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/lesson.yaml#/CreateLessonInput'
+            example:
+              title: "第1集：开发环境搭建"
+              description: 安装 Node.js、VS Code 并初始化第一个 React 项目。
+              episode_number: 1
+              duration: 600
+              is_free: true
+              thumbnail_url: https://via.placeholder.com/320x180?text=Lesson+1
+              video_url: https://cdn.example.com/videos/lesson1.mp4
+              status: published
+              metadata: {}
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lesson]
+                properties:
+                  lesson:
+                    $ref: './components/schemas/lesson.yaml#/LessonAdmin'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  # ── Lessons ───────────────────────────────────────────────────────────────────
+
+  /admin/lessons/{id}:
+    get:
+      tags: [Admin Lessons]
+      summary: 获取课时详情（含 video_url）
+      operationId: admin-get-lesson
+      parameters:
+        - $ref: './components/parameters.yaml#/LessonIdParam'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课时
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lesson]
+                properties:
+                  lesson:
+                    $ref: './components/schemas/lesson.yaml#/LessonAdmin'
+        "404":
+          description: 课时不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+              example:
+                message: Lesson not found
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    put:
+      tags: [Admin Lessons]
+      summary: 更新课时
+      operationId: admin-update-lesson
+      parameters:
+        - $ref: './components/parameters.yaml#/LessonIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/lesson.yaml#/UpdateLessonInput'
+            example:
+              title: "第1集：开发环境搭建（更新版）"
+              is_free: false
+              video_url: https://cdn.example.com/videos/lesson1-v2.mp4
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lesson]
+                properties:
+                  lesson:
+                    $ref: './components/schemas/lesson.yaml#/LessonAdmin'
+        "404":
+          description: 课时不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+    delete:
+      tags: [Admin Lessons]
+      summary: 删除课时
+      operationId: admin-delete-lesson
+      parameters:
+        - $ref: './components/parameters.yaml#/LessonIdParam'
+      responses:
+        "200":
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/DeleteResponse'
+              example:
+                id: lesson_c1_1
+                deleted: true
+        "404":
+          description: 课时不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'

@@ -1,0 +1,44 @@
+CourseIdParam:
+  name: id
+  in: path
+  required: true
+  description: 课程 ID
+  schema:
+    type: string
+    example: course_demo_1
+
+LessonIdParam:
+  name: id
+  in: path
+  required: true
+  description: 课时 ID
+  schema:
+    type: string
+    example: lesson_c1_1
+
+PublishableKeyHeader:
+  name: x-publishable-api-key
+  in: header
+  required: true
+  description: Medusa Publishable API Key（Store API 必须携带）
+  schema:
+    type: string
+    example: pk_01XXXXXXXXXXXXXXXXXXXXXXXXXX
+
+LocaleQuery:
+  name: locale
+  in: query
+  required: false
+  description: 内容语言。未传时返回默认内容，传入后按 locale 优先并回退到默认内容。
+  schema:
+    type: string
+    example: zh-CN
+
+SiteKeyQuery:
+  name: site_key
+  in: query
+  required: false
+  description: 站点标识。未传时使用 default，用于返回当前站点的首页内容。
+  schema:
+    type: string
+    example: us

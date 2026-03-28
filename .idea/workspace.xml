@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7edb6f18-3ab3-453b-9ac0-07c3c8463fc3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/ai-playwright.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/docs/playwright-recorder-beginner-guide.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/cli/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/player/player.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/recorder/injected-recorder.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/recorder/recorder.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/types/script.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/utils/fs.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/src/utils/paths.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/tests/player.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/tests/script.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ai-playwright/ai-playwright/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../seata/demo1/src/main/java/com/example/demo/controller/ApiController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/.idea/libraries/Maven__com_google_guava_guava_20_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/minimal.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/minimal.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/MinimalApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/MinimalApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/api/sample/SampleApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/api/sample/SampleDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/sequence/DefaultIdGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/sequence/DefaultIdGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/web/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/web/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/web/ResponseUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/common/sdk/web/ResponseUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/controller/AppletController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/controller/swagger/Swagger2TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/controller/swagger/Swagger2TestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/controller/test/RedisTestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/controller/test/RedisTestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/entity/model/Article.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/entity/model/Article.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/mybatis/mapper/ArticleMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/mybatis/mapper/ArticleMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/mybatis/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/mybatis/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/repository/UserMongoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/repository/UserMongoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/ArticleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/ArticleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/ConfigService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/ConfigService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/ArticleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/ArticleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/ConfigServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/ConfigServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/java/com/minimal/util/RedisUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/resources/generatorConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/resources/generatorConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/resources/log4j2.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/resources/mapper/ArticleMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/resources/mapper/ArticleMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/src/main/resources/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/src/main/resources/mapper/UserMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/MinimalApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/MinimalApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/api/sample/SampleApi.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/api/sample/SampleDto.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/sequence/DefaultIdGenerator.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/sequence/DefaultIdGenerator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/web/Response.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/web/Response.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/web/ResponseUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/common/sdk/web/ResponseUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/AppletController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/AppletController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/swagger/Swagger2TestController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/swagger/Swagger2TestController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/test/RedisTestController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/controller/test/RedisTestController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/entity/model/Article.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/entity/model/Article.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/mybatis/mapper/ArticleMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/mybatis/mapper/ArticleMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/mybatis/mapper/UserMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/mybatis/mapper/UserMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/ArticleService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/ArticleService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/ConfigService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/ConfigService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ArticleServiceImpl$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ArticleServiceImpl$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ArticleServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ArticleServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ConfigServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/ConfigServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/service/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/com/minimal/util/RedisUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/generatorConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/generatorConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/log4j2.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/mapper/ArticleMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/mapper/ArticleMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/classes/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/classes/mapper/UserMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/minimal-1.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/minimal-1.0.0.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../minimal/target/minimal-1.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/../../minimal/target/minimal-1.0.0.jar.original" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_D:/project/ai-cross-stand/ai-cross-stand" value="3AwMD6jKmmz7kmPWZguNFBmglZ3" />
+    </persistenceIdMap>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="3AwMD6jKmmz7kmPWZguNFBmglZ3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/project/ai-cross-stand/ai-cross-stand"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7edb6f18-3ab3-453b-9ac0-07c3c8463fc3" name="Changes" comment="" />
+      <created>1773499060211</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1773499060211</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

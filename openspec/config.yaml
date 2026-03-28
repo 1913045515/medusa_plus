@@ -1,0 +1,19 @@
+schema: spec-driven
+
+context: |
+  Tech stack: TypeScript, React 19, Next.js 15, Node.js, Medusa v2, PostgreSQL, Tailwind CSS
+  Monorepo with two packages:
+    - my-store: Medusa v2 backend (port 9000)
+    - my-store-storefront: Next.js 15 frontend (port 8000)
+  Domain: e-commerce + online course platform
+  Conventions: conventional commits, REST API via Medusa store/admin routes
+  Specs directory: openspec/specs/
+  Changes directory: openspec/changes/
+
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+  tasks:
+    - Break tasks into chunks of max 2 hours
+    - Reference affected files with relative paths

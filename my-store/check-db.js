@@ -1,0 +1,10 @@
+const { Client } = require('pg')
+const c = new Client({ connectionString: 'postgres://postgres:0316@localhost/medusa-my-store' })
+c.connect()
+  .then(() => c.query("SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'course' ORDER BY ordinal_position"))
+  .then(r => {
+    console.log('=== course 表字段 ===')
+    r.rows.forEach(x => console.log(`  ${x.column_name} (${x.data_type}, nullable:${x.is_nullable})`))
+    c.end()
+  })
+  .catch(e => { console.error(e.message); c.end() })

@@ -1,0 +1,202 @@
+Lesson:
+  type: object
+  description: 课时对象（Store 公开版，不含 video_url）
+  required:
+    - id
+    - course_id
+    - title
+    - episode_number
+    - duration
+    - is_free
+    - status
+    - created_at
+    - updated_at
+  properties:
+    id:
+      type: string
+      example: lesson_c1_1
+      description: 课时唯一 ID
+    course_id:
+      type: string
+      example: course_demo_1
+      description: 所属课程 ID
+    title:
+      type: string
+      example: "第1集：开发环境搭建"
+      description: 课时标题
+    description:
+      type: string
+      nullable: true
+      example: 安装 Node.js、VS Code 并初始化第一个 React 项目。
+      description: 课时简介
+    translations:
+      type: object
+      nullable: true
+      description: 多语言内容覆盖。key 为 locale，value 为该语言下的标题和简介。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: Episode 1: Environment Setup
+          description:
+            type: string
+            nullable: true
+            example: Localized lesson description.
+    episode_number:
+      type: integer
+      example: 1
+      description: 集数，从 1 开始
+    duration:
+      type: integer
+      example: 600
+      description: 时长（秒）
+    is_free:
+      type: boolean
+      example: true
+      description: 是否免费观看
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/320x180?text=Lesson+1
+      description: 课时封面图 URL
+    status:
+      type: string
+      enum: [published, draft]
+      example: published
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+    created_at:
+      type: string
+      format: date-time
+      example: "2024-01-01T00:00:00.000Z"
+    updated_at:
+      type: string
+      format: date-time
+      example: "2024-01-01T00:00:00.000Z"
+
+LessonAdmin:
+  allOf:
+    - $ref: './lesson.yaml#/Lesson'
+  description: 课时对象（Admin 完整版，含 video_url）
+  properties:
+    video_url:
+      type: string
+      nullable: true
+      example: https://cdn.example.com/videos/lesson1.mp4
+      description: 视频播放地址（仅 Admin 接口返回）
+
+CreateLessonInput:
+  type: object
+  description: 创建课时请求体
+  required:
+    - title
+    - episode_number
+  properties:
+    title:
+      type: string
+      example: "第1集：开发环境搭建"
+    description:
+      type: string
+      nullable: true
+      example: 安装 Node.js、VS Code 并初始化第一个 React 项目。
+    translations:
+      type: object
+      nullable: true
+      description: 可选，多语言内容覆盖。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: Episode 1: Environment Setup
+          description:
+            type: string
+            nullable: true
+            example: Localized lesson description.
+    episode_number:
+      type: integer
+      example: 1
+    duration:
+      type: integer
+      default: 0
+      example: 600
+    is_free:
+      type: boolean
+      default: false
+      example: true
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/320x180
+    video_url:
+      type: string
+      nullable: true
+      example: https://cdn.example.com/videos/lesson1.mp4
+    status:
+      type: string
+      enum: [published, draft]
+      default: published
+      example: published
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+      example: {}
+
+UpdateLessonInput:
+  type: object
+  description: 更新课时请求体（所有字段可选）
+  properties:
+    title:
+      type: string
+      example: "第1集：开发环境搭建（更新版）"
+    description:
+      type: string
+      nullable: true
+      example: 更新后的课时简介。
+    translations:
+      type: object
+      nullable: true
+      description: 可选，多语言内容覆盖。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: Episode 1: Updated
+          description:
+            type: string
+            nullable: true
+            example: Updated localized lesson description.
+    episode_number:
+      type: integer
+      example: 1
+    duration:
+      type: integer
+      example: 600
+    is_free:
+      type: boolean
+      example: false
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/320x180?text=Updated
+    video_url:
+      type: string
+      nullable: true
+      example: https://cdn.example.com/videos/lesson1-v2.mp4
+    status:
+      type: string
+      enum: [published, draft]
+      example: published
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+      example: {}

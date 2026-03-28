@@ -1,0 +1,3 @@
+- [x] Add default fallback pages for storefront account parallel routes.
+- [x] Rebuild and restart the Medusa Admin frontend to clear route-extension regression artifacts.
+- [x] Verify storefront account addresses and Admin core products/settings routes respond correctly after the fix.

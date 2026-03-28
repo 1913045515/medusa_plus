@@ -1,0 +1,198 @@
+{
+  "courses": [
+    {
+      "id": "course_01",
+      "handle": "react-from-zero-to-hero",
+      "title": "React 从零到英雄",
+      "description": "系统学习 React 18 核心概念，掌握 Hooks、状态管理、性能优化等技术，带你从入门到实战项目开发。",
+      "thumbnail_url": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80",
+      "level": "beginner",
+      "lessons_count": 8,
+      "status": "published"
+    },
+    {
+      "id": "course_02",
+      "handle": "nextjs-fullstack",
+      "title": "Next.js 全栈开发实战",
+      "description": "深入掌握 Next.js 14 App Router，服务端渲染、API Routes、数据库集成，构建完整的全栈应用。",
+      "thumbnail_url": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
+      "level": "intermediate",
+      "lessons_count": 6,
+      "status": "published"
+    }
+  ],
+  "lessons": {
+    "course_01": [
+      {
+        "id": "lesson_01_01",
+        "course_id": "course_01",
+        "title": "课程介绍与环境搭建",
+        "description": "了解课程整体规划，安装 Node.js、VS Code 和必要插件，创建第一个 React 项目。",
+        "episode_number": 1,
+        "duration": 623,
+        "is_free": true,
+        "thumbnail_url": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_02",
+        "course_id": "course_01",
+        "title": "JSX 语法与组件基础",
+        "description": "深入理解 JSX 语法规则，掌握函数组件和类组件的写法，学习 Props 传递。",
+        "episode_number": 2,
+        "duration": 891,
+        "is_free": true,
+        "thumbnail_url": "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_03",
+        "course_id": "course_01",
+        "title": "useState 与 useEffect 详解",
+        "description": "掌握最常用的两个 Hook，理解状态更新机制和副作用管理，避免常见陷阱。",
+        "episode_number": 3,
+        "duration": 1243,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_04",
+        "course_id": "course_01",
+        "title": "自定义 Hook 与复用逻辑",
+        "description": "学习如何抽离可复用的业务逻辑，编写优雅的自定义 Hook，提升代码质量。",
+        "episode_number": 4,
+        "duration": 987,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_05",
+        "course_id": "course_01",
+        "title": "Context API 全局状态管理",
+        "description": "使用 Context API 实现跨组件状态共享，结合 useReducer 搭建轻量级状态管理方案。",
+        "episode_number": 5,
+        "duration": 1102,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_06",
+        "course_id": "course_01",
+        "title": "React Router 路由管理",
+        "description": "掌握 React Router v6 的使用，实现 SPA 路由、嵌套路由、路由守卫等功能。",
+        "episode_number": 6,
+        "duration": 856,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_07",
+        "course_id": "course_01",
+        "title": "性能优化：memo、useMemo、useCallback",
+        "description": "深入理解 React 渲染机制，使用 React.memo、useMemo 和 useCallback 优化应用性能。",
+        "episode_number": 7,
+        "duration": 1356,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_01_08",
+        "course_id": "course_01",
+        "title": "综合实战：Todo 应用完整开发",
+        "description": "综合运用所学知识，从零开发一个功能完整的 Todo 应用，包含增删改查和本地存储。",
+        "episode_number": 8,
+        "duration": 2104,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      }
+    ],
+    "course_02": [
+      {
+        "id": "lesson_02_01",
+        "course_id": "course_02",
+        "title": "Next.js 14 新特性概览",
+        "description": "全面了解 Next.js 14 的 App Router 架构，对比 Pages Router 的优劣，规划学习路径。",
+        "episode_number": 1,
+        "duration": 745,
+        "is_free": true,
+        "thumbnail_url": "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_02_02",
+        "course_id": "course_02",
+        "title": "Server Components 与 Client Components",
+        "description": "深入理解服务端组件和客户端组件的区别，掌握 'use client' 指令的使用场景。",
+        "episode_number": 2,
+        "duration": 1124,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_02_03",
+        "course_id": "course_02",
+        "title": "数据获取策略：fetch 与缓存",
+        "description": "掌握 Next.js 中的数据获取模式，理解静态生成、增量静态再生和服务端渲染的区别。",
+        "episode_number": 3,
+        "duration": 998,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_02_04",
+        "course_id": "course_02",
+        "title": "Route Handlers 构建 REST API",
+        "description": "使用 Route Handlers 创建 API 接口，处理请求验证、错误处理和中间件逻辑。",
+        "episode_number": 4,
+        "duration": 867,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1600267185393-e158a98703de?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_02_05",
+        "course_id": "course_02",
+        "title": "Prisma ORM 数据库集成",
+        "description": "集成 Prisma ORM，设计数据模型，进行 CRUD 操作，连接 PostgreSQL 数据库。",
+        "episode_number": 5,
+        "duration": 1456,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      },
+      {
+        "id": "lesson_02_06",
+        "course_id": "course_02",
+        "title": "部署到 Vercel 与环境配置",
+        "description": "将完整的全栈应用部署到 Vercel，配置环境变量、数据库连接和 CI/CD 流程。",
+        "episode_number": 6,
+        "duration": 923,
+        "is_free": false,
+        "thumbnail_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80",
+        "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "status": "published"
+      }
+    ]
+  }
+}

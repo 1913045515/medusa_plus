@@ -1,0 +1,22 @@
+apis:
+  store@v1:
+    root: ./openapi/store.yaml
+  admin@v1:
+    root: ./openapi/admin.yaml
+
+rules:
+  no-unused-components: warn
+  operation-summary: error
+  operation-operationId: error
+  operation-tag-defined: error
+  no-ambiguous-paths: error
+  no-identical-paths: error
+  path-parameters-defined: error
+  parameter-description: warn
+  response-contains-header: off
+  scalar-property-missing-example: warn
+  tag-description: warn
+
+resolve:
+  http:
+    headers: []

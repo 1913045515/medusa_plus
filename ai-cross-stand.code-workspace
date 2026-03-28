@@ -1,0 +1,14 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "git.ignoreLimitWarning": true,
+        "chat.tools.terminal.autoApprove": {
+            "openspec": true,
+            "npm run lint": true
+        }
+    }
+}

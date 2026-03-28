@@ -1,0 +1,203 @@
+Course:
+  type: object
+  description: 课程对象
+  required:
+    - id
+    - handle
+    - title
+    - lessons_count
+    - status
+    - created_at
+    - updated_at
+  properties:
+    id:
+      type: string
+      example: course_demo_1
+      description: 课程唯一 ID
+    product_id:
+      type: string
+      nullable: true
+      example: prod_01H...
+      description: 关联的商品 ID（一对一）
+    handle:
+      type: string
+      example: demo-course-1
+      description: 课程 URL slug，全局唯一
+    title:
+      type: string
+      example: React 从零到一
+      description: 课程标题
+    description:
+      type: string
+      nullable: true
+      example: 系统学习 React 核心概念，包含 Hooks、状态管理与项目实战。
+      description: 课程简介
+    translations:
+      type: object
+      nullable: true
+      description: 多语言内容覆盖。key 为 locale，value 为该语言下的标题和简介。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: React From Zero to One
+          description:
+            type: string
+            nullable: true
+            example: Learn React fundamentals with localized copy.
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/640x360?text=React+Course
+      description: 封面图 URL
+    level:
+      type: string
+      nullable: true
+      enum: [beginner, intermediate, advanced]
+      example: beginner
+      description: 课程难度
+    lessons_count:
+      type: integer
+      example: 4
+      description: 课时总数
+    status:
+      type: string
+      enum: [published, draft]
+      example: published
+      description: 发布状态
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: 扩展元数据
+    created_at:
+      type: string
+      format: date-time
+      example: "2024-01-01T00:00:00.000Z"
+    updated_at:
+      type: string
+      format: date-time
+      example: "2024-01-01T00:00:00.000Z"
+
+CreateCourseInput:
+  type: object
+  description: 创建课程请求体
+  required:
+    - handle
+    - title
+  properties:
+    id:
+      type: string
+      nullable: true
+      example: course_demo_1
+      description: 可选，自定义课程 ID
+    product_id:
+      type: string
+      nullable: true
+      example: prod_01H...
+      description: 关联的商品 ID（一对一）。创建成功后会写入 product.metadata.course_id
+    handle:
+      type: string
+      example: my-new-course
+    title:
+      type: string
+      example: TypeScript 入门
+    description:
+      type: string
+      nullable: true
+      example: 从零开始学习 TypeScript 类型系统。
+    translations:
+      type: object
+      nullable: true
+      description: 可选，多语言内容覆盖。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: TypeScript Basics
+          description:
+            type: string
+            nullable: true
+            example: Localized course description.
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/640x360
+    level:
+      type: string
+      nullable: true
+      enum: [beginner, intermediate, advanced]
+      example: beginner
+    lessons_count:
+      type: integer
+      default: 0
+      example: 0
+    status:
+      type: string
+      enum: [published, draft]
+      default: published
+      example: published
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+
+UpdateCourseInput:
+  type: object
+  description: 更新课程请求体（所有字段可选）
+  properties:
+    product_id:
+      type: string
+      nullable: true
+      example: prod_01H...
+      description: 关联的商品 ID（一对一）。传入后会同步写入 product.metadata.course_id
+    handle:
+      type: string
+      example: updated-handle
+    title:
+      type: string
+      example: 更新后的课程标题
+    description:
+      type: string
+      nullable: true
+      example: 更新后的课程简介。
+    translations:
+      type: object
+      nullable: true
+      description: 可选，多语言内容覆盖。
+      additionalProperties:
+        type: object
+        properties:
+          title:
+            type: string
+            nullable: true
+            example: Updated Course Title
+          description:
+            type: string
+            nullable: true
+            example: Updated localized description.
+    thumbnail_url:
+      type: string
+      nullable: true
+      example: https://via.placeholder.com/640x360?text=Updated
+    level:
+      type: string
+      nullable: true
+      enum: [beginner, intermediate, advanced]
+      example: intermediate
+    lessons_count:
+      type: integer
+      example: 5
+    status:
+      type: string
+      enum: [published, draft]
+      example: published
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+      example: {}

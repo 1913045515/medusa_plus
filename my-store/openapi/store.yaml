@@ -1,0 +1,243 @@
+openapi: 3.0.3
+
+info:
+  title: Video Course Platform — Store API
+  description: |
+    面向前台用户的 Store API。
+
+    **鉴权说明**
+    - 所有请求需携带 `x-publishable-api-key` Header
+    - 免费课时无需登录即可获取播放地址
+    - 付费课时需登录且已购买，否则返回 `401` / `403`
+
+    **数据来源**
+    > 当前使用静态 JSON 数据，接口签名与数据库模式完全兼容，后续切换 ORM 时前端零改动。
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: http://localhost:9000
+
+servers:
+  - url: http://localhost:9000
+    description: 本地开发环境
+
+tags:
+  - name: Courses
+    description: 课程列表与课时管理
+  - name: Lessons
+    description: 课时播放地址获取
+  - name: Homepage
+    description: 首页模板读取
+
+paths:
+  /store/homepage-content:
+    get:
+      tags: [Homepage]
+      summary: 获取当前发布的首页模板内容
+      operationId: store-get-homepage-content
+      description: 返回 storefront 首页渲染所需的公开首页模板内容，仅包含已发布展示数据。
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+        - $ref: './components/parameters.yaml#/SiteKeyQuery'
+      responses:
+        "200":
+          description: 成功返回首页模板内容
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [homepage]
+                properties:
+                  homepage:
+                    $ref: './components/schemas/homepage-content.yaml#/HomepageContent'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /store/courses:
+    get:
+      tags: [Courses]
+      summary: 获取课程列表
+      operationId: store-list-courses
+      description: 返回所有已发布（`status=published`）的课程列表。
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课程列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [courses, count]
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      $ref: './components/schemas/course.yaml#/Course'
+                  count:
+                    type: integer
+                    example: 2
+              example:
+                courses:
+                  - id: course_demo_1
+                    handle: demo-course-1
+                    title: React 从零到一
+                    description: 系统学习 React 核心概念，包含 Hooks、状态管理与项目实战。
+                    thumbnail_url: https://via.placeholder.com/640x360?text=React+Course
+                    level: beginner
+                    lessons_count: 4
+                    status: published
+                    metadata: {}
+                    created_at: "2024-01-01T00:00:00.000Z"
+                    updated_at: "2024-01-01T00:00:00.000Z"
+                  - id: course_demo_2
+                    handle: demo-course-2
+                    title: Next.js 全栈开发
+                    description: 深入 Next.js 13+ App Router，Server Components 与全栈部署实战。
+                    thumbnail_url: https://via.placeholder.com/640x360?text=Next.js+Course
+                    level: intermediate
+                    lessons_count: 8
+                    status: published
+                    metadata: {}
+                    created_at: "2024-02-01T00:00:00.000Z"
+                    updated_at: "2024-02-01T00:00:00.000Z"
+                count: 2
+
+  /store/courses/{id}/lessons:
+    get:
+      tags: [Courses]
+      summary: 获取课程的课时列表
+      operationId: store-list-course-lessons
+      description: |
+        返回指定课程的所有课时列表，按 `episode_number` 升序排列。
+
+        **注意**：响应中不包含 `video_url`，播放地址需通过 `/store/lessons/{id}/play` 获取。
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+        - $ref: './components/parameters.yaml#/CourseIdParam'
+        - $ref: './components/parameters.yaml#/LocaleQuery'
+      responses:
+        "200":
+          description: 成功返回课时列表（课程不存在时返回空数组）
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lessons, count]
+                properties:
+                  lessons:
+                    type: array
+                    items:
+                      $ref: './components/schemas/lesson.yaml#/Lesson'
+                  count:
+                    type: integer
+                    example: 4
+              example:
+                lessons:
+                  - id: lesson_c1_1
+                    course_id: course_demo_1
+                    title: "第1集：开发环境搭建"
+                    description: 安装 Node.js、VS Code 并初始化第一个 React 项目。
+                    episode_number: 1
+                    duration: 600
+                    is_free: true
+                    thumbnail_url: https://via.placeholder.com/320x180?text=Lesson+1
+                    status: published
+                    metadata: {}
+                    created_at: "2024-01-01T00:00:00.000Z"
+                    updated_at: "2024-01-01T00:00:00.000Z"
+                  - id: lesson_c1_2
+                    course_id: course_demo_1
+                    title: "第2集：JSX 与组件基础"
+                    description: 学习 JSX 语法、函数组件与 Props 传递。
+                    episode_number: 2
+                    duration: 780
+                    is_free: true
+                    thumbnail_url: https://via.placeholder.com/320x180?text=Lesson+2
+                    status: published
+                    metadata: {}
+                    created_at: "2024-01-02T00:00:00.000Z"
+                    updated_at: "2024-01-02T00:00:00.000Z"
+                  - id: lesson_c1_3
+                    course_id: course_demo_1
+                    title: "第3集：useState 与 useEffect"
+                    description: 深入理解 React 核心 Hooks 的使用场景与陷阱。
+                    episode_number: 3
+                    duration: 1200
+                    is_free: false
+                    thumbnail_url: https://via.placeholder.com/320x180?text=Lesson+3
+                    status: published
+                    metadata: {}
+                    created_at: "2024-01-03T00:00:00.000Z"
+                    updated_at: "2024-01-03T00:00:00.000Z"
+                  - id: lesson_c1_4
+                    course_id: course_demo_1
+                    title: "第4集：项目实战 —— Todo App"
+                    description: 综合运用所学知识，构建一个完整的 Todo 应用并部署上线。
+                    episode_number: 4
+                    duration: 1800
+                    is_free: false
+                    thumbnail_url: https://via.placeholder.com/320x180?text=Lesson+4
+                    status: published
+                    metadata: {}
+                    created_at: "2024-01-04T00:00:00.000Z"
+                    updated_at: "2024-01-04T00:00:00.000Z"
+                count: 4
+
+  /store/lessons/{id}/play:
+    get:
+      tags: [Lessons]
+      summary: 获取课时播放地址
+      operationId: store-get-lesson-play-url
+      description: |
+        根据鉴权状态返回视频播放地址。
+
+        **鉴权规则：**
+        | 条件 | 结果 |
+        |------|------|
+        | `is_free = true` | `200` 直接返回 `video_url` |
+        | `is_free = false` + 未登录 | `401 Unauthorized` |
+        | `is_free = false` + 已登录 + 未购买 | `403 Forbidden` |
+        | `is_free = false` + 已登录 + 已购买 | `200` 返回 `video_url` |
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+        - $ref: './components/parameters.yaml#/LessonIdParam'
+      responses:
+        "200":
+          description: 成功返回视频播放地址
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/PlayUrlResponse'
+              example:
+                video_url: https://www.w3schools.com/html/mov_bbb.mp4
+        "401":
+          description: 未登录，无法访问付费课时
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+              example:
+                message: 请先登录
+        "403":
+          description: 已登录但未购买课程
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+              example:
+                message: 请先购买课程
+        "404":
+          description: 课时不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+              example:
+                message: Lesson not found
