@@ -1,0 +1,67 @@
+# ==============================
+# 1. IntelliJ IDEA 相关（必加）
+# ==============================
+.idea/                  # IDEA 项目配置文件夹（个人配置，不共享）
+*.iml                   # IDEA 模块文件
+*.iws                   # IDEA 工作区文件
+out/                    # IDEA 编译输出目录
+
+# ==============================
+# 2. VS Code 相关（可选）
+# ==============================
+.vscode/                # VS Code 项目配置
+*.code-workspace        # VS Code 工作区文件
+
+# ==============================
+# 3. Eclipse 相关（可选）
+# ==============================
+.project                # Eclipse 项目文件
+.classpath              # Eclipse 类路径文件
+.settings/              # Eclipse 设置文件夹
+bin/                    # Eclipse 编译输出目录
+
+# ==============================
+# 4. 系统文件（必加，跨平台）
+# ==============================
+.DS_Store               # Mac 系统文件
+Thumbs.db               # Windows 缩略图缓存
+desktop.ini             # Windows 文件夹配置
+
+# ==============================
+# 5. Java 项目（Maven/Gradle）
+# ==============================
+target/                 # Maven 编译输出目录
+.gradle/                # Gradle 缓存
+build/                  # Gradle 编译输出目录
+*.jar                   # JAR 包（避免提交构建产物）
+*.war                   # WAR 包
+*.ear                   # EAR 包
+
+# ==============================
+# 6. Node.js 项目
+# ==============================
+node_modules/           # 依赖包（通过 package.json 重新安装）
+npm-debug.log*          # npm 调试日志
+yarn-debug.log*         # yarn 调试日志
+yarn-error.log*         # yarn 错误日志
+dist/                   # 前端构建输出目录（如 Vue/React）
+build/                  # 另一种前端构建输出目录
+
+# ==============================
+# 7. Python 项目
+# ==============================
+__pycache__/            # Python 字节码缓存
+*.pyc                   # 编译后的 Python 文件
+*.pyo                   # 优化后的 Python 文件
+venv/                   # 虚拟环境
+env/                    # 另一种虚拟环境命名
+*.egg-info/             # Python 包元数据
+
+# ==============================
+# 8. 其他通用
+# ==============================
+*.log                   # 日志文件
+*.tmp                   # 临时文件
+*.swp                   # Vim 临时文件
+*.swo                   # Vim 临时文件
+*~                      # 备份文件
