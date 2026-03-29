@@ -17,6 +17,7 @@ type ImageWithMeta = {
   id: string
   url: string
   is_main?: boolean
+  sort_order: number
 }
 
 type ProductTemplateProps = {
@@ -61,11 +62,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       const meta = metaMap.get(img.id)
       return {
         id: img.id,
-        url: img.url ?? "",
+        url: img.url?.trim() ?? "",
         is_main: meta?.is_main ?? (idx === 0 && !imagesMeta?.length),
         sort_order: meta?.sort_order ?? idx,
       }
     })
+    .filter((img) => img.url.length > 0)
     .sort((a, b) => a.sort_order - b.sort_order)
 
   return (
