@@ -14,6 +14,9 @@ module.exports = defineConfig({
       jwtExpiresIn: "7d",
     }
   },
+  admin: {
+    disable: false,
+  },
   modules: [
     {
       resolve: "./src/modules/video",

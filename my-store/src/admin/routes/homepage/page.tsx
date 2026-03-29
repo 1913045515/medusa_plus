@@ -643,9 +643,8 @@ const HomepageEditorPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "homepageEditor.menuLabel",
+  label: "首页模板",
   icon: PencilSquare,
-  translationNs: "translation",
 })
 
 export default HomepageEditorPage
