@@ -38,6 +38,8 @@ tags:
     description: 课时管理（CRUD）
   - name: Admin Homepage Content
     description: 首页静态模板管理
+  - name: Admin Product Detail
+    description: 产品富文本详情与图片元数据管理
 
 paths:
   /admin/homepage-content:
@@ -504,6 +506,98 @@ paths:
             application/json:
               schema:
                 $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/products/{id}/detail:
+    get:
+      tags: [Admin Product Detail]
+      summary: 获取产品富文本详情
+      operationId: admin-get-product-detail
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+      responses:
+        "200":
+          description: 成功返回产品富文本
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductDetailResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+    put:
+      tags: [Admin Product Detail]
+      summary: 保存产品富文本详情
+      operationId: admin-update-product-detail
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/product-detail.yaml#/ProductDetailInput'
+      responses:
+        "200":
+          description: 保存成功
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductDetailResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/products/{id}/images-meta:
+    get:
+      tags: [Admin Product Detail]
+      summary: 获取产品图片元数据列表
+      operationId: admin-get-product-images-meta
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+      responses:
+        "200":
+          description: 成功返回图片元数据
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductImageMetaListResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+    put:
+      tags: [Admin Product Detail]
+      summary: 批量更新产品图片排序和主图
+      operationId: admin-upsert-product-images-meta
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/product-detail.yaml#/UpsertProductImageMetaInput'
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductImageMetaListResponse'
         "401":
           description: 未授权
           content:

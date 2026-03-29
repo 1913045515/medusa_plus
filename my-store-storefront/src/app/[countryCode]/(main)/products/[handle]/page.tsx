@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
+import { getProductDetail, getProductImagesMeta } from "@lib/data/product-detail"
+import { getProductDetailDictionary } from "@lib/i18n/dictionaries"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 
@@ -120,12 +122,24 @@ export default async function ProductPage(props: Props) {
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
+  // Fetch product detail rich-text and image meta in parallel
+  const [detailData, imagesMeta] = await Promise.all([
+    pricedProduct.id ? getProductDetail(pricedProduct.id) : Promise.resolve({ long_desc_html: null }),
+    pricedProduct.id ? getProductImagesMeta(pricedProduct.id) : Promise.resolve([]),
+  ])
+
+  // i18n dictionary for product detail UI labels
+  const dict = getProductDetailDictionary()
+
   return (
     <ProductTemplate
       product={pricedProduct}
       region={region}
       countryCode={params.countryCode}
       images={images}
+      longDescHtml={detailData.long_desc_html}
+      imagesMeta={imagesMeta}
+      dict={dict}
     />
   )
 }

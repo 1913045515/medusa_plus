@@ -28,6 +28,8 @@ tags:
     description: 课时播放地址获取
   - name: Homepage
     description: 首页模板读取
+  - name: Product Detail
+    description: 产品富文本详情与图片元数据
 
 paths:
   /store/homepage-content:
@@ -241,3 +243,37 @@ paths:
                 $ref: './components/schemas/common.yaml#/Error'
               example:
                 message: Lesson not found
+
+  /store/products/{id}/detail:
+    get:
+      tags: [Product Detail]
+      summary: 获取产品富文本详情
+      operationId: store-get-product-detail
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+      responses:
+        "200":
+          description: 成功返回产品富文本
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductDetailResponse'
+              example:
+                detail_html: "<h2>产品特色</h2><p>高品质工艺。</p>"
+
+  /store/products/{id}/images-meta:
+    get:
+      tags: [Product Detail]
+      summary: 获取产品图片排序与主图信息
+      operationId: store-get-product-images-meta
+      parameters:
+        - $ref: './components/parameters.yaml#/ProductIdParam'
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+      responses:
+        "200":
+          description: 成功返回图片元数据列表（按 sort_order 排序）
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/product-detail.yaml#/ProductImageMetaListResponse'

@@ -155,5 +155,39 @@
     "lessonsUnit": "{{count}} lessons",
     "productLabel": "Product: {{id}}",
     "notFound": "Course not found"
+  },
+  "productDetail": {
+    "sectionTitle": "Product Descriptions (Rich Text)",
+    "shortDescLabel": "Description",
+    "shortDescHint": "This is the product's main Description field (same as General Information). Rich text is supported here — use this editor instead of the plain text field above.",
+    "longDescLabel": "Long Description",
+    "longDescHint": "Displayed below the product images as a full-width content section.",
+    "loading": "Loading...",
+    "save": "Save",
+    "saveSuccess": "Description saved",
+    "saveError": "Failed to save description",
+    "visualMode": "Visual",
+    "htmlMode": "HTML Source",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "bulletList": "Bullet List",
+    "orderedList": "Ordered List",
+    "quote": "Quote",
+    "codeBlock": "Code Block",
+    "insertTable": "Insert Table",
+    "insertImage": "Insert Image",
+    "insertLink": "Insert Link",
+    "imageUrlPrompt": "Image URL",
+    "linkUrlPrompt": "Link URL"
+  },
+  "productImages": {
+    "sectionTitle": "Product Image Management",
+    "saveOrder": "Save Order",
+    "saveSuccess": "Image order saved",
+    "saveError": "Failed to save image order",
+    "setAsMain": "Set as Main",
+    "mainBadge": "Main",
+    "empty": "No images available"
   }
 }

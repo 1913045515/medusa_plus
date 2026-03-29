@@ -21,5 +21,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/course",
     },
+    {
+      resolve: "./src/modules/product-detail",
+    },
   ],
 })

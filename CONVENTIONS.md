@@ -372,3 +372,88 @@ schema:
 | `video_url`（Lesson） | ❌ 不返回 | ✅ 返回 | Store 通过 `/play` 鉴权后获取 |
 | `status=draft` 的课程 | ❌ 不返回 | ✅ 返回 | Store 只返回 `published` |
 | 所有课时字段 | 返回（不含 `video_url`） | 返回全部 | Admin 使用 `LessonAdmin` schema |
+
+### 6.6 API 调整必须同步文档（强制）
+
+只要出现以下任意一种变更，都视为 **API 调整**，必须同步更新 OpenAPI 文档（含 schemas / parameters / examples）：
+
+- 新增/删除任意 `/store/*` 或 `/admin/*` 路由
+- 修改路径参数、query 参数、header（例如 locale / site / publishable key）、cookie 语义
+- 修改请求体/响应体字段（新增/删除/改名/改类型/枚举变更/字段可空性变化）
+- 修改响应码或错误语义（例如 401/403/404 的触发条件或 message 约定）
+
+同步要求：
+
+- Store API → `my-store/openapi/store.yaml`
+- Admin API → `my-store/openapi/admin.yaml`
+- 公共参数 → `my-store/openapi/components/parameters.yaml`
+- Schema 变更 → `my-store/openapi/components/schemas/*.yaml`
+- 必须执行 `npm run spec:lint` 且 **0 errors**
+
+---
+
+## 七、国际化（i18n）与文案规范（强制）
+
+### 7.1 基本原则
+
+- **任何新增 UI 文案必须可翻译**：禁止在组件/页面/路由中硬编码面向用户的显示文案。
+- **业务内容与 UI 文案分离**：课程标题/描述、首页内容等“业务内容”优先由后端按 locale 返回；前台/后台的“界面文案”由各自 i18n 资源文件提供。
+- **默认回退**：缺失翻译时必须有合理回退（例如 `en` 或 `zh-CN`），避免渲染崩溃。
+
+### 7.2 Storefront（front）翻译资源
+
+front 指 `my-store-storefront/`。
+
+- 位置：`my-store-storefront/src/lib/i18n/**`
+- 新增/修改 UI 文案时：必须同时补齐至少 `en` 与 `zh-CN` 两套翻译（与现有字典保持一致）。
+- 变更检查：切换 locale 后同一页面不应出现“半中文/半英文”或 key 泄漏。
+
+### 7.3 Admin（后台）翻译资源
+
+- 位置：`my-store/src/admin/i18n/json/*.json`，并在 `my-store/src/admin/i18n/index.ts` 导出。
+- 新增/修改后台 UI 文案时：必须补齐至少 `en` 与 `zh-CN`。
+- key 约定：按业务域分组（例如 `homepage.*`、`courses.*`），禁止散落在顶层。
+
+### 7.4 API 层的 locale/site 语义必须文档化
+
+- 如 API 读取/依赖 locale（例如 `x-medusa-locale`）或站点上下文（例如 `site_key` / countryCode 映射），必须：
+  - 在 OpenAPI 中补充对应 header / 参数定义
+  - 在 examples 中体现 locale/site 的差异
+
+---
+
+## 八、最小化改动与可打开验证（强制）
+
+### 8.1 最小化模块原则
+
+- 新功能/修复必须尽量 **限定在最小模块与最小影响面** 内：优先新增/扩展单一 module、单一路由文件或单一前端数据函数。
+- 避免修改跨域公共工具、全局中间件、全局布局等高影响入口；确需修改时必须说明影响范围，并补充回归验证点。
+
+### 8.2 “能打开不报错”最低验证清单
+
+每次完成代码变更后，至少完成以下自检（按变更影响选择执行）：
+
+- 后端（`my-store/`）：`npm run build`
+- storefront（`my-store-storefront/`）：`npm run lint`（必要时再跑 `npm run build`）
+- 若改动涉及 API 文档：`npm run spec:lint`
+
+并进行人工冒烟验证（不得出现白屏/404/关键页面不可访问）：
+
+- storefront 首页、课程列表/详情、结账流程入口
+- Admin 核心页面（Products/Settings 等）以及本次新增/修改的自定义页面
+
+---
+
+## 九、Admin / Storefront 归属与技术栈边界（强制）
+
+### 9.1 归属规则
+
+- 后台 UI 功能：只能放在 `my-store/src/admin/**`
+- 后台 API：只能放在 `my-store/src/api/admin/**`
+- 前台（front）UI：只能放在 `my-store-storefront/src/**`
+- 前台（store）API：只能放在 `my-store/src/api/store/**`
+
+### 9.2 技术栈约束
+
+- 必须基于 Medusa v2 的模块化与路由扩展方式进行衍生实现（module/service/repository + store/admin routes）。
+- 不引入与当前架构冲突的新框架或“第二套后端/前端”实现方式；若确需新增依赖，必须说明原因与替代方案。
