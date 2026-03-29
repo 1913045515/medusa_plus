@@ -1,0 +1,79 @@
+ProductDetailResponse:
+  type: object
+  properties:
+    long_desc_html:
+      type: string
+      nullable: true
+      description: 产品长描述富文本 HTML（显示在下方全宽区域）
+      example: "<h2>产品特色</h2><p>详细的产品介绍内容。</p>"
+
+ProductDetailInput:
+  type: object
+  properties:
+    long_desc_html:
+      type: string
+      nullable: true
+      description: 产品长描述富文本 HTML（后端会做 XSS 过滤）
+      example: "<h2>About</h2><p>Detailed product description.</p>"
+
+ProductImageMeta:
+  type: object
+  properties:
+    id:
+      type: string
+      example: pimg_01
+    product_id:
+      type: string
+      example: prod_01
+    image_id:
+      type: string
+      example: img_01
+    is_main:
+      type: boolean
+      example: true
+    sort_order:
+      type: integer
+      example: 0
+    created_at:
+      type: string
+      format: date-time
+      example: "2026-03-29T10:00:00Z"
+    updated_at:
+      type: string
+      format: date-time
+      example: "2026-03-29T10:00:00Z"
+
+ProductImageMetaListResponse:
+  type: object
+  properties:
+    images:
+      type: array
+      items:
+        $ref: '#/ProductImageMeta'
+
+UpsertProductImageMetaItem:
+  type: object
+  required:
+    - image_id
+    - is_main
+    - sort_order
+  properties:
+    image_id:
+      type: string
+      example: img_01
+    is_main:
+      type: boolean
+      example: true
+    sort_order:
+      type: integer
+      example: 0
+
+UpsertProductImageMetaInput:
+  type: object
+  required:
+    - images
+  properties:
+    images:
+      type: array
+      items:
+        $ref: '#/UpsertProductImageMetaItem'

@@ -97,3 +97,41 @@ export function getCoursesDictionary(locale?: string | null): CoursesDictionary 
   if (!locale) return en
   return dictionaries[locale] ?? (locale.startsWith("zh") ? zh : en)
 }
+
+// ─── Product Detail Page Dictionary ──────────────────────────────────────────
+
+export type ProductDetailDictionary = {
+  productDetails: string
+  shortDescription: string
+  longDescription: string
+  previousImage: string
+  nextImage: string
+}
+
+const pdZh: ProductDetailDictionary = {
+  productDetails: "产品详情",
+  shortDescription: "短描述",
+  longDescription: "详细描述",
+  previousImage: "上一张",
+  nextImage: "下一张",
+}
+
+const pdEn: ProductDetailDictionary = {
+  productDetails: "Product Details",
+  shortDescription: "Short Description",
+  longDescription: "Long Description",
+  previousImage: "Previous",
+  nextImage: "Next",
+}
+
+const pdDictionaries: Record<string, ProductDetailDictionary> = {
+  "zh-CN": pdZh,
+  zh: pdZh,
+  en: pdEn,
+  "en-US": pdEn,
+}
+
+export function getProductDetailDictionary(locale?: string | null): ProductDetailDictionary {
+  if (!locale) return pdEn
+  return pdDictionaries[locale] ?? (locale.startsWith("zh") ? pdZh : pdEn)
+}

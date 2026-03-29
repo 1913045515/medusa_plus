@@ -5,7 +5,7 @@ export default {
 	en: {
 		translation: en,
 	},
-	zhCN: {
+	"zh-CN": {
 		translation: zhCN,
 	},
 }

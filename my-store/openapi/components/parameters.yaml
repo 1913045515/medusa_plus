@@ -42,3 +42,12 @@ SiteKeyQuery:
   schema:
     type: string
     example: us
+
+ProductIdParam:
+  name: id
+  in: path
+  required: true
+  description: Medusa 产品 ID
+  schema:
+    type: string
+    example: prod_01
