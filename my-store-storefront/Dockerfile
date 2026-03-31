@@ -5,10 +5,13 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
+# 切换 Alpine apk 为阿里云镜像加速
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 RUN apk add --no-cache libc6-compat
 
 COPY my-store-storefront/package.json my-store-storefront/package-lock.json* ./
-RUN npm ci
+RUN npm ci --registry=https://registry.npmmirror.com
 
 # ============================================================
 # Stage 2: Builder
@@ -35,6 +38,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8000
+
+# 切换 Alpine apk 为阿里云镜像加速
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk add --no-cache dumb-init
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs

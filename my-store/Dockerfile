@@ -5,12 +5,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# 切换 Alpine apk 为阿里云镜像加速
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # 安装构建依赖（node-gyp 等原生模块需要python/make）
 RUN apk add --no-cache python3 make g++
 
 # 先复制 package 文件利用 Docker 层缓存
 COPY my-store/package.json my-store/package-lock.json* ./
-RUN npm ci
+RUN npm ci --registry=https://registry.npmmirror.com
 
 # 复制源码并构建
 COPY my-store/ .
@@ -24,6 +27,9 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# 切换 Alpine apk 为阿里云镜像加速
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 # 安装运行时依赖
 RUN apk add --no-cache dumb-init
