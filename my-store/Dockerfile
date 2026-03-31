@@ -9,11 +9,11 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 # 先复制 package 文件利用 Docker 层缓存
-COPY package.json package-lock.json* ./
+COPY my-store/package.json my-store/package-lock.json* ./
 RUN npm ci
 
 # 复制源码并构建
-COPY . .
+COPY my-store/ .
 RUN npm run build
 
 # ============================================================

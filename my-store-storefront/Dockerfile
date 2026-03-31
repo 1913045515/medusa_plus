@@ -7,7 +7,7 @@ WORKDIR /app
 
 RUN apk add --no-cache libc6-compat
 
-COPY package.json package-lock.json* ./
+COPY my-store-storefront/package.json my-store-storefront/package-lock.json* ./
 RUN npm ci
 
 # ============================================================
@@ -18,7 +18,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY my-store-storefront/ .
 
 # next.config.js 中需要 output: 'standalone' 才能使用轻量镜像
 ENV NEXT_TELEMETRY_DISABLED=1
