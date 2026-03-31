@@ -155,5 +155,39 @@
     "lessonsUnit": "{{count}} 节课",
     "productLabel": "产品: {{id}}",
     "notFound": "课程不存在"
+  },
+  "productDetail": {
+    "sectionTitle": "产品描述编辑（富文本）",
+    "shortDescLabel": "描述",
+    "shortDescHint": "这是产品的基础描述字段（与基础信息中的描述字段相同），此处支持富文本格式，请在此编辑，而非使用上方的纯文本输入框。",
+    "longDescLabel": "详细描述",
+    "longDescHint": "在产品图片下方全宽展示的详细描述内容区域。",
+    "loading": "加载中...",
+    "save": "保存",
+    "saveSuccess": "描述已保存",
+    "saveError": "保存描述失败",
+    "visualMode": "可视化",
+    "htmlMode": "HTML 源码",
+    "bold": "加粗",
+    "italic": "斜体",
+    "underline": "下划线",
+    "bulletList": "无序列表",
+    "orderedList": "有序列表",
+    "quote": "引用",
+    "codeBlock": "代码块",
+    "insertTable": "插入表格",
+    "insertImage": "插入图片",
+    "insertLink": "插入链接",
+    "imageUrlPrompt": "图片地址",
+    "linkUrlPrompt": "链接地址"
+  },
+  "productImages": {
+    "sectionTitle": "产品图片管理",
+    "saveOrder": "保存排序",
+    "saveSuccess": "图片排序已保存",
+    "saveError": "保存排序失败",
+    "setAsMain": "设为主图",
+    "mainBadge": "主图",
+    "empty": "暂无图片"
   }
 }

@@ -1,0 +1,14 @@
+node_modules
+.medusa
+.next
+.git
+.env
+.env.*
+!.env.example
+npm-debug.log*
+*.log
+dist
+coverage
+.DS_Store
+Thumbs.db
+uploads

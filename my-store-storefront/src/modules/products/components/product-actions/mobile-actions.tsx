@@ -17,10 +17,11 @@ type MobileActionsProps = {
   options: Record<string, string | undefined>
   updateOptions: (title: string, value: string) => void
   inStock?: boolean
-  handleAddToCart: () => void
+  handleAddToCart: () => Promise<boolean>
   isAdding?: boolean
   show: boolean
   optionsDisabled: boolean
+  onAddedToCart?: () => void
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -33,6 +34,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   isAdding,
   show,
   optionsDisabled,
+  onAddedToCart,
 }) => {
   const { state, open, close } = useToggleState()
 
@@ -51,6 +53,15 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const isSimple = isSimpleProduct(product)
+
+  const handleMobileAddToCart = async () => {
+    const didAdd = await handleAddToCart()
+
+    if (didAdd) {
+      close()
+      onAddedToCart?.()
+    }
+  }
 
   return (
     <>
@@ -102,6 +113,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               "!grid-cols-1": isSimple
             })}>
               {!isSimple && <Button
+                type="button"
                 onClick={open}
                 variant="secondary"
                 className="w-full"
@@ -117,7 +129,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 </div>
               </Button>}
               <Button
-                onClick={handleAddToCart}
+                type="button"
+                onClick={handleMobileAddToCart}
                 disabled={!inStock || !variant}
                 className="w-full"
                 isLoading={isAdding}
@@ -164,6 +177,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 >
                   <div className="w-full flex justify-end pr-6">
                     <button
+                      type="button"
                       onClick={close}
                       className="bg-white w-12 h-12 rounded-full text-ui-fg-base flex justify-center items-center"
                       data-testid="close-modal-button"

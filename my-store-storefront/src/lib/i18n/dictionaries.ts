@@ -97,3 +97,78 @@ export function getCoursesDictionary(locale?: string | null): CoursesDictionary 
   if (!locale) return en
   return dictionaries[locale] ?? (locale.startsWith("zh") ? zh : en)
 }
+
+// ─── Product Detail Page Dictionary ──────────────────────────────────────────
+
+// ─── Cart Success Dialog Dictionary ──────────────────────────────────────────
+
+export type CartDictionary = {
+  added: string
+  addedDesc: (title: string) => string
+  viewCart: string
+  continue: string
+}
+
+const cartZh: CartDictionary = {
+  added: "已加入购物车",
+  addedDesc: (title: string) => `${title} 已成功加入购物车`,
+  viewCart: "查看购物车",
+  continue: "继续购物",
+}
+
+const cartEn: CartDictionary = {
+  added: "Added to cart",
+  addedDesc: (title: string) => `${title} was added to cart`,
+  viewCart: "View cart",
+  continue: "Continue shopping",
+}
+
+const cartDictionaries: Record<string, CartDictionary> = {
+  "zh-CN": cartZh,
+  zh: cartZh,
+  en: cartEn,
+  "en-US": cartEn,
+}
+
+export function getCartDictionary(locale?: string | null): CartDictionary {
+  if (!locale) return cartEn
+  return cartDictionaries[locale] ?? (locale.startsWith("zh") ? cartZh : cartEn)
+}
+
+// ─── Product Detail Page Dictionary ──────────────────────────────────────────
+
+export type ProductDetailDictionary = {
+  productDetails: string
+  shortDescription: string
+  longDescription: string
+  previousImage: string
+  nextImage: string
+}
+
+const pdZh: ProductDetailDictionary = {
+  productDetails: "产品详情",
+  shortDescription: "短描述",
+  longDescription: "详细描述",
+  previousImage: "上一张",
+  nextImage: "下一张",
+}
+
+const pdEn: ProductDetailDictionary = {
+  productDetails: "Product Details",
+  shortDescription: "Short Description",
+  longDescription: "Long Description",
+  previousImage: "Previous",
+  nextImage: "Next",
+}
+
+const pdDictionaries: Record<string, ProductDetailDictionary> = {
+  "zh-CN": pdZh,
+  zh: pdZh,
+  en: pdEn,
+  "en-US": pdEn,
+}
+
+export function getProductDetailDictionary(locale?: string | null): ProductDetailDictionary {
+  if (!locale) return pdEn
+  return pdDictionaries[locale] ?? (locale.startsWith("zh") ? pdZh : pdEn)
+}

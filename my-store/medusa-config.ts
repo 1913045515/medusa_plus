@@ -14,12 +14,18 @@ module.exports = defineConfig({
       jwtExpiresIn: "7d",
     }
   },
+  admin: {
+    disable: false,
+  },
   modules: [
     {
       resolve: "./src/modules/video",
     },
     {
       resolve: "./src/modules/course",
+    },
+    {
+      resolve: "./src/modules/product-detail",
     },
   ],
 })

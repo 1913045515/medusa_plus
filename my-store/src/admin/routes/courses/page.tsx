@@ -560,9 +560,8 @@ const CoursesPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "courseEditor.menuLabel",
+  label: "课程管理",
   icon: BookOpen,
-  translationNs: "translation",
 })
 
 export default CoursesPage
