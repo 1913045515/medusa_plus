@@ -58,3 +58,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "server.js"]
+
