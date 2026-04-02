@@ -39,6 +39,8 @@ COPY --from=builder /app/.medusa ./.medusa
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/medusa-config.ts ./medusa-config.ts
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/src ./src
 
 # 文件上传目录（宿主机挂载持久化）
 RUN mkdir -p /app/uploads && chown -R node:node /app/uploads

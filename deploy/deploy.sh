@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================
 # 一键生产部署脚本
+# 适用系统：Ubuntu Server 24.04 LTS
+# 依赖：docker compose v2（参考 docs/docker-install-ubuntu2404.md）
 # 用法：bash deploy.sh [IMAGE_TAG]
 #   IMAGE_TAG 可选，默认 latest；推荐传入 sha-xxxxxx 精确版本
 #
@@ -22,8 +24,8 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 
 # ── 前置检查 ────────────────────────────────────────────────
 [[ ! -f "${ENV_FILE}" ]] && error ".env 文件不存在，请先执行：cp .env.example .env 并填写配置"
-command -v docker &>/dev/null    || error "未找到 docker，请先安装"
-docker compose version &>/dev/null || error "未找到 docker compose v2"
+command -v docker &>/dev/null       || error "未找到 docker，请先安装（参考 docs/docker-install-ubuntu2404.md）"
+docker compose version &>/dev/null  || error "未找到 docker compose v2，请先安装 docker-compose-plugin"
 
 # ── 读取/覆盖 IMAGE_TAG ─────────────────────────────────────
 IMAGE_TAG="${1:-}"
@@ -66,23 +68,40 @@ check_cert "${DEPLOY_DIR}/nginx/ssl/store" "前端域名"
 
 # ── 拉取最新镜像 ────────────────────────────────────────────
 info "拉取最新镜像..."
-$COMPOSE pull admin storefront 2>&1 | grep -E "Pulling|pulled|up to date|error" || true
+$COMPOSE pull || warn "部分镜像拉取失败，将在启动时重试"
 
 # ── 启动/更新基础设施（postgres、redis）─────────────────────
 info "启动基础设施服务（postgres、redis）..."
 $COMPOSE up -d postgres redis
 
 info "等待数据库就绪..."
-timeout 60 bash -c "until $COMPOSE exec -T postgres pg_isready -U \$(grep POSTGRES_USER ${ENV_FILE} | cut -d= -f2) &>/dev/null; do sleep 2; done" \
-  || error "PostgreSQL 60s 内未就绪，请检查日志：docker compose logs postgres"
+PG_USER=$(grep '^POSTGRES_USER=' "${ENV_FILE}" | sed 's/^POSTGRES_USER=//' | tr -d '"' | tr -d "'")
+PG_READY=0
+for i in $(seq 1 30); do
+  if $COMPOSE exec -T postgres pg_isready -U "${PG_USER}" &>/dev/null; then
+    PG_READY=1
+    break
+  fi
+  sleep 2
+done
+[[ $PG_READY -eq 0 ]] && error "PostgreSQL 60s 内未就绪，请检查日志：$COMPOSE logs postgres"
+info "PostgreSQL 已就绪 ✓"
 
 # ── 滚动更新 admin ───────────────────────────────────────────
 info "部署 admin 服务..."
 $COMPOSE up -d --no-deps admin
 
 info "等待 admin 健康检查通过..."
-timeout 90 bash -c "until $COMPOSE exec -T admin wget -qO- http://localhost:9000/health &>/dev/null; do sleep 3; done" \
-  || { warn "admin 90s 内未通过健康检查，请查看日志：docker compose logs admin --tail=50"; }
+ADMIN_READY=0
+for i in $(seq 1 30); do
+  if $COMPOSE exec -T admin wget -qO- http://localhost:9000/health &>/dev/null; then
+    ADMIN_READY=1
+    break
+  fi
+  sleep 3
+done
+[[ $ADMIN_READY -eq 0 ]] && warn "admin 90s 内未通过健康检查，请查看日志：$COMPOSE logs admin --tail=50"
+[[ $ADMIN_READY -eq 1 ]] && info "admin 健康检查通过 ✓"
 
 # ── 运行数据库迁移 ───────────────────────────────────────────
 info "运行数据库迁移..."

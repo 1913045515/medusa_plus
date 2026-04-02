@@ -1,4 +1,4 @@
-# Docker 生产环境部署指南
+﻿# Docker 生产环境部署指南
 
 > 适用项目：`my-store`（Medusa 后端 + Admin）、`my-store-storefront`（Next.js 前端）
 > 基础设施：PostgreSQL + Redis + Nginx（SSL）
@@ -79,8 +79,8 @@ docker compose version    # Docker Compose version v2.x.x
 ### 2.2 初始化部署目录
 
 ```bash
-mkdir -p /opt/ai-cross-stand
-cd /opt/ai-cross-stand
+mkdir -p /home/opt/ai-cross-stand
+cd /home/opt/ai-cross-stand
 
 # 上传 deploy/ 目录下的所有文件到此处
 # 或通过 git clone 后进入 deploy/ 目录
@@ -285,15 +285,15 @@ sudo certbot certonly --standalone \
 ```bash
 # api 域名证书
 sudo cp /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem \
-        /opt/ai-cross-stand/deploy/nginx/ssl/api/fullchain.pem
+        /home/opt/ai-cross-stand/deploy/nginx/ssl/api/fullchain.pem
 sudo cp /etc/letsencrypt/live/api.yourdomain.com/privkey.pem \
-        /opt/ai-cross-stand/deploy/nginx/ssl/api/privkey.pem
+        /home/opt/ai-cross-stand/deploy/nginx/ssl/api/privkey.pem
 
 # 前端域名证书
 sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem \
-        /opt/ai-cross-stand/deploy/nginx/ssl/store/fullchain.pem
+        /home/opt/ai-cross-stand/deploy/nginx/ssl/store/fullchain.pem
 sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem \
-        /opt/ai-cross-stand/deploy/nginx/ssl/store/privkey.pem
+        /home/opt/ai-cross-stand/deploy/nginx/ssl/store/privkey.pem
 
 # 设置合适的文件权限
 chmod 644 deploy/nginx/ssl/**/*.pem
@@ -309,10 +309,10 @@ crontab -e
 
 # 添加以下内容（每天凌晨 3 点检查）
 0 3 * * * certbot renew --quiet && \
-  cp /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem /opt/ai-cross-stand/deploy/nginx/ssl/api/fullchain.pem && \
-  cp /etc/letsencrypt/live/api.yourdomain.com/privkey.pem /opt/ai-cross-stand/deploy/nginx/ssl/api/privkey.pem && \
-  cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem /opt/ai-cross-stand/deploy/nginx/ssl/store/fullchain.pem && \
-  cp /etc/letsencrypt/live/yourdomain.com/privkey.pem /opt/ai-cross-stand/deploy/nginx/ssl/store/privkey.pem && \
+  cp /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem /home/opt/ai-cross-stand/deploy/nginx/ssl/api/fullchain.pem && \
+  cp /etc/letsencrypt/live/api.yourdomain.com/privkey.pem /home/opt/ai-cross-stand/deploy/nginx/ssl/api/privkey.pem && \
+  cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem /home/opt/ai-cross-stand/deploy/nginx/ssl/store/fullchain.pem && \
+  cp /etc/letsencrypt/live/yourdomain.com/privkey.pem /home/opt/ai-cross-stand/deploy/nginx/ssl/store/privkey.pem && \
   docker exec $(docker ps -qf "name=nginx") nginx -s reload
 ```
 
@@ -447,7 +447,7 @@ sed -i 's/yourdomain\.com/你的前端域名/g' nginx/conf.d/storefront.conf
 ### 9.4 启动所有服务
 
 ```bash
-cd /opt/ai-cross-stand/deploy
+cd /home/opt/ai-cross-stand/deploy
 
 # 首次启动（等待基础设施服务就绪）
 docker compose up -d postgres redis
@@ -530,7 +530,7 @@ docker compose up -d --no-deps（零停机滚动更新）
 | `SERVER_HOST` | 服务器 IP 或域名 | 如 `123.123.123.123` |
 | `SERVER_USER` | SSH 用户名 | 如 `ubuntu` 或 `root` |
 | `SERVER_SSH_KEY` | SSH 私钥（PEM 格式完整内容） | 见下方说明 |
-| `SERVER_DEPLOY_PATH` | 服务器上 deploy 目录绝对路径 | 如 `/opt/ai-cross-stand/deploy` |
+| `SERVER_DEPLOY_PATH` | 服务器上 deploy 目录绝对路径 | 如 `/home/opt/ai-cross-stand/deploy` |
 
 #### Variables（明文，适合非敏感配置）
 
@@ -586,7 +586,7 @@ git push origin main
 
 ```bash
 # 进入 deploy/ 目录后执行
-cd /opt/ai-cross-stand/deploy
+cd /home/opt/ai-cross-stand/deploy
 
 # ── 查看服务状态 ────────────────────────────────────────────
 docker compose ps
