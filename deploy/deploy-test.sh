@@ -27,28 +27,7 @@ mkdir -p \
   "${DEPLOY_DIR}/data/postgres" \
   "${DEPLOY_DIR}/data/redis" \
   "${DEPLOY_DIR}/nginx/logs" \
-  "${DEPLOY_DIR}/nginx/ssl/api" \
-  "${DEPLOY_DIR}/nginx/ssl/store"
-
-# ── 检查 SSL 证书（测试环境自动生成自签名证书）──────────────
-check_cert() {
-  local dir="$1" name="$2"
-  if [[ ! -f "${dir}/fullchain.pem" || ! -f "${dir}/privkey.pem" ]]; then
-    warn "SSL 证书缺失：${dir}/ 下无 fullchain.pem 或 privkey.pem"
-    info "测试环境自动生成自签名证书..."
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-      -keyout "${dir}/privkey.pem" \
-      -out "${dir}/fullchain.pem" \
-      -subj "/CN=localhost" \
-      2>/dev/null \
-      && info "自签名证书 [${name}] 已生成 ✓" \
-      || warn "自签名证书生成失败，Nginx HTTPS 可能无法启动"
-  else
-    info "SSL 证书 [${name}] 存在 ✓"
-  fi
-}
-check_cert "${DEPLOY_DIR}/nginx/ssl/api"   "api 域名"
-check_cert "${DEPLOY_DIR}/nginx/ssl/store" "前端域名"
+  "${DEPLOY_DIR}/uploads"
 
 # ── 拉取基础设施镜像（无需认证）────────────────────────────
 info "拉取基础设施镜像..."
@@ -74,9 +53,12 @@ else
   fi
 fi
 
-# ── 拉取 Admin 镜像 ─────────────────────────────────────────
+# ── 拉取业务镜像 ────────────────────────────────────────────
 info "拉取 Admin 镜像..."
 $COMPOSE pull admin || warn "Admin 镜像拉取失败，请检查仓库登录状态"
+
+info "拉取 Storefront 镜像..."
+$COMPOSE pull storefront || warn "Storefront 镜像拉取失败，请检查仓库登录状态"
 
 # ── 启动基础设施 ────────────────────────────────────────────
 info "启动基础设施服务（postgres、redis）..."
@@ -136,13 +118,32 @@ else
   warn "Admin 30s 内未通过健康检查，请查看日志：$COMPOSE logs admin --tail=50"
 fi
 
+# ── 启动 Storefront ─────────────────────────────────────────
+info "启动 Storefront 服务..."
+$COMPOSE up -d storefront
+
+info "等待 Storefront 就绪..."
+SFRONT_READY=0
+for i in $(seq 1 15); do
+  if $COMPOSE exec -T storefront wget -qO- http://localhost:8000 &>/dev/null; then
+    SFRONT_READY=1
+    break
+  fi
+  sleep 3
+done
+if [[ $SFRONT_READY -eq 1 ]]; then
+  info "Storefront 已就绪 ✓"
+else
+  warn "Storefront 45s 内未通过健康检查，请查看日志：$COMPOSE logs storefront --tail=50"
+fi
+
 # ── 启动 Nginx ──────────────────────────────────────────────
 info "启动 Nginx..."
 if $COMPOSE up -d nginx; then
   info "Nginx 启动成功 ✓"
 else
   warn "Nginx 启动失败，请检查日志：$COMPOSE logs nginx"
-  warn "其他服务仍正常运行，可继续开发"
+  warn "其他服务仍正常运行，可继续访问"
 fi
 
 # ── 结果汇总 ────────────────────────────────────────────────
@@ -150,12 +151,13 @@ echo ""
 info "====== 测试环境部署完成 ======"
 $COMPOSE ps
 echo ""
-info "PostgreSQL 已暴露端口 5432，可通过外部工具连接"
-info "Redis     已暴露端口 6379，可通过外部工具连接"
-info "Admin     已暴露端口 9000"
-info "Nginx     监听端口 80/443"
+info "PostgreSQL  已暴露端口 5432，可通过外部工具连接"
+info "Redis       已暴露端口 6379，可通过外部工具连接"
+info "Admin       已暴露端口 9000  → http://170.106.111.51:9000/app"
+info "Storefront  内部 8000，通过 Nginx 对外暴露"
+info "Nginx       监听端口 80     → http://170.106.111.51/"
 echo ""
 info "常用命令："
-info "  查看日志：$COMPOSE logs -f [postgres|redis|nginx]"
+info "  查看日志：docker compose ... logs -f [postgres|redis|admin|storefront|nginx]"
 info "  停止服务：$COMPOSE down"
 info "  清除数据：$COMPOSE down -v && rm -rf ${DEPLOY_DIR}/data"
