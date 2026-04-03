@@ -34,16 +34,11 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 # 安装运行时依赖
 RUN apk add --no-cache dumb-init
 
-# 复制构建产物和依赖
-COPY --from=builder /app/.medusa ./.medusa
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/medusa-config.ts ./medusa-config.ts
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
-COPY --from=builder /app/src ./src
+# 复制构建产物和全部依赖（避免遗漏 .medusa/build admin UI 等文件）
+COPY --from=builder /app /app
 
 # 文件上传目录（宿主机挂载持久化）
-RUN mkdir -p /app/uploads && chown -R node:node /app/uploads
+RUN mkdir -p /app/uploads && chown -R node:node /app/uploads /app/.medusa
 
 # 以非 root 用户运行，提升安全性
 USER node
@@ -52,4 +47,6 @@ EXPOSE 9000
 
 # dumb-init 作为 PID 1，正确处理信号
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["npm", "run", "start"]
+# medusa build 将 admin UI 输出到 .medusa/server/public/admin/
+# medusa start 从 process.cwd() 查找 ./public/admin，因此需从 .medusa/server/ 目录启动
+CMD ["sh", "-c", "cd /app/.medusa/server && /app/node_modules/.bin/medusa start"]

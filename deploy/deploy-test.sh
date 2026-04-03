@@ -118,6 +118,9 @@ info "Redis 已就绪 ✓"
 info "启动 Admin 服务..."
 $COMPOSE up -d admin
 
+info "等待 Admin 容器启动..."
+sleep 5
+
 info "等待 Admin 就绪..."
 ADMIN_READY=0
 for i in $(seq 1 10); do
