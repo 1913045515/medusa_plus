@@ -48,6 +48,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8000
+ENV HOSTNAME=0.0.0.0
 
 # 切换 Alpine apk 为阿里云镜像加速
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
