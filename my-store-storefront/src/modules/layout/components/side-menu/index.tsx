@@ -129,7 +129,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                         />
                       </div>
                       <Text className="txt-compact-small text-ui-fg-subtle/90">
-                        © {new Date().getFullYear()} Medusa Store. All rights
+                        © {new Date().getFullYear()} wolzq. All rights
                         reserved.
                       </Text>
                       </div>
