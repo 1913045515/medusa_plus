@@ -10,7 +10,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk add --no-cache libc6-compat
 
-COPY my-store-storefront/package.json my-store-storefront/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci --registry=https://registry.npmmirror.com
 
 # ============================================================
@@ -21,7 +21,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY my-store-storefront/ .
+COPY . .
 
 # next.config.js 中需要 output: 'standalone' 才能使用轻量镜像
 ENV NEXT_TELEMETRY_DISABLED=1

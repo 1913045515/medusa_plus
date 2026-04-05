@@ -68,6 +68,7 @@ export default function ImageCarousel({ images, dict }: ImageCarouselProps) {
                   alt={`Product image ${idx + 1}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
+                  unoptimized
                   className="object-cover"
                   priority={idx === 0}
                 />
@@ -114,6 +115,7 @@ export default function ImageCarousel({ images, dict }: ImageCarouselProps) {
                   alt={`Thumbnail ${idx + 1}`}
                   fill
                   sizes="64px"
+                  unoptimized
                   className="object-cover"
                 />
               </div>

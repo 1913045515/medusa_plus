@@ -35,14 +35,18 @@ const nextConfig = {
         protocol: "http",
         hostname: "127.0.0.1",
       },
-      // 生产环境：允许任意 hostname（通过 nginx 代理的图片）
+      // 生产环境：明确允许后台与前台域名
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "admin.wolzq.com",
       },
       {
-        protocol: "http",
-        hostname: "**",
+        protocol: "https",
+        hostname: "www.wolzq.com",
+      },
+      {
+        protocol: "https",
+        hostname: "wolzq.com",
       },
       {
         protocol: "https",
