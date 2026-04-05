@@ -54,8 +54,9 @@ services:
   admin:
     image: hkccr.ccs.tencentyun.com/website-pro/medusa_plus_pro:${IMAGE_TAG:-latest}
     restart: unless-stopped
-    ports:
-      - "9000:9000"
+    # admin 端口不对外暴露，仅 nginx/storefront 通过 Docker 内网访问
+    # ports:
+    #   - "9000:9000"
     environment:
       NODE_ENV: test
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -84,8 +85,9 @@ services:
   storefront:
     image: hkccr.ccs.tencentyun.com/website-pro/medusa_plus_front_pro:${IMAGE_TAG:-latest}
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # storefront 端口不对外暴露，仅 nginx 通过 Docker 内网访问
+    # ports:
+    #   - "8000:8000"
     environment:
       NODE_ENV: test
       MEDUSA_BACKEND_URL: http://admin:9000

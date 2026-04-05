@@ -7,6 +7,10 @@ import { getProductDetailDictionary } from "@lib/i18n/dictionaries"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 
+// 产品详情页依赖 cookies()（通过 getRegion → listRegions → getCacheOptions），
+// 必须强制动态渲染，否则 Next.js 静态预渲染时会抛 DYNAMIC_SERVER_USAGE
+export const dynamic = "force-dynamic"
+
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
   searchParams: Promise<{ v_id?: string }>
