@@ -59,6 +59,7 @@ services:
       STORE_CORS: ${STORE_CORS}
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
+      BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
     volumes:
       # 上传文件持久化到宿主机
       - ./uploads:/app/uploads
@@ -107,6 +108,8 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       # 访问日志持久化
       - ./nginx/logs:/var/log/nginx
+      # 上传文件（由 nginx 直接提供静态服务）
+      - ./uploads:/var/uploads:ro
     depends_on:
       - admin
       - storefront

@@ -66,6 +66,7 @@ services:
       STORE_CORS: ${STORE_CORS}
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
+      BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
     volumes:
       - ./uploads:/app/uploads
     depends_on:
@@ -119,6 +120,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/logs:/var/log/nginx
+      - ./uploads:/var/uploads:ro
     depends_on:
       - storefront
       - admin
