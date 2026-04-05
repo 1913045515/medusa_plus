@@ -82,14 +82,16 @@ services:
 
   # ─────────────────── Next.js 前端 (Storefront) ───────────────────
   storefront:
-    image: hkccr.ccs.tencentyun.com/website-pro/medusa_storefront:${IMAGE_TAG:-latest}
+    image: hkccr.ccs.tencentyun.com/website-pro/medusa_plus_front_pro:${IMAGE_TAG:-latest}
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     environment:
-      NODE_ENV: production
-      HOSTNAME: "0.0.0.0"
+      NODE_ENV: test
+      MEDUSA_BACKEND_URL: http://admin:9000
       NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL}
       NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
-      NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-cn}
+      NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-us}
       NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
     depends_on:
@@ -109,10 +111,11 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # 测试环境只加载 test.conf（HTTP Only，不需要 SSL）
-      - ./nginx/conf.d/test.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/logs:/var/log/nginx
     depends_on:
       - storefront

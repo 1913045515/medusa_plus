@@ -44,8 +44,7 @@ if [[ -n "${REGISTRY_PASS}" ]]; then
     || warn "镜像仓库登录失败，请检查 TENCENT_REGISTRY_PASSWORD 是否正确"
 else
   # 尝试检测是否已有缓存凭据
-  if docker pull "${REGISTRY_HOST}/website-pro/medusa_plus_pro:latest" --dry-run &>/dev/null 2>&1 || \
-     grep -q "${REGISTRY_HOST}" ~/.docker/config.json 2>/dev/null; then
+  if grep -q "${REGISTRY_HOST}" ~/.docker/config.json 2>/dev/null; then
     info "使用已缓存的 docker 登录凭据"
   else
     warn "未在 .env 中找到 TENCENT_REGISTRY_PASSWORD 且无缓存凭据"
