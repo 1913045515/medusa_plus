@@ -1,22 +1,19 @@
 # ==============================================================
-# Docker Compose 测试环境部署配置
-# 用法：docker compose --env-file .env -f docker-compose.test.yml up -d
-# 说明：部署 PostgreSQL、Redis、Nginx、Admin、Storefront
+# Docker Compose 生产环境部署配置（Docker Hub 官方基础镜像备份）
+# 用法：docker compose --env-file .env -f docker-compose.dockerhub-backup.yml up -d
+# 说明：仅基础设施镜像使用 Docker Hub 官方地址，业务镜像仍使用腾讯云 TCR
 # ==============================================================
 
 services:
 
   # ─────────────────── PostgreSQL ───────────────────
   postgres:
-    image: hkccr.ccs.tencentyun.com/website-pro/postgresql:16-alpine
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      # 测试环境暴露端口便于外部连接调试
-      - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
@@ -29,7 +26,7 @@ services:
 
   # ─────────────────── Redis ───────────────────
   redis:
-    image: hkccr.ccs.tencentyun.com/website-pro/redis:7-alpine
+    image: redis:7-alpine
     restart: unless-stopped
     command: >
       redis-server
@@ -37,9 +34,6 @@ services:
       --appendonly yes
       --appendfilename appendonly.aof
       --appendfsync everysec
-    ports:
-      # 测试环境暴露端口便于外部连接调试
-      - "6379:6379"
     volumes:
       - ./data/redis:/data
     networks:
@@ -54,11 +48,8 @@ services:
   admin:
     image: hkccr.ccs.tencentyun.com/website-pro/medusa_plus_pro:${IMAGE_TAG:-latest}
     restart: unless-stopped
-    # admin 端口不对外暴露，仅 nginx/storefront 通过 Docker 内网访问
-    # ports:
-    #   - "9000:9000"
     environment:
-      NODE_ENV: test
+      NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       JWT_SECRET: ${JWT_SECRET}
@@ -86,31 +77,21 @@ services:
   storefront:
     image: hkccr.ccs.tencentyun.com/website-pro/medusa_plus_front_pro:${IMAGE_TAG:-latest}
     restart: unless-stopped
-    # storefront 端口不对外暴露，仅 nginx 通过 Docker 内网访问
-    # ports:
-    #   - "8000:8000"
     environment:
-      NODE_ENV: test
-      MEDUSA_BACKEND_URL: http://admin:9000
+      NODE_ENV: production
       NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL}
       NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
-      NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-us}
-      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
+      NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-cn}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
     depends_on:
       admin:
         condition: service_healthy
     networks:
       - internal
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # ─────────────────── Nginx 反向代理 ───────────────────
   nginx:
-    image: hkccr.ccs.tencentyun.com/website-pro/nginx:1.27-alpine
+    image: nginx:1.27-alpine
     restart: unless-stopped
     ports:
       - "80:80"
@@ -122,8 +103,8 @@ services:
       - ./nginx/logs:/var/log/nginx
       - ./uploads:/var/uploads:ro
     depends_on:
-      - storefront
       - admin
+      - storefront
     networks:
       - internal
 
