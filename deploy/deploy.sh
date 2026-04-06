@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================
-# 一键生产部署脚本
+# 测试环境一键部署脚本（PostgreSQL + Redis + Nginx + Admin）
 # 适用系统：Ubuntu Server 24.04 LTS
-# 依赖：docker compose v2（参考 docs/docker-install-ubuntu2404.md）
-# 用法：bash deploy.sh [IMAGE_TAG]
-#   IMAGE_TAG 可选，默认 latest；推荐传入 sha-xxxxxx 精确版本
-#
-# 示例：
-#   bash deploy.sh                  # 部署 latest
-#   bash deploy.sh sha-abc1234      # 部署指定版本
+# 用法：bash deploy-test.sh
 # ==============================================================
 set -euo pipefail
 
@@ -23,108 +17,146 @@ warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 
 # ── 前置检查 ────────────────────────────────────────────────
-[[ ! -f "${ENV_FILE}" ]] && error ".env 文件不存在，请先执行：cp .env.example .env 并填写配置"
+[[ ! -f "${ENV_FILE}" ]] && error ".env 文件不存在，请先执行：cp .env.test.example .env 并填写配置"
 command -v docker &>/dev/null       || error "未找到 docker，请先安装（参考 docs/docker-install-ubuntu2404.md）"
-docker compose version &>/dev/null  || error "未找到 docker compose v2，请先安装 docker-compose-plugin"
-
-# ── 读取/覆盖 IMAGE_TAG ─────────────────────────────────────
-IMAGE_TAG="${1:-}"
-if [[ -n "${IMAGE_TAG}" ]]; then
-  # 追加或更新 .env 中的 IMAGE_TAG
-  if grep -q "^IMAGE_TAG=" "${ENV_FILE}"; then
-    sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" "${ENV_FILE}"
-  else
-    echo "IMAGE_TAG=${IMAGE_TAG}" >> "${ENV_FILE}"
-  fi
-  info "使用镜像版本：${IMAGE_TAG}"
-else
-  IMAGE_TAG=$(grep "^IMAGE_TAG=" "${ENV_FILE}" | cut -d= -f2 || echo "latest")
-  info "使用 .env 中的镜像版本：${IMAGE_TAG}"
-fi
+docker compose version &>/dev/null  || error "未找到 docker compose v2，请先安装"
 
 # ── 创建必要目录 ────────────────────────────────────────────
 info "检查持久化目录..."
 mkdir -p \
   "${DEPLOY_DIR}/data/postgres" \
   "${DEPLOY_DIR}/data/redis" \
-  "${DEPLOY_DIR}/uploads" \
   "${DEPLOY_DIR}/nginx/logs" \
-  "${DEPLOY_DIR}/nginx/ssl/api" \
-  "${DEPLOY_DIR}/nginx/ssl/store"
+  "${DEPLOY_DIR}/uploads"
 
-# ── 检查 SSL 证书 ───────────────────────────────────────────
-check_cert() {
-  local dir="$1" name="$2"
-  if [[ ! -f "${dir}/fullchain.pem" || ! -f "${dir}/privkey.pem" ]]; then
-    warn "SSL 证书缺失：${dir}/ 下无 fullchain.pem 或 privkey.pem"
-    warn "请参考 docs/infrastructure-docker.md 中的证书申请章节"
-    warn "跳过证书检查，Nginx 可能无法启动"
+# ── 拉取基础设施镜像（无需认证）────────────────────────────
+info "拉取基础设施镜像..."
+$COMPOSE pull postgres redis nginx || warn "部分基础设施镜像拉取失败"
+
+# ── 登录腾讯云镜像仓库 ──────────────────────────────────────
+REGISTRY_HOST="hkccr.ccs.tencentyun.com"
+REGISTRY_USER="${TENCENT_REGISTRY_USER:-100003146322}"
+REGISTRY_PASS=$(grep '^TENCENT_REGISTRY_PASSWORD=' "${ENV_FILE}" | sed 's/^TENCENT_REGISTRY_PASSWORD=//' | tr -d '"' | tr -d "'" || true)
+if [[ -n "${REGISTRY_PASS}" ]]; then
+  info "登录腾讯云镜像仓库..."
+  echo "${REGISTRY_PASS}" | docker login "${REGISTRY_HOST}" --username="${REGISTRY_USER}" --password-stdin 2>&1 \
+    && info "腾讯云镜像仓库登录成功 ✓" \
+    || warn "镜像仓库登录失败，请检查 TENCENT_REGISTRY_PASSWORD 是否正确"
+else
+  # 尝试检测是否已有缓存凭据
+  if grep -q "${REGISTRY_HOST}" ~/.docker/config.json 2>/dev/null; then
+    info "使用已缓存的 docker 登录凭据"
   else
-    info "SSL 证书 [${name}] 存在 ✓"
+    warn "未在 .env 中找到 TENCENT_REGISTRY_PASSWORD 且无缓存凭据"
+    warn "请在 .env 中添加 TENCENT_REGISTRY_PASSWORD=<密码> 或手动执行: docker login ${REGISTRY_HOST} --username=${REGISTRY_USER}"
   fi
-}
-check_cert "${DEPLOY_DIR}/nginx/ssl/api"   "api 域名"
-check_cert "${DEPLOY_DIR}/nginx/ssl/store" "前端域名"
+fi
 
-# ── 拉取最新镜像 ────────────────────────────────────────────
-info "拉取最新镜像..."
-$COMPOSE pull || warn "部分镜像拉取失败，将在启动时重试"
+# ── 拉取业务镜像 ────────────────────────────────────────────
+info "拉取 Admin 镜像..."
+$COMPOSE pull admin || warn "Admin 镜像拉取失败，请检查仓库登录状态"
 
-# ── 启动/更新基础设施（postgres、redis）─────────────────────
+info "拉取 Storefront 镜像..."
+$COMPOSE pull storefront || warn "Storefront 镜像拉取失败，请检查仓库登录状态"
+
+# ── 启动基础设施 ────────────────────────────────────────────
 info "启动基础设施服务（postgres、redis）..."
 $COMPOSE up -d postgres redis
 
-info "等待数据库就绪..."
-PG_USER=$(grep '^POSTGRES_USER=' "${ENV_FILE}" | sed 's/^POSTGRES_USER=//' | tr -d '"' | tr -d "'")
+info "等待 PostgreSQL 就绪..."
 PG_READY=0
 for i in $(seq 1 30); do
-  if $COMPOSE exec -T postgres pg_isready -U "${PG_USER}" &>/dev/null; then
+  STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_DIR}/docker-compose.yml" ps -q postgres 2>/dev/null)" 2>/dev/null || echo "")
+  if [[ "${STATUS}" == "healthy" ]]; then
     PG_READY=1
     break
   fi
   sleep 2
 done
-[[ $PG_READY -eq 0 ]] && error "PostgreSQL 60s 内未就绪，请检查日志：$COMPOSE logs postgres"
+if [[ $PG_READY -eq 0 ]]; then
+  $COMPOSE logs --tail=20 postgres
+  error "PostgreSQL 60s 内未就绪"
+fi
 info "PostgreSQL 已就绪 ✓"
 
-# ── 滚动更新 admin ───────────────────────────────────────────
-info "部署 admin 服务..."
-$COMPOSE up -d --no-deps admin
+info "等待 Redis 就绪..."
+REDIS_READY=0
+for i in $(seq 1 15); do
+  STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_DIR}/docker-compose.yml" ps -q redis 2>/dev/null)" 2>/dev/null || echo "")
+  if [[ "${STATUS}" == "healthy" ]]; then
+    REDIS_READY=1
+    break
+  fi
+  sleep 2
+done
+if [[ $REDIS_READY -eq 0 ]]; then
+  $COMPOSE logs --tail=20 redis
+  error "Redis 30s 内未就绪"
+fi
+info "Redis 已就绪 ✓"
 
-info "等待 admin 健康检查通过..."
+# ── 启动 Admin ──────────────────────────────────────────────
+info "启动 Admin 服务..."
+$COMPOSE up -d admin
+
+info "等待 Admin 容器启动..."
+sleep 5
+
+info "等待 Admin 就绪..."
 ADMIN_READY=0
-for i in $(seq 1 30); do
+for i in $(seq 1 10); do
   if $COMPOSE exec -T admin wget -qO- http://localhost:9000/health &>/dev/null; then
     ADMIN_READY=1
     break
   fi
   sleep 3
 done
-[[ $ADMIN_READY -eq 0 ]] && warn "admin 90s 内未通过健康检查，请查看日志：$COMPOSE logs admin --tail=50"
-[[ $ADMIN_READY -eq 1 ]] && info "admin 健康检查通过 ✓"
-
-# ── 运行数据库迁移 ───────────────────────────────────────────
-info "运行数据库迁移..."
-$COMPOSE exec -T admin npx medusa migrations run \
-  && info "迁移完成 ✓" \
-  || warn "迁移命令返回非零，请手动确认：docker compose exec admin npx medusa migrations run"
-
-# ── 滚动更新 storefront ──────────────────────────────────────
-info "部署 storefront 服务..."
-$COMPOSE up -d --no-deps storefront
-
-# ── 更新/重载 nginx ──────────────────────────────────────────
-info "更新 nginx..."
-if $COMPOSE ps nginx | grep -q "Up"; then
-  $COMPOSE exec -T nginx nginx -t && $COMPOSE exec -T nginx nginx -s reload \
-    && info "Nginx 配置重载 ✓"
+if [[ $ADMIN_READY -eq 1 ]]; then
+  info "Admin 已就绪 ✓"
 else
-  $COMPOSE up -d nginx
+  warn "Admin 30s 内未通过健康检查，请查看日志：$COMPOSE logs admin --tail=50"
+fi
+
+# ── 启动 Storefront ─────────────────────────────────────────
+info "启动 Storefront 服务..."
+$COMPOSE up -d storefront
+
+info "等待 Storefront 就绪..."
+SFRONT_READY=0
+for i in $(seq 1 15); do
+  if $COMPOSE exec -T storefront wget -qO- http://localhost:8000 &>/dev/null; then
+    SFRONT_READY=1
+    break
+  fi
+  sleep 3
+done
+if [[ $SFRONT_READY -eq 1 ]]; then
+  info "Storefront 已就绪 ✓"
+else
+  warn "Storefront 45s 内未通过健康检查，请查看日志：$COMPOSE logs storefront --tail=50"
+fi
+
+# ── 启动 Nginx ──────────────────────────────────────────────
+info "启动 Nginx..."
+if $COMPOSE up -d nginx; then
+  info "Nginx 启动成功 ✓"
+else
+  warn "Nginx 启动失败，请检查日志：$COMPOSE logs nginx"
+  warn "其他服务仍正常运行，可继续访问"
 fi
 
 # ── 结果汇总 ────────────────────────────────────────────────
 echo ""
-info "====== 部署完成 ======"
+info "====== 测试环境部署完成 ======"
 $COMPOSE ps
 echo ""
-info "查看日志：docker compose logs -f [admin|storefront|nginx]"
+info "PostgreSQL  已暴露端口 5432，可通过外部工具连接"
+info "Redis       已暴露端口 6379，可通过外部工具连接"
+info "Admin       已暴露端口 9000  → https://admin.wolzq.com/app"
+info "Storefront  内部 8000，通过 Nginx 对外暴露"
+info "Nginx       监听端口 80     → https://www.wolzq.com"
+echo ""
+info "常用命令："
+info "  查看日志：docker compose ... logs -f [postgres|redis|admin|storefront|nginx]"
+info "  停止服务：$COMPOSE down"
+info "  清除数据：$COMPOSE down -v && rm -rf ${DEPLOY_DIR}/data"
