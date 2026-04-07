@@ -79,6 +79,13 @@ if [[ $PG_READY -eq 0 ]]; then
 fi
 info "PostgreSQL 已就绪 ✓"
 
+# ── 初始化业务数据库与基础数据 ─────────────────────────────
+info "检查并初始化 medusa-my-store 数据库..."
+bash "${DEPLOY_DIR}/ensure-medusa-db.sh" "medusa-my-store"
+
+info "按缺失表导入 dump-medusa-my-store.sql ..."
+bash "${DEPLOY_DIR}/import-medusa-dump-if-missing-tables.sh" "medusa-my-store"
+
 info "等待 Redis 就绪..."
 REDIS_READY=0
 for i in $(seq 1 15); do
