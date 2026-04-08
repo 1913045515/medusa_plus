@@ -6,10 +6,13 @@ import type { CourseRecord } from "../types"
 
 const makeCourse = (overrides: Partial<CourseRecord> = {}): CourseRecord => ({
   id: "course_1",
+  product_id: null,
   handle: "test-course",
   title: "Test Course",
   description: null,
+  translations: null,
   thumbnail_url: null,
+  thumbnail_asset: null,
   level: "beginner",
   lessons_count: 0,
   status: "published",
@@ -41,7 +44,7 @@ describe("CourseService", () => {
       const result = await service.listCourses()
 
       expect(repo.findAll).toHaveBeenCalledWith(undefined)
-      expect(result).toEqual([course])
+      expect(result).toEqual([{ ...course, locale: null }])
     })
 
     it("passes filters to repository", async () => {
@@ -62,7 +65,7 @@ describe("CourseService", () => {
 
       const result = await service.getCourse("course_1")
 
-      expect(result).toEqual(course)
+      expect(result).toEqual({ ...course, locale: null })
     })
 
     it("returns null when not found", async () => {
@@ -79,7 +82,7 @@ describe("CourseService", () => {
 
       const result = await service.getCourseByHandle("test-course")
 
-      expect(result).toEqual(course)
+      expect(result).toEqual({ ...course, locale: null })
     })
   })
 
@@ -90,10 +93,13 @@ describe("CourseService", () => {
       const service = new CourseService(repo)
 
       const input = {
+        product_id: null,
         handle: "new-course",
         title: "New Course",
         description: null,
+        translations: null,
         thumbnail_url: null,
+        thumbnail_asset: null,
         level: null,
         lessons_count: 0,
         status: "published",

@@ -5,6 +5,7 @@ export type Course = {
   description: string
   locale?: string | null
   thumbnail_url: string | null
+  thumbnail_url_expires_at?: string | null
   level?: string
   lessons_count?: number
   status?: string

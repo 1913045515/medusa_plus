@@ -5,15 +5,22 @@ import type {
   UpdateLessonInput,
   ListLessonsFilters,
   LocalizedLessonRecord,
+  StoreLessonRecord,
+  StoredS3MediaAsset,
+  SignedMediaAsset,
 } from "../types"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import type { CourseMediaService } from "./media-asset.service"
 
 // ─── LessonService ────────────────────────────────────────────────────────────
 // 依赖 ILessonRepository 接口，不关心底层是静态 JSON 还是 ORM。
 // 切换数据库时：构造函数注入不同的 Repository 实现即可。
 
 export class LessonService {
-  constructor(private readonly lessonRepo: ILessonRepository) {}
+  constructor(
+    private readonly lessonRepo: ILessonRepository,
+    private readonly mediaService?: Pick<CourseMediaService, "isConfigured" | "sign">
+  ) {}
 
   private resolveLocaleText(record: LessonRecord, locale?: string | null): LocalizedLessonRecord {
     const normalizedLocale = locale?.trim() || null
@@ -43,6 +50,32 @@ export class LessonService {
   async getLesson(id: string, locale?: string | null): Promise<LocalizedLessonRecord | null> {
     const item = await this.lessonRepo.findById(id)
     return item ? this.resolveLocaleText(item, locale) : null
+  }
+
+  private async signMediaAsset(asset: StoredS3MediaAsset | null): Promise<SignedMediaAsset | null> {
+    if (!asset || !this.mediaService?.isConfigured()) {
+      return null
+    }
+
+    return await this.mediaService.sign(asset)
+  }
+
+  async serializeStoreLesson(lesson: LocalizedLessonRecord): Promise<StoreLessonRecord> {
+    const signedThumbnail = await this.signMediaAsset(lesson.thumbnail_asset)
+    const { thumbnail_asset: _thumbnailAsset, video_asset: _videoAsset, ...rest } = lesson
+
+    return {
+      ...rest,
+      thumbnail_url: lesson.thumbnail_asset
+        ? signedThumbnail?.url ?? null
+        : lesson.thumbnail_url,
+      thumbnail_url_expires_at: signedThumbnail?.expires_at ?? null,
+      video_url: null,
+    }
+  }
+
+  async serializeStoreLessons(lessons: LocalizedLessonRecord[]): Promise<StoreLessonRecord[]> {
+    return await Promise.all(lessons.map((lesson) => this.serializeStoreLesson(lesson)))
   }
 
   async createLesson(input: CreateLessonInput): Promise<LessonRecord> {
@@ -78,38 +111,57 @@ export class LessonService {
     customerId: string | null,
     hasPurchasedFn: (customerId: string, courseId: string) => Promise<boolean>
   ): Promise<
-    | { ok: true; video_url: string }
+    | {
+        ok: true
+        video_url: string
+        video_url_expires_at?: string
+        video_url_expires_in_seconds?: number
+      }
     | { ok: false; code: 401 | 403; message: string }
   > {
     const lesson = await this.lessonRepo.findById(lessonId)
-    console.log("[resolvePlayUrl] lessonId=", lessonId, "lesson=", lesson ? { id: lesson.id, is_free: lesson.is_free, course_id: lesson.course_id } : null)
 
     if (!lesson) {
       return { ok: false, code: 403, message: "Lesson not found" }
     }
 
-    // 免费集：直接返回
     if (lesson.is_free) {
-      console.log("[resolvePlayUrl] is_free=true, bypassing purchase check")
-      return { ok: true, video_url: lesson.video_url ?? "" }
+      const signedVideo = await this.signMediaAsset(lesson.video_asset)
+
+      if (lesson.video_asset && !signedVideo) {
+        return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试" }
+      }
+
+      return {
+        ok: true,
+        video_url: signedVideo?.url ?? lesson.video_url ?? "",
+        video_url_expires_at: signedVideo?.expires_at,
+        video_url_expires_in_seconds: signedVideo?.expires_in_seconds,
+      }
     }
 
-    // 付费集：未登录
     if (!customerId) {
-      console.log("[resolvePlayUrl] is_free=false, customerId=null → 401")
       return { ok: false, code: 401, message: "请先登录" }
     }
 
-    // 付费集：已登录，检查是否购买
-    console.log("[resolvePlayUrl] is_free=false, customerId=", customerId, "course_id=", lesson.course_id, "→ checking purchase...")
     const purchased = await hasPurchasedFn(customerId, lesson.course_id)
-    console.log("[resolvePlayUrl] purchased=", purchased)
 
     if (!purchased) {
       return { ok: false, code: 403, message: "请先购买课程" }
     }
 
-    return { ok: true, video_url: lesson.video_url ?? "" }
+    const signedVideo = await this.signMediaAsset(lesson.video_asset)
+
+    if (lesson.video_asset && !signedVideo) {
+      return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试" }
+    }
+
+    return {
+      ok: true,
+      video_url: signedVideo?.url ?? lesson.video_url ?? "",
+      video_url_expires_at: signedVideo?.expires_at,
+      video_url_expires_in_seconds: signedVideo?.expires_in_seconds,
+    }
   }
 
   private resolveKnex(): any | null {

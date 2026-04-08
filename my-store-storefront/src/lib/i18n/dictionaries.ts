@@ -24,6 +24,10 @@ export type CoursesDictionary = {
   loading: string
   purchaseCourse: string
   purchaseToWatch: string
+  accessExpired: string
+  refreshAccess: string
+  refreshingAccess: string
+  refreshToContinue: string
   cancel: string
   close: string
   freePreviewHint: string
@@ -51,6 +55,10 @@ const zh: CoursesDictionary = {
   loading: "加载中...",
   purchaseCourse: "购买课程",
   purchaseToWatch: "购买后观看",
+  accessExpired: "当前播放授权已过期",
+  refreshAccess: "刷新访问授权",
+  refreshingAccess: "刷新中...",
+  refreshToContinue: "请刷新访问授权后继续播放",
   cancel: "取消",
   close: "关闭",
   freePreviewHint: "免费试看",
@@ -78,6 +86,10 @@ const en: CoursesDictionary = {
   loading: "Loading...",
   purchaseCourse: "Purchase Course",
   purchaseToWatch: "Purchase to watch",
+  accessExpired: "Playback access has expired",
+  refreshAccess: "Refresh access",
+  refreshingAccess: "Refreshing...",
+  refreshToContinue: "Refresh access to continue playback",
   cancel: "Cancel",
   close: "Close",
   freePreviewHint: "Free preview",

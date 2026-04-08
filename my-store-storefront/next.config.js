@@ -7,6 +7,9 @@ checkEnvVariables()
  */
 const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
+const COURSE_MEDIA_S3_BUCKET = process.env.COURSE_MEDIA_S3_BUCKET
+const COURSE_MEDIA_S3_REGION =
+  process.env.COURSE_MEDIA_S3_REGION || "ap-southeast-1"
 
 /**
  * @type {import('next').NextConfig}
@@ -60,6 +63,18 @@ const nextConfig = {
         protocol: "https",
         hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
       },
+      ...(COURSE_MEDIA_S3_BUCKET
+        ? [
+            {
+              protocol: "https",
+              hostname: `${COURSE_MEDIA_S3_BUCKET}.s3.${COURSE_MEDIA_S3_REGION}.amazonaws.com`,
+            },
+            {
+              protocol: "https",
+              hostname: `${COURSE_MEDIA_S3_BUCKET}.s3.amazonaws.com`,
+            },
+          ]
+        : []),
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
             {

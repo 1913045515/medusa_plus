@@ -65,7 +65,7 @@ export async function listCourses(localeArg?: string | null): Promise<Course[]> 
   return (data?.courses ?? []) as Course[]
 }
 
-export async function getCourseByHandle(handle: string): Promise<Course | null> {
-  const courses = await listCourses()
+export async function getCourseByHandle(handle: string, localeArg?: string | null): Promise<Course | null> {
+  const courses = await listCourses(localeArg)
   return courses.find((c) => c.handle === handle) ?? null
 }

@@ -32,7 +32,9 @@ export class LessonOrmRepository implements ILessonRepository {
         "duration",
         "is_free",
         "thumbnail_url",
+        "thumbnail_asset",
         "video_url",
+        "video_asset",
         "status",
         "metadata",
         "created_at",
@@ -61,7 +63,9 @@ export class LessonOrmRepository implements ILessonRepository {
         "duration",
         "is_free",
         "thumbnail_url",
+        "thumbnail_asset",
         "video_url",
+        "video_asset",
         "status",
         "metadata",
         "created_at",
@@ -86,7 +90,9 @@ export class LessonOrmRepository implements ILessonRepository {
         "duration",
         "is_free",
         "thumbnail_url",
+        "thumbnail_asset",
         "video_url",
+        "video_asset",
         "status",
         "metadata",
         "created_at",
@@ -113,7 +119,9 @@ export class LessonOrmRepository implements ILessonRepository {
       duration: input.duration ?? 0,
       is_free: input.is_free ?? false,
       thumbnail_url: input.thumbnail_url ?? null,
+      thumbnail_asset: input.thumbnail_asset ?? null,
       video_url: input.video_url ?? null,
+      video_asset: input.video_asset ?? null,
       status: input.status ?? "published",
       metadata: input.metadata ?? null,
       created_at: now,
@@ -140,7 +148,9 @@ export class LessonOrmRepository implements ILessonRepository {
     if ("duration" in input) patch.duration = input.duration
     if ("is_free" in input) patch.is_free = input.is_free
     if ("thumbnail_url" in input) patch.thumbnail_url = input.thumbnail_url ?? null
+    if ("thumbnail_asset" in input) patch.thumbnail_asset = input.thumbnail_asset ?? null
     if ("video_url" in input) patch.video_url = input.video_url ?? null
+    if ("video_asset" in input) patch.video_asset = input.video_asset ?? null
     if ("status" in input) patch.status = input.status
     if ("metadata" in input) patch.metadata = input.metadata ?? null
 

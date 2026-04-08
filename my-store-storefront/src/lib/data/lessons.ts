@@ -1,6 +1,6 @@
 "use server"
 
-import type { Lesson } from "types/lesson"
+import type { Lesson, LessonPlayResponse, LessonPlaySuccess } from "types/lesson"
 import { getAuthHeaders, removeAuthToken } from "./cookies"
 import { getLocale } from "./locale-actions"
 
@@ -65,7 +65,7 @@ export async function getCourseLessons(courseId: string, localeArg?: string | nu
 
 export async function getLessonPlayUrl(
   lessonId: string
-): Promise<{ video_url: string } | { error: string; code: 401 | 403 }> {
+): Promise<LessonPlayResponse> {
   if (!BACKEND_URL) {
     throw new Error(
       "Missing backend url. Set MEDUSA_BACKEND_URL in my-store-storefront/.env.local"
@@ -87,11 +87,6 @@ export async function getLessonPlayUrl(
       // 解析失败则继续，让后端决定
     }
   }
-
-  console.log(
-    "[storefront:getLessonPlayUrl] hasAuthorization=",
-    typeof (authHeaders as any)?.authorization === "string"
-  )
 
   const res = await fetch(`${BACKEND_URL}/store/lessons/${lessonId}/play`, {
     method: "GET",
@@ -115,10 +110,10 @@ export async function getLessonPlayUrl(
       error:
         data?.message ||
         data?.error ||
-        `Failed to fetch video (${res.status}). url=${BACKEND_URL}/store/lessons/${lessonId}/play body=${rawText}`,
+        "Failed to fetch video",
       code: res.status as 401 | 403,
     }
   }
 
-  return (data ?? {}) as { video_url: string }
+  return (data ?? {}) as LessonPlaySuccess
 }

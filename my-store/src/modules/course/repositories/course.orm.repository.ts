@@ -30,6 +30,7 @@ export class CourseOrmRepository implements ICourseRepository {
         "description",
         "translations",
         "thumbnail_url",
+        "thumbnail_asset",
         "level",
         "lessons_count",
         "status",
@@ -55,6 +56,7 @@ export class CourseOrmRepository implements ICourseRepository {
         "description",
         "translations",
         "thumbnail_url",
+        "thumbnail_asset",
         "level",
         "lessons_count",
         "status",
@@ -79,6 +81,7 @@ export class CourseOrmRepository implements ICourseRepository {
         "description",
         "translations",
         "thumbnail_url",
+        "thumbnail_asset",
         "level",
         "lessons_count",
         "status",
@@ -105,6 +108,7 @@ export class CourseOrmRepository implements ICourseRepository {
       description: input.description ?? null,
       translations: input.translations ? JSON.stringify(input.translations) : null,
       thumbnail_url: input.thumbnail_url ?? null,
+      thumbnail_asset: input.thumbnail_asset ?? null,
       level: input.level ?? null,
       lessons_count: input.lessons_count ?? 0,
       status: input.status ?? "published",
@@ -131,6 +135,7 @@ export class CourseOrmRepository implements ICourseRepository {
     if ("description" in input) patch.description = input.description ?? null
     if ("translations" in input) patch.translations = input.translations ? JSON.stringify(input.translations) : null
     if ("thumbnail_url" in input) patch.thumbnail_url = input.thumbnail_url ?? null
+    if ("thumbnail_asset" in input) patch.thumbnail_asset = input.thumbnail_asset ?? null
     if ("level" in input) patch.level = input.level ?? null
     if ("lessons_count" in input) patch.lessons_count = input.lessons_count
     if ("status" in input) patch.status = input.status

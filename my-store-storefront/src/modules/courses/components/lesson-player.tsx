@@ -55,10 +55,14 @@ function CheckIcon({ className }: { className?: string }) {
 // ── 视频播放器 ─────────────────────────────────────────────────────────────────
 function VideoPlayer({
   lesson,
+  videoUrl,
   onEnded,
+  onPlaybackError,
 }: {
   lesson: Lesson
+  videoUrl: string
   onEnded?: () => void
+  onPlaybackError?: () => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -157,7 +161,7 @@ function VideoPlayer({
       <video
         ref={videoRef}
         className="w-full h-full object-contain"
-        src={lesson.video_url ?? undefined}
+        src={videoUrl}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={handleTimeUpdate}
@@ -165,7 +169,17 @@ function VideoPlayer({
         onCanPlay={() => setIsLoading(false)}
         onWaiting={() => setIsLoading(true)}
         onPlaying={() => setIsLoading(false)}
+        onError={() => {
+          setIsPlaying(false)
+          setIsLoading(false)
+          onPlaybackError?.()
+        }}
         onClick={togglePlay}
+        onContextMenu={(event) => event.preventDefault()}
+        controlsList="nodownload noplaybackrate noremoteplayback"
+        disablePictureInPicture
+        disableRemotePlayback
+        preload="metadata"
         playsInline
       />
 
@@ -391,7 +405,11 @@ export default function LessonPlayer({
   dict: CoursesDictionary
 }) {
   const [activeLesson, setActiveLesson] = useState<Lesson>(lessons[0])
-  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
+  const [activePlayback, setActivePlayback] = useState<{
+    videoUrl: string
+    expiresAt: string | null
+    expiresInSeconds: number | null
+  } | null>(null)
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set())
   // Set of course IDs confirmed as purchased (written when play API returns 200)
   const [purchasedCourseIds, setPurchasedCourseIds] = useState<Set<string>>(new Set())
@@ -400,6 +418,9 @@ export default function LessonPlayer({
     lesson?: Lesson
     message?: string
   }>({ open: false })
+  const [accessExpired, setAccessExpired] = useState(false)
+  const [isRefreshingAccess, setIsRefreshingAccess] = useState(false)
+  const [playbackRequestVersion, setPlaybackRequestVersion] = useState(0)
 
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -432,38 +453,73 @@ export default function LessonPlayer({
     let cancelled = false
 
     async function load() {
-      setActiveVideoUrl(null)
+      setIsRefreshingAccess(true)
+      setActivePlayback(null)
+      setAccessExpired(false)
       setPurchasePrompt({ open: false })
 
-      const r = await getLessonPlayUrl(activeLesson.id)
-      if (cancelled) return
+      try {
+        const r = await getLessonPlayUrl(activeLesson.id)
+        if (cancelled) return
 
-      if ("video_url" in r) {
-        setActiveVideoUrl(r.video_url)
-        // Only mark as purchased when the episode requires auth
-        if (!activeLesson.is_free) {
-          setPurchasedCourseIds((prev) => {
-            const next = new Set(Array.from(prev))
-            next.add(activeLesson.course_id)
-            return next
+        if ("video_url" in r) {
+          setActivePlayback({
+            videoUrl: r.video_url,
+            expiresAt: r.video_url_expires_at ?? null,
+            expiresInSeconds: r.video_url_expires_in_seconds ?? null,
           })
+          if (!activeLesson.is_free) {
+            setPurchasedCourseIds((prev) => {
+              const next = new Set(Array.from(prev))
+              next.add(activeLesson.course_id)
+              return next
+            })
+          }
+          return
         }
-        return
-      }
 
-      // 401: not logged in; 403: not purchased
-      setPurchasePrompt({
-        open: true,
-        lesson: activeLesson,
-        message: r.error,
-      })
+        setPurchasePrompt({
+          open: true,
+          lesson: activeLesson,
+          message: r.error,
+        })
+      } finally {
+        if (!cancelled) {
+          setIsRefreshingAccess(false)
+        }
+      }
     }
 
     load()
     return () => {
       cancelled = true
     }
-  }, [activeLesson.id])
+  }, [activeLesson.id, playbackRequestVersion])
+
+  useEffect(() => {
+    if (!activePlayback?.expiresAt) {
+      return
+    }
+
+    const expiresAtMs = Date.parse(activePlayback.expiresAt)
+    if (!Number.isFinite(expiresAtMs)) {
+      return
+    }
+
+    const remainingMs = expiresAtMs - Date.now()
+    if (remainingMs <= 0) {
+      setActivePlayback(null)
+      setAccessExpired(true)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setActivePlayback(null)
+      setAccessExpired(true)
+    }, remainingMs)
+
+    return () => window.clearTimeout(timer)
+  }, [activePlayback?.expiresAt])
 
   // Auto-advance to next episode on playback end
   const handleEnded = () => {
@@ -485,6 +541,7 @@ export default function LessonPlayer({
   }
 
   const currentIndex = lessons.findIndex((l) => l.id === activeLesson.id)
+  const activeVideoUrl = activePlayback?.videoUrl ?? null
 
   // Purchase page link: MVP uses /products/<course.handle>
   const purchaseHref = `/products/${course.handle}`
@@ -497,8 +554,13 @@ export default function LessonPlayer({
           <div className="w-full rounded-xl overflow-hidden shadow-2xl bg-black">
             {activeVideoUrl ? (
               <VideoPlayer
-                lesson={{ ...activeLesson, video_url: activeVideoUrl }}
+                lesson={activeLesson}
+                videoUrl={activeVideoUrl}
                 onEnded={handleEnded}
+                onPlaybackError={() => {
+                  setActivePlayback(null)
+                  setAccessExpired(true)
+                }}
               />
             ) : (
               <div
@@ -506,10 +568,30 @@ export default function LessonPlayer({
                 style={{ aspectRatio: "16/9" }}
               >
                 <div className="text-center px-6">
-                  <p className="text-sm font-medium">{dict.cannotPlay}</p>
-                  <p className="text-xs text-white/50 mt-2">
-                    {purchasePrompt.open ? purchasePrompt.message : dict.loading}
+                  <p className="text-sm font-medium">
+                    {accessExpired ? dict.accessExpired : dict.cannotPlay}
                   </p>
+                  <p className="text-xs text-white/50 mt-2">
+                    {accessExpired
+                      ? dict.refreshToContinue
+                      : purchasePrompt.open
+                        ? purchasePrompt.message
+                        : isRefreshingAccess
+                          ? dict.refreshingAccess
+                          : dict.loading}
+                  </p>
+
+                  {accessExpired && (
+                    <div className="mt-4">
+                      <button
+                        className="inline-flex items-center justify-center rounded-md bg-[#00aaff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0095dd] disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => setPlaybackRequestVersion((value) => value + 1)}
+                        disabled={isRefreshingAccess}
+                      >
+                        {isRefreshingAccess ? dict.refreshingAccess : dict.refreshAccess}
+                      </button>
+                    </div>
+                  )}
 
                   {purchasePrompt.open && !activeLesson.is_free && (
                     <div className="mt-4 flex items-center justify-center gap-3">
@@ -521,7 +603,10 @@ export default function LessonPlayer({
                       </LocalizedClientLink>
                       <button
                         className="inline-flex items-center justify-center rounded-md border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
-                        onClick={() => setPurchasePrompt({ open: false })}
+                        onClick={() => {
+                          setPurchasePrompt({ open: false })
+                          setAccessExpired(false)
+                        }}
                       >
                         {dict.cancel}
                       </button>
@@ -531,7 +616,10 @@ export default function LessonPlayer({
                   {purchasePrompt.open && activeLesson.is_free && (
                     <button
                       className="mt-4 inline-flex items-center justify-center rounded-md border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
-                      onClick={() => setPurchasePrompt({ open: false })}
+                      onClick={() => {
+                        setPurchasePrompt({ open: false })
+                        setAccessExpired(false)
+                      }}
                     >
                       {dict.close}
                     </button>

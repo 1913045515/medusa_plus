@@ -5,15 +5,22 @@ import type {
   UpdateCourseInput,
   ListCoursesFilters,
   LocalizedCourseRecord,
+  StoreCourseRecord,
+  StoredS3MediaAsset,
+  SignedMediaAsset,
 } from "../types"
 import { Modules } from "@medusajs/framework/utils"
+import type { CourseMediaService } from "./media-asset.service"
 
 // ─── CourseService ────────────────────────────────────────────────────────────
 // 依赖 ICourseRepository 接口，不关心底层是静态 JSON 还是 ORM。
 // 切换数据库时：构造函数注入不同的 Repository 实现即可。
 
 export class CourseService {
-  constructor(private readonly courseRepo: ICourseRepository) {}
+  constructor(
+    private readonly courseRepo: ICourseRepository,
+    private readonly mediaService?: Pick<CourseMediaService, "isConfigured" | "sign">
+  ) {}
 
   private resolveLocaleText(record: CourseRecord, locale?: string | null): LocalizedCourseRecord {
     const normalizedLocale = locale?.trim() || null
@@ -43,6 +50,31 @@ export class CourseService {
   async getCourseByHandle(handle: string, locale?: string | null): Promise<LocalizedCourseRecord | null> {
     const item = await this.courseRepo.findByHandle(handle)
     return item ? this.resolveLocaleText(item, locale) : null
+  }
+
+  private async signMediaAsset(asset: StoredS3MediaAsset | null): Promise<SignedMediaAsset | null> {
+    if (!asset || !this.mediaService?.isConfigured()) {
+      return null
+    }
+
+    return await this.mediaService.sign(asset)
+  }
+
+  async serializeStoreCourse(course: LocalizedCourseRecord): Promise<StoreCourseRecord> {
+    const signedThumbnail = await this.signMediaAsset(course.thumbnail_asset)
+    const { thumbnail_asset: _thumbnailAsset, ...rest } = course
+
+    return {
+      ...rest,
+      thumbnail_url: course.thumbnail_asset
+        ? signedThumbnail?.url ?? null
+        : course.thumbnail_url,
+      thumbnail_url_expires_at: signedThumbnail?.expires_at ?? null,
+    }
+  }
+
+  async serializeStoreCourses(courses: LocalizedCourseRecord[]): Promise<StoreCourseRecord[]> {
+    return await Promise.all(courses.map((course) => this.serializeStoreCourse(course)))
   }
 
   private resolveProductModule(): any | null {

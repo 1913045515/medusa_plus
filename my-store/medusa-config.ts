@@ -2,6 +2,13 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+process.env.COURSE_MEDIA_S3_REGION =
+  process.env.COURSE_MEDIA_S3_REGION || process.env.AWS_REGION || 'ap-southeast-1'
+process.env.COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES =
+  process.env.COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES || `${2 * 1024 * 1024 * 1024}`
+process.env.COURSE_MEDIA_SIGNED_URL_TTL_SECONDS =
+  process.env.COURSE_MEDIA_SIGNED_URL_TTL_SECONDS || `${2 * 60 * 60}`
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,

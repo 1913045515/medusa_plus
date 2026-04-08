@@ -42,6 +42,33 @@ Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to se
 
 Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
 
+## Course Media S3 Configuration
+
+The course admin and storefront media flow now support S3-backed course thumbnails, lesson thumbnails, and lesson videos.
+
+Set these environment variables in local and production environments:
+
+- COURSE_MEDIA_S3_BUCKET: target S3 bucket name.
+- COURSE_MEDIA_S3_REGION: S3 region. Defaults to ap-southeast-1.
+- COURSE_MEDIA_S3_ACCESS_KEY_ID: IAM access key for server-side uploads, deletes, and signed URL generation.
+- COURSE_MEDIA_S3_SECRET_ACCESS_KEY: IAM secret key paired with the access key above.
+- COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES: optional upload limit in bytes. Defaults to 2147483648 (2 GB).
+- COURSE_MEDIA_SIGNED_URL_TTL_SECONDS: optional signed URL lifetime in seconds. Defaults to 7200.
+
+Notes:
+
+- Do not commit S3 credentials to the repository. Load them from .env files, secret managers, or your deployment platform.
+- The admin stores permanent S3 object metadata in the database, but the storefront only receives time-limited signed URLs.
+- Existing legacy thumbnail_url and video_url values remain untouched until an editor uploads replacement media.
+
+Recommended post-deploy validation:
+
+1. Upload a course thumbnail, a lesson thumbnail, and a lesson video in admin.
+2. Confirm the admin UI shows file name, type, and size instead of the permanent S3 URL.
+3. Open the storefront course detail page and verify thumbnails load through signed URLs.
+4. Play a lesson and confirm the /store/lessons/:id/play response includes video_url_expires_at and video_url_expires_in_seconds.
+5. After the signed URL expires, confirm the player shows the refresh-access prompt and can fetch a new URL.
+
 ## What is Medusa
 
 Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.

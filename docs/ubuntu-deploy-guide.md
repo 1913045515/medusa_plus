@@ -133,6 +133,21 @@ nano .env
 - 域名和 CORS 配置
 - Next.js 前端配置
 
+课程媒体 S3 相关变量也必须填写：
+
+- COURSE_MEDIA_S3_BUCKET=你的 S3 bucket 名称
+- COURSE_MEDIA_S3_REGION=ap-southeast-1
+- COURSE_MEDIA_S3_ACCESS_KEY_ID=服务端上传 IAM Access Key
+- COURSE_MEDIA_S3_SECRET_ACCESS_KEY=服务端上传 IAM Secret Key
+- COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES=2147483648
+- COURSE_MEDIA_SIGNED_URL_TTL_SECONDS=7200
+
+补充说明：
+
+- 上述 S3 密钥只能放在服务器 .env 或密钥管理系统中，不能提交到仓库。
+- 课程封面、Lesson 封面、Lesson 视频都由后端上传到 S3，浏览器不会直接持有 S3 长期凭证。
+- 历史媒体不会自动迁移，只有重新上传后的媒体才会写入新的结构化 S3 元数据。
+
 ### 2. 上传 SSL 证书
 
 ```bash
@@ -163,6 +178,26 @@ docker compose ps
 docker compose logs -f admin
 docker compose logs -f storefront
 ```
+
+### 6. 验证课程媒体链路
+
+部署完成后，至少执行一次以下检查：
+
+```bash
+# 检查后端环境变量是否注入成功
+docker compose exec admin env | grep COURSE_MEDIA_
+
+# 查看后端日志，确认没有 S3 鉴权或签名报错
+docker compose logs --tail=200 admin
+```
+
+然后在浏览器中完成以下验证：
+
+1. 进入 admin 课程管理页面，上传课程封面、Lesson 封面、Lesson 视频。
+2. 确认后台仅显示文件名、类型、大小，不显示永久 S3 地址。
+3. 打开 storefront 课程详情页，确认课程卡片和选集缩略图正常显示。
+4. 播放一个免费 Lesson 和一个已购 Lesson，确认视频可正常拉取签名 URL。
+5. 等待签名过期或临时调低 COURSE_MEDIA_SIGNED_URL_TTL_SECONDS，确认前台会显示“刷新访问授权”提示并可重新获取播放地址。
 
 ## 常用运维命令
 

@@ -12,7 +12,7 @@ export default async function CourseDetailTemplate({
   handle: string
   locale?: string | null
 }) {
-  const course = await getCourseByHandle(handle)
+  const course = await getCourseByHandle(handle, locale)
   const dict = getCoursesDictionary(locale)
 
   if (!course) {

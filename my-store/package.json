@@ -29,6 +29,8 @@
     "spec:preview:admin": "redocly preview openapi/admin.yaml --port 8081"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1026.0",
+    "@aws-sdk/s3-request-presigner": "^3.1026.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@medusajs/admin-sdk": "2.13.1",
     "@medusajs/cli": "2.13.1",
@@ -47,6 +49,7 @@
     "@tiptap/pm": "^3.21.0",
     "@tiptap/react": "^3.21.0",
     "@tiptap/starter-kit": "^3.21.0",
+    "busboy": "^1.6.0",
     "sanitize-html": "^2.17.2"
   },
   "devDependencies": {
@@ -54,6 +57,7 @@
     "@redocly/cli": "^2.22.1",
     "@swc/core": "^1.7.28",
     "@swc/jest": "^0.2.36",
+    "@types/busboy": "^1.5.4",
     "@types/jest": "^29.5.13",
     "@types/node": "^20.12.11",
     "@types/react": "^18.3.2",

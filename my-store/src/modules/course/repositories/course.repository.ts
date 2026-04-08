@@ -35,6 +35,7 @@ const STATIC_COURSES: CourseRecord[] = [
       },
     },
     thumbnail_url: "https://via.placeholder.com/640x360?text=React+Course",
+    thumbnail_asset: null,
     level: "beginner",
     lessons_count: 4,
     status: "published",
@@ -55,6 +56,7 @@ const STATIC_COURSES: CourseRecord[] = [
       },
     },
     thumbnail_url: "https://via.placeholder.com/640x360?text=Next.js+Course",
+    thumbnail_asset: null,
     level: "intermediate",
     lessons_count: 8,
     status: "published",
@@ -95,6 +97,7 @@ export class CourseStaticRepository implements ICourseRepository {
       id: input.id ?? `course_${Date.now()}`,
       product_id: input.product_id ?? null,
       translations: input.translations ?? null,
+      thumbnail_asset: input.thumbnail_asset ?? null,
       created_at: now,
       updated_at: now,
     }

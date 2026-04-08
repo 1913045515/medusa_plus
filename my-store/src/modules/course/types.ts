@@ -9,6 +9,7 @@ export type CourseRecord = {
   description: string | null
   translations: LocalizedTextMap | null
   thumbnail_url: string | null
+  thumbnail_asset: StoredS3MediaAsset | null
   level: string | null
   lessons_count: number
   status: string
@@ -40,6 +41,39 @@ export type LocalizedTextMap = Record<string, LocalizedText>
 
 export type LocalizedCourseRecord = CourseRecord & {
   locale: string | null
+}
+
+export type StoreCourseRecord = Omit<LocalizedCourseRecord, "thumbnail_asset"> & {
+  thumbnail_url_expires_at: string | null
+}
+
+export type CourseMediaField =
+  | "course_thumbnail"
+  | "lesson_thumbnail"
+  | "lesson_video"
+
+export type StoredS3MediaAsset = {
+  provider: "s3"
+  bucket: string
+  key: string
+  permanent_url: string
+  original_name: string
+  extension: string | null
+  mime_type: string
+  size_bytes: number
+  uploaded_at: string
+}
+
+export type SignedMediaAsset = {
+  url: string
+  expires_at: string
+  expires_in_seconds: number
+}
+
+export type CourseMediaUploadTarget = {
+  entity_type: "course" | "lesson"
+  entity_id: string
+  field: CourseMediaField
 }
 
 // ─── Course Purchase ─────────────────────────────────────────────────────────
@@ -163,7 +197,9 @@ export type LessonRecord = {
   duration: number
   is_free: boolean
   thumbnail_url: string | null
+  thumbnail_asset: StoredS3MediaAsset | null
   video_url: string | null
+  video_asset: StoredS3MediaAsset | null
   status: string
   metadata: Record<string, unknown> | null
   created_at: string
@@ -182,9 +218,18 @@ export type ListLessonsFilters = {
 // ─── Play ─────────────────────────────────────────────────────────────────────
 
 export type PlayResponse =
-  | { video_url: string }
+  | {
+      video_url: string
+      video_url_expires_at?: string
+      video_url_expires_in_seconds?: number
+    }
   | { error: string; code: 401 | 403 }
 
 export type LocalizedLessonRecord = LessonRecord & {
   locale: string | null
+}
+
+export type StoreLessonRecord = Omit<LocalizedLessonRecord, "thumbnail_asset" | "video_asset"> & {
+  thumbnail_url_expires_at: string | null
+  video_url: null
 }

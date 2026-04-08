@@ -15,6 +15,7 @@ import { CourseService } from "./services/course.service"
 import { LessonService } from "./services/lesson.service"
 import { PurchaseService } from "./services/purchase.service"
 import { HomepageContentService } from "./services/homepage-content.service"
+import { CourseMediaService } from "./services/media-asset.service"
 import { Module } from "@medusajs/framework/utils"
 import CourseModuleService from "./service"
 
@@ -41,12 +42,14 @@ const courseRepo = new CourseOrmRepository({ resolve: (k: any) => _scope.resolve
 const lessonRepo = new LessonOrmRepository({ resolve: (k: any) => _scope.resolve(k) })
 const purchaseRepo = new PurchaseOrmRepository({ resolve: (k: any) => _scope.resolve(k) })
 const homepageContentRepo = new HomepageContentOrmRepository({ resolve: (k: any) => _scope.resolve(k) })
+const courseMediaService = new CourseMediaService()
 
 // ── 单例 Service（Route 层直接 import 使用）──────────────────────────────────
-export const courseService = new CourseService(courseRepo)
-export const lessonService = new LessonService(lessonRepo)
+export const courseService = new CourseService(courseRepo, courseMediaService)
+export const lessonService = new LessonService(lessonRepo, courseMediaService)
 export const purchaseService = new PurchaseService(purchaseRepo)
 export const homepageContentService = new HomepageContentService(homepageContentRepo)
+export { courseMediaService }
 
 // ── 类型 re-export（方便 Route 层 import）───────────────────────────────────
 export type {
@@ -69,4 +72,10 @@ export type {
   HomepageContentRecord,
   CreateHomepageContentInput,
   UpsertHomepageContentInput,
+  StoreCourseRecord,
+  StoreLessonRecord,
+  StoredS3MediaAsset,
+  SignedMediaAsset,
+  CourseMediaField,
+  CourseMediaUploadTarget,
 } from "./types"

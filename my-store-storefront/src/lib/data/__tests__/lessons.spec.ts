@@ -16,6 +16,7 @@ const makeLesson = (overrides: Partial<Lesson> = {}): Lesson => ({
   duration: 600,
   is_free: true,
   thumbnail_url: null,
+  thumbnail_url_expires_at: null,
   video_url: null,
   status: "published",
   metadata: {},
@@ -30,7 +31,7 @@ const mockFetch = (status: number, body: unknown) => {
   global.fetch = jest.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
     status,
-    json: () => Promise.resolve(body),
+    text: () => Promise.resolve(JSON.stringify(body)),
   })
 }
 
@@ -52,12 +53,10 @@ describe("getCourseLessons", () => {
     )
   })
 
-  it("returns empty array on non-200 response", async () => {
+  it("throws on non-200 response", async () => {
     mockFetch(500, { message: "Internal Server Error" })
 
-    const result = await getCourseLessons("course_1")
-
-    expect(result).toEqual([])
+    await expect(getCourseLessons("course_1")).rejects.toThrow("Internal Server Error")
   })
 
   it("returns empty array when lessons field is missing", async () => {
@@ -73,11 +72,19 @@ describe("getCourseLessons", () => {
 
 describe("getLessonPlayUrl", () => {
   it("returns video_url on 200", async () => {
-    mockFetch(200, { video_url: "https://cdn.example.com/video.mp4" })
+    mockFetch(200, {
+      video_url: "https://cdn.example.com/video.mp4",
+      video_url_expires_at: "2026-04-08T02:00:00.000Z",
+      video_url_expires_in_seconds: 7200,
+    })
 
     const result = await getLessonPlayUrl("lesson_1")
 
-    expect(result).toEqual({ video_url: "https://cdn.example.com/video.mp4" })
+    expect(result).toEqual({
+      video_url: "https://cdn.example.com/video.mp4",
+      video_url_expires_at: "2026-04-08T02:00:00.000Z",
+      video_url_expires_in_seconds: 7200,
+    })
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/store/lessons/lesson_1/play"),
       expect.any(Object)

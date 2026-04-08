@@ -16,8 +16,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const lessons = await lessonService.getLessonsByCourse(id, locale)
   const publishedLessons = lessons.filter((l) => l.status === "published")
 
-  // Store API 不暴露 video_url，由 /play 接口按权限返回
-  const publicLessons = publishedLessons.map(({ video_url: _omit, ...rest }) => rest)
+  const publicLessons = await lessonService.serializeStoreLessons(publishedLessons)
 
   res.json({ lessons: publicLessons, count: publicLessons.length })
 }
