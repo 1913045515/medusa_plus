@@ -27,6 +27,8 @@ type Course = {
   title: string
   description: string | null
   thumbnail_url: string | null
+  thumbnail_asset: { mime_type: string; original_name: string; size_bytes: number } | null
+  thumbnail_signed_url: string | null
   level: string | null
   lessons_count: number
   status: string
@@ -264,7 +266,7 @@ const CoursesPage = () => {
     try {
       const suffix = selectedLocale === DEFAULT_LOCALE ? "" : `?locale=${encodeURIComponent(selectedLocale)}`
       const data = await apiFetch<{ courses: Course[] }>(`/courses${suffix}`)
-      setCourses(data.courses)
+      setCourses(data.courses ?? [])
     } catch (e: any) {
       toast.error(e.message ?? t("courseEditor.toast.loadFailed"))
     } finally {
@@ -427,7 +429,7 @@ const CoursesPage = () => {
           {loading ? (
             <Table.Row>
               <td colSpan={7} className="px-4 py-6 text-center text-ui-fg-muted text-sm">
-                加载中…
+                {t("common.loading")}
               </td>
             </Table.Row>
           ) : courses.length === 0 ? (
@@ -444,9 +446,20 @@ const CoursesPage = () => {
                 onClick={() => navigate(`/courses/${course.id}`)}
               >
                 <Table.Cell>
-                  <Text size="small" weight="plus" className="text-ui-fg-interactive">
-                    {course.title}
-                  </Text>
+                  <div className="flex items-center gap-2">
+                    {(course.thumbnail_signed_url || course.thumbnail_url) ? (
+                      <img
+                        src={course.thumbnail_signed_url ?? course.thumbnail_url!}
+                        alt={course.title}
+                        className="w-12 h-8 object-cover rounded flex-shrink-0 border border-ui-border-base"
+                      />
+                    ) : (
+                      <div className="w-12 h-8 bg-ui-bg-subtle rounded flex-shrink-0 border border-ui-border-base" />
+                    )}
+                    <Text size="small" weight="plus" className="text-ui-fg-interactive">
+                      {course.title}
+                    </Text>
+                  </div>
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="small" className="font-mono text-ui-fg-muted">
@@ -560,7 +573,8 @@ const CoursesPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "课程管理",
+  label: "courseEditor.menuLabel",
+  translationNs: "translation",
   icon: BookOpen,
 })
 

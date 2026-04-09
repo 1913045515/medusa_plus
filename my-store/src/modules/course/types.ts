@@ -21,7 +21,7 @@ export type CourseRecord = {
 // 允许创建时指定 id（例如 course_demo_1），否则由后端生成
 export type CreateCourseInput = Omit<
   CourseRecord,
-  "created_at" | "updated_at"
+  "id" | "created_at" | "updated_at"
 > & {
   id?: string
 }

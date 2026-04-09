@@ -37,6 +37,7 @@ type MediaSummary = {
   mime_type: string
   size_bytes: number
   uploaded_at: string
+  signed_url?: string | null
 }
 
 type Course = {
@@ -46,6 +47,7 @@ type Course = {
   description: string | null
   thumbnail_url: string | null
   thumbnail_asset: MediaAsset | null
+  thumbnail_signed_url: string | null
   level: string | null
   lessons_count: number
   status: string
@@ -65,8 +67,10 @@ type Lesson = {
   is_free: boolean
   thumbnail_url: string | null
   thumbnail_asset: MediaAsset | null
+  thumbnail_signed_url: string | null
   video_url: string | null
   video_asset: MediaAsset | null
+  video_signed_url: string | null
   status: string
   metadata: Record<string, unknown> | null
   created_at: string
@@ -151,7 +155,7 @@ function formatFileSize(sizeBytes: number) {
   return `${(sizeBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
 }
 
-function toMediaSummary(asset: MediaAsset | null): MediaSummary | null {
+function toMediaSummary(asset: MediaAsset | null, signedUrl?: string | null): MediaSummary | null {
   if (!asset) return null
 
   return {
@@ -160,6 +164,7 @@ function toMediaSummary(asset: MediaAsset | null): MediaSummary | null {
     mime_type: asset.mime_type,
     size_bytes: asset.size_bytes,
     uploaded_at: asset.uploaded_at,
+    signed_url: signedUrl ?? null,
   }
 }
 
@@ -168,15 +173,27 @@ function renderMediaSummary(summary: MediaSummary | null, emptyLabel: string) {
     return <Text size="small" className="text-ui-fg-muted">{emptyLabel}</Text>
   }
 
+  const isImage = summary.mime_type?.startsWith("image/")
+
   return (
-    <div className="flex flex-col gap-1 rounded-md border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
-      <Text size="small" weight="plus">
-        {summary.file_name}
-      </Text>
-      <Text size="xsmall" className="text-ui-fg-muted">
-        {summary.extension ? `.${summary.extension} · ` : ""}
-        {summary.mime_type} · {formatFileSize(summary.size_bytes)}
-      </Text>
+    <div className="flex flex-col gap-2">
+      {isImage && summary.signed_url ? (
+        <img
+          src={summary.signed_url}
+          alt={summary.file_name}
+          className="w-full max-w-[200px] rounded-md border border-ui-border-base object-cover"
+          style={{ aspectRatio: "16/9" }}
+        />
+      ) : null}
+      <div className="flex flex-col gap-1 rounded-md border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+        <Text size="small" weight="plus">
+          {summary.file_name}
+        </Text>
+        <Text size="xsmall" className="text-ui-fg-muted">
+          {summary.extension ? `.${summary.extension} · ` : ""}
+          {summary.mime_type} · {formatFileSize(summary.size_bytes)}
+        </Text>
+      </div>
     </div>
   )
 }
@@ -548,7 +565,7 @@ const CourseEditForm = ({
       <ManagedMediaField
         label={t("courseEditor.form.thumbnailLabel")}
         accept="image/png,image/jpeg,image/webp,image/gif"
-        summary={toMediaSummary(course.thumbnail_asset)}
+        summary={toMediaSummary(course.thumbnail_asset, course.thumbnail_signed_url)}
         hint={t("courseEditor.form.thumbnailHint")}
         emptyLabel={t("common.notUploaded")}
         onUpload={onUploadThumbnail}
@@ -861,7 +878,7 @@ const CourseDetailPage = () => {
           <div className="flex items-start justify-between gap-4">
             <div className="flex gap-4 items-start flex-1">
               {course.thumbnail_asset ? (
-                <div className="w-56">{renderMediaSummary(toMediaSummary(course.thumbnail_asset), t("common.notUploaded"))}</div>
+                <div className="w-56">{renderMediaSummary(toMediaSummary(course.thumbnail_asset, course.thumbnail_signed_url), t("common.notUploaded"))}</div>
               ) : course.thumbnail_url ? (
                 <img
                   src={course.thumbnail_url}
@@ -989,15 +1006,25 @@ const CourseDetailPage = () => {
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>
-                    {renderMediaSummary(
-                      toMediaSummary(lesson.thumbnail_asset),
-                      lesson.thumbnail_url ? t("lessonEditor.legacyMedia") : t("common.notUploaded")
+                    {lesson.thumbnail_signed_url ? (
+                      <img
+                        src={lesson.thumbnail_signed_url}
+                        alt={lesson.title}
+                        className="w-16 h-10 object-cover rounded border border-ui-border-base"
+                      />
+                    ) : lesson.thumbnail_url ? (
+                      <Text size="xsmall" className="text-ui-fg-muted">{t("lessonEditor.legacyMedia")}</Text>
+                    ) : (
+                      <Text size="xsmall" className="text-ui-fg-muted">{t("common.notUploaded")}</Text>
                     )}
                   </Table.Cell>
                   <Table.Cell>
-                    {renderMediaSummary(
-                      toMediaSummary(lesson.video_asset),
-                      lesson.video_url ? t("lessonEditor.legacyMedia") : t("common.notUploaded")
+                    {lesson.video_asset ? (
+                      <Badge size="2xsmall" color="green">{t("common.uploaded") ?? "已上传"}</Badge>
+                    ) : lesson.video_url ? (
+                      <Text size="xsmall" className="text-ui-fg-muted">{t("lessonEditor.legacyMedia")}</Text>
+                    ) : (
+                      <Text size="xsmall" className="text-ui-fg-muted">{t("common.notUploaded")}</Text>
                     )}
                   </Table.Cell>
                   <Table.Cell>
@@ -1052,8 +1079,8 @@ const CourseDetailPage = () => {
                   status: editLesson.status,
                 }}
                 isEdit={true}
-                thumbnailSummary={toMediaSummary(editLesson.thumbnail_asset)}
-                videoSummary={toMediaSummary(editLesson.video_asset)}
+                thumbnailSummary={toMediaSummary(editLesson.thumbnail_asset, editLesson.thumbnail_signed_url)}
+                videoSummary={toMediaSummary(editLesson.video_asset, editLesson.video_signed_url)}
                 onUploadThumbnail={(file) => handleUploadLessonThumbnail(editLesson.id, file)}
                 onDeleteThumbnail={() => handleDeleteLessonThumbnail(editLesson.id)}
                 onUploadVideo={(file) => handleUploadLessonVideo(editLesson.id, file)}

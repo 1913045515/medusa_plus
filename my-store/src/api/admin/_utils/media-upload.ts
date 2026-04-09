@@ -42,7 +42,8 @@ export async function parseAdminUploadRequest(
     let tempFilePath = ""
     let sizeBytes = 0
     let limitReached = false
-    let writeCompleted = false
+    // Promise that resolves/rejects when the write stream finishes
+    let writeStreamDone: Promise<void> = Promise.resolve()
 
     const cleanup = async () => {
       if (tempFilePath) {
@@ -75,6 +76,15 @@ export async function parseAdminUploadRequest(
 
       const writeStream = createWriteStream(tempFilePath)
 
+      // Track write stream completion as a Promise so we can await it in
+      // busboy's "finish" handler (busboy fires before writeStream finishes)
+      writeStreamDone = new Promise<void>((res, rej) => {
+        writeStream.on("finish", res)
+        writeStream.on("error", (error) => {
+          rej(error instanceof Error ? error : new Error("Failed to persist uploaded file"))
+        })
+      })
+
       file.on("data", (chunk: Buffer) => {
         sizeBytes += chunk.length
       })
@@ -86,14 +96,6 @@ export async function parseAdminUploadRequest(
 
       file.on("error", (error) => {
         void finalizeReject(error instanceof Error ? error : new Error("Failed to read uploaded file"))
-      })
-
-      writeStream.on("error", (error) => {
-        void finalizeReject(error instanceof Error ? error : new Error("Failed to persist uploaded file"))
-      })
-
-      writeStream.on("finish", () => {
-        writeCompleted = true
       })
 
       file.pipe(writeStream)
@@ -118,7 +120,15 @@ export async function parseAdminUploadRequest(
         return
       }
 
-      if (!writeCompleted || sizeBytes <= 0) {
+      // Wait for the write stream to fully flush before checking size
+      try {
+        await writeStreamDone
+      } catch (error) {
+        await finalizeReject(error instanceof Error ? error : new Error("Failed to persist uploaded file"))
+        return
+      }
+
+      if (sizeBytes <= 0) {
         await finalizeReject(new Error("Uploaded file is empty"))
         return
       }

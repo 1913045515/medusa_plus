@@ -476,7 +476,7 @@ const HomepageEditorPage = () => {
                 <Input id="new-title" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
               </div>
               <div className="flex flex-col gap-1">
-                <Label htmlFor="new-handle">Handle</Label>
+                <Label htmlFor="new-handle">{t("common.handle")}</Label>
                 <Input id="new-handle" value={newHandle} onChange={(e) => setNewHandle(e.target.value)} />
               </div>
               <Button onClick={createRecord} isLoading={creating}>{t("homepageEditor.createDraft")}</Button>
@@ -497,8 +497,8 @@ const HomepageEditorPage = () => {
                     <div className="flex items-center justify-between gap-3">
                       <Text className="txt-small-plus">{record.title}</Text>
                       <div className="flex gap-2">
-                        <Badge color={record.status === "published" ? "green" : "orange"}>{record.status}</Badge>
-                        {record.is_active ? <Badge color="blue">active</Badge> : null}
+                        <Badge color={record.status === "published" ? "green" : "orange"}>{record.status === "published" ? t("common.published") : t("common.draft")}</Badge>
+                        {record.is_active ? <Badge color="blue">{t("common.active")}</Badge> : null}
                       </div>
                     </div>
                     <Text className="txt-small text-ui-fg-subtle mt-2">/{record.handle}</Text>
@@ -521,7 +521,7 @@ const HomepageEditorPage = () => {
           <Container className="p-6">
             <div className="flex items-center justify-between gap-3">
               <Heading level="h2">{t("homepageEditor.basicInfo")}</Heading>
-              {isLegacyRecord ? <Badge color="orange">legacy structured</Badge> : null}
+              {isLegacyRecord ? <Badge color="orange">{t("homepageEditor.legacyStructured")}</Badge> : null}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="flex flex-col gap-1">
@@ -529,7 +529,7 @@ const HomepageEditorPage = () => {
                 <Input id="homepage-title" value={title} onChange={(e) => setTitle(e.target.value)} disabled={!selectedRecord} />
               </div>
               <div className="flex flex-col gap-1">
-                <Label htmlFor="homepage-handle">Handle</Label>
+                <Label htmlFor="homepage-handle">{t("common.handle")}</Label>
                 <Input id="homepage-handle" value={handle} onChange={(e) => setHandle(e.target.value)} disabled={!selectedRecord} />
               </div>
             </div>
@@ -643,7 +643,8 @@ const HomepageEditorPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "首页模板",
+  label: "homepageEditor.menuLabel",
+  translationNs: "translation",
   icon: PencilSquare,
 })
 

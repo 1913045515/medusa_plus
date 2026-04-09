@@ -15,7 +15,9 @@
     "status": "状态",
     "actions": "操作",
     "published": "已发布",
-    "draft": "草稿"
+    "draft": "草稿",
+    "uploaded": "已上传",
+    "active": "激活"
   },
   "contentLocale": {
     "label": "内容语言",

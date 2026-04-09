@@ -1,6 +1,11 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { courseService, setCourseModuleScope } from "../../../../modules/course"
-import type { UpdateCourseInput } from "../../../../modules/course"
+import { courseService, courseMediaService, setCourseModuleScope } from "../../../../modules/course"
+import type { UpdateCourseInput, StoredS3MediaAsset } from "../../../../modules/course"
+
+async function trySign(asset: StoredS3MediaAsset | null): Promise<string | null> {
+  if (!asset || !courseMediaService.isConfigured()) return null
+  return courseMediaService.sign(asset).then((s) => s.url).catch(() => null)
+}
 
 // GET /admin/courses/:id
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -8,7 +13,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const locale = (req.query.locale as string | undefined) ?? null
   const course = await courseService.getCourse(req.params.id, locale)
   if (!course) return res.status(404).json({ message: "Course not found" })
-  res.json({ course })
+  res.json({ course: { ...course, thumbnail_signed_url: await trySign(course.thumbnail_asset) } })
 }
 
 // PUT /admin/courses/:id

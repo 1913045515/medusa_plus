@@ -3,9 +3,9 @@ import { basename, extname } from "node:path"
 import {
   DeleteObjectCommand,
   GetObjectCommand,
-  PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3"
+import { Upload } from "@aws-sdk/lib-storage"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import type {
   CourseMediaField,
@@ -39,7 +39,9 @@ export type CourseMediaConfig = {
   signedUrlTtlSeconds: number
 }
 
-type UploadBody = Buffer | NodeJS.ReadableStream
+import type { Readable } from "node:stream"
+
+type UploadBody = Buffer | Readable
 
 type UploadMediaInput = CourseMediaUploadTarget & {
   file_name: string
@@ -278,15 +280,19 @@ export class CourseMediaService {
       return
     }
 
-    await this.s3Client!.send(
-      new PutObjectCommand({
+    const upload = new Upload({
+      client: this.s3Client!,
+      queueSize: 4,
+      partSize: 10 * 1024 * 1024, // 10 MB per part, handles large videos
+      params: {
         Bucket: input.bucket,
         Key: input.key,
         Body: input.body,
         ContentType: input.mimeType,
         ContentDisposition: `inline; filename="${sanitizeFileName(input.fileName)}"`,
-      })
-    )
+      },
+    })
+    await upload.done()
   }
 
   private async deleteObject(input: { bucket: string; key: string }) {

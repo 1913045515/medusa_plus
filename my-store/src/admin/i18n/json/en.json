@@ -15,7 +15,9 @@
     "status": "Status",
     "actions": "Actions",
     "published": "Published",
-    "draft": "Draft"
+    "draft": "Draft",
+    "uploaded": "Uploaded",
+    "active": "Active"
   },
   "contentLocale": {
     "label": "Content locale",
