@@ -20,8 +20,10 @@ For repo-wide development rules, see `CONVENTIONS.md`. Key requirements:
 
 1. Internationalization: any new UI copy must add translations for supported locales (storefront + admin i18n).
 2. Minimal impact: implement changes in the smallest module/surface area possible and verify the app can open without errors.
-3. Clear ownership: admin features live under Medusa Admin (`my-store/src/admin` + `my-store/src/api/admin`), storefront lives under `my-store-storefront`.
-4. API documentation: any API contract change must be reflected in OpenAPI (`my-store/openapi/*`) and pass spec lint.
+3. Review gate: every code change must go through code review, and work is only complete after the review passes.
+4. Database changes: every schema change must persist the reviewed DDL in repo scripts/docs and must also be applied to the target database environment.
+5. Clear ownership: admin features live under Medusa Admin (`my-store/src/admin` + `my-store/src/api/admin`), storefront lives under `my-store-storefront`.
+6. API documentation: any API contract change must be reflected in OpenAPI (`my-store/openapi/*`) and pass spec lint.
 
 ## Core Domains
 1. **Courses** — course catalog, lessons, video playback

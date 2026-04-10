@@ -54,5 +54,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/product-detail",
     },
+    {
+      resolve: "./src/modules/site-analytics",
+    },
   ],
 })

@@ -30,8 +30,46 @@ tags:
     description: 首页模板读取
   - name: Product Detail
     description: 产品富文本详情与图片元数据
+  - name: Site Analytics
+    description: 前台埋点事件采集
 
 paths:
+  /store/site-analytics/events:
+    post:
+      tags: [Site Analytics]
+      summary: 异步上报网站埋点事件
+      operationId: store-track-site-analytics-event
+      description: 接收前台异步上报的页面访问与停留时长事件，写入数据库供后台检索与聚合。
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/site-analytics.yaml#/StoreSiteAnalyticsEventInput'
+      responses:
+        "202":
+          description: 事件已接受异步处理
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accepted, event_id]
+                properties:
+                  accepted:
+                    type: boolean
+                    example: true
+                  event_id:
+                    type: string
+                    example: sae_01HX123ABC
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
   /store/homepage-content:
     get:
       tags: [Homepage]

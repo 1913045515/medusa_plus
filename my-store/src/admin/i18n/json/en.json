@@ -208,5 +208,53 @@
     "setAsMain": "Set as Main",
     "mainBadge": "Main",
     "empty": "No images available"
+  },
+  "siteAnalytics": {
+    "title": "Website Logs",
+    "menuLabel": "Website Logs",
+    "pageDescription": "Query analytics logs and aggregate metrics, filter by time and country, and manually clean retained log data.",
+    "refresh": "Refresh",
+    "search": "Search",
+    "reset": "Reset",
+    "bulkDelete": "Bulk Delete",
+    "empty": "No logs match the current filters.",
+    "emptyMetrics": "No aggregate metrics are available for the current filters.",
+    "selectAll": "Select all rows on this page",
+    "selectRow": "Select log {{id}}",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pagination": "Page {{currentPage}} / {{totalPages}}, {{count}} total",
+    "confirmDeleteTitle": "Confirm log deletion",
+    "confirmDeleteDesc": "Delete {{count}} log entries? Aggregate metrics will be recalculated from the retained dataset.",
+    "filters": {
+      "startAt": "Start time",
+      "endAt": "End time",
+      "country": "Country",
+      "allCountries": "All countries"
+    },
+    "summary": {
+      "totalPageViews": "Total page views",
+      "totalUniqueVisitors": "Total unique visitors",
+      "totalDwellEvents": "Dwell events",
+      "averageDwell": "Average dwell time",
+      "pageMetrics": "Top 5 page metrics",
+      "dailyMetrics": "Last 7 daily metrics"
+    },
+    "columns": {
+      "eventType": "Event type",
+      "path": "Path",
+      "visitorId": "Visitor ID",
+      "country": "Country",
+      "duration": "Dwell time",
+      "occurredAt": "Occurred at"
+    },
+    "toast": {
+      "loadFailed": "Failed to load website logs",
+      "deleted": "Log deleted",
+      "deleteFailed": "Failed to delete log",
+      "selectRowsFirst": "Select logs to delete first",
+      "bulkDeleted": "Deleted {{count}} logs",
+      "bulkDeleteFailed": "Failed to bulk delete logs"
+    }
   }
 }

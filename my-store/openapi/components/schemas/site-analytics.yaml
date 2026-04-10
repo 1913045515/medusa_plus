@@ -1,0 +1,204 @@
+SiteAnalyticsEvent:
+  type: object
+  required: [id, event_type, visitor_id, path, occurred_at, created_at, updated_at]
+  properties:
+    id:
+      type: string
+      example: sae_01HX123ABC
+    event_type:
+      type: string
+      enum: [page_view, page_leave]
+      example: page_view
+    visitor_id:
+      type: string
+      example: visitor_9a1b2c3d
+    session_id:
+      type: string
+      nullable: true
+      example: session_f83b1d20
+    path:
+      type: string
+      example: /us/courses/react-2024
+    full_path:
+      type: string
+      nullable: true
+      example: /us/courses/react-2024?from=homepage
+    country_code:
+      type: string
+      nullable: true
+      example: us
+    duration_seconds:
+      type: integer
+      nullable: true
+      example: 86
+    referrer:
+      type: string
+      nullable: true
+      example: https://www.google.com/
+    user_agent:
+      type: string
+      nullable: true
+      example: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+    ip_address:
+      type: string
+      nullable: true
+      example: 203.0.113.1
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+    occurred_at:
+      type: string
+      format: date-time
+      example: 2026-04-09T10:00:00.000Z
+    created_at:
+      type: string
+      format: date-time
+      example: 2026-04-09T10:00:01.000Z
+    updated_at:
+      type: string
+      format: date-time
+      example: 2026-04-09T10:00:01.000Z
+
+StoreSiteAnalyticsEventInput:
+  type: object
+  required: [event_type, visitor_id, path]
+  properties:
+    event_type:
+      type: string
+      enum: [page_view, page_leave]
+      example: page_view
+    visitor_id:
+      type: string
+      example: visitor_9a1b2c3d
+    session_id:
+      type: string
+      nullable: true
+      example: session_f83b1d20
+    path:
+      type: string
+      example: /us/courses/react-2024
+    full_path:
+      type: string
+      nullable: true
+      example: /us/courses/react-2024?from=homepage
+    country_code:
+      type: string
+      nullable: true
+      example: us
+    duration_seconds:
+      type: integer
+      nullable: true
+      example: 86
+    occurred_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: 2026-04-09T10:00:00.000Z
+    referrer:
+      type: string
+      nullable: true
+      example: https://www.google.com/
+    metadata:
+      type: object
+      nullable: true
+      additionalProperties: true
+
+SiteAnalyticsDailyMetric:
+  type: object
+  required: [date, page_views, unique_visitors]
+  properties:
+    date:
+      type: string
+      example: 2026-04-09
+    page_views:
+      type: integer
+      example: 1234
+    unique_visitors:
+      type: integer
+      example: 345
+
+SiteAnalyticsCountryDailyMetric:
+  allOf:
+    - $ref: '#/SiteAnalyticsDailyMetric'
+    - type: object
+      required: [country_code]
+      properties:
+        country_code:
+          type: string
+          example: us
+
+SiteAnalyticsPageMetric:
+  type: object
+  required: [path, page_views]
+  properties:
+    path:
+      type: string
+      example: /us/courses/react-2024
+    page_views:
+      type: integer
+      example: 430
+    average_dwell_seconds:
+      type: number
+      format: float
+      nullable: true
+      example: 92.5
+
+SiteAnalyticsSummary:
+  type: object
+  required:
+    [
+      total_page_views,
+      total_unique_visitors,
+      total_dwell_events,
+      daily_metrics,
+      country_daily_metrics,
+      page_metrics
+    ]
+  properties:
+    total_page_views:
+      type: integer
+      example: 1234
+    total_unique_visitors:
+      type: integer
+      example: 345
+    total_dwell_events:
+      type: integer
+      example: 900
+    average_dwell_seconds:
+      type: number
+      format: float
+      nullable: true
+      example: 88.2
+    daily_metrics:
+      type: array
+      items:
+        $ref: '#/SiteAnalyticsDailyMetric'
+    country_daily_metrics:
+      type: array
+      items:
+        $ref: '#/SiteAnalyticsCountryDailyMetric'
+    page_metrics:
+      type: array
+      items:
+        $ref: '#/SiteAnalyticsPageMetric'
+
+AdminSiteAnalyticsLogResponse:
+  type: object
+  required: [logs, count, limit, offset, summary]
+  properties:
+    logs:
+      type: array
+      items:
+        $ref: '#/SiteAnalyticsEvent'
+    count:
+      type: integer
+      example: 256
+    limit:
+      type: integer
+      example: 20
+    offset:
+      type: integer
+      example: 0
+    summary:
+      $ref: '#/SiteAnalyticsSummary'

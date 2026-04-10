@@ -208,5 +208,53 @@
     "setAsMain": "设为主图",
     "mainBadge": "主图",
     "empty": "暂无图片"
+  },
+  "siteAnalytics": {
+    "title": "网站日志",
+    "menuLabel": "网站日志",
+    "pageDescription": "查询网站埋点明细与聚合指标，支持按时间、国家筛选并手动清理日志数据。",
+    "refresh": "刷新",
+    "search": "查询",
+    "reset": "重置",
+    "bulkDelete": "批量删除",
+    "empty": "当前筛选条件下没有日志数据。",
+    "emptyMetrics": "当前筛选条件下暂无聚合数据。",
+    "selectAll": "全选当前页",
+    "selectRow": "选择日志 {{id}}",
+    "previousPage": "上一页",
+    "nextPage": "下一页",
+    "pagination": "第 {{currentPage}} / {{totalPages}} 页，共 {{count}} 条",
+    "confirmDeleteTitle": "确认删除日志",
+    "confirmDeleteDesc": "确定要删除 {{count}} 条日志吗？删除后聚合指标会基于保留数据重新计算。",
+    "filters": {
+      "startAt": "开始时间",
+      "endAt": "结束时间",
+      "country": "国家",
+      "allCountries": "全部国家"
+    },
+    "summary": {
+      "totalPageViews": "总访问量 PV",
+      "totalUniqueVisitors": "总独立访问量 UV",
+      "totalDwellEvents": "停留事件数",
+      "averageDwell": "平均停留时长",
+      "pageMetrics": "页面指标 Top 5",
+      "dailyMetrics": "最近 7 天日指标"
+    },
+    "columns": {
+      "eventType": "事件类型",
+      "path": "页面路径",
+      "visitorId": "访客 ID",
+      "country": "国家",
+      "duration": "停留时长",
+      "occurredAt": "发生时间"
+    },
+    "toast": {
+      "loadFailed": "加载网站日志失败",
+      "deleted": "日志已删除",
+      "deleteFailed": "删除日志失败",
+      "selectRowsFirst": "请先选择需要删除的日志",
+      "bulkDeleted": "已删除 {{count}} 条日志",
+      "bulkDeleteFailed": "批量删除日志失败"
+    }
   }
 }

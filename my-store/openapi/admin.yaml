@@ -40,8 +40,165 @@ tags:
     description: 首页静态模板管理
   - name: Admin Product Detail
     description: 产品富文本详情与图片元数据管理
+  - name: Admin Site Analytics
+    description: 网站埋点日志查询与清理
 
 paths:
+  /admin/site-analytics/logs:
+    get:
+      tags: [Admin Site Analytics]
+      summary: 查询网站埋点日志
+      operationId: admin-list-site-analytics-logs
+      parameters:
+        - name: start_at
+          in: query
+          required: false
+          description: 查询时间窗口开始时间（含）。
+          schema:
+            type: string
+            format: date-time
+            example: 2026-04-01T00:00:00.000Z
+        - name: end_at
+          in: query
+          required: false
+          description: 查询时间窗口结束时间（含）。
+          schema:
+            type: string
+            format: date-time
+            example: 2026-04-09T23:59:59.999Z
+        - name: country_code
+          in: query
+          required: false
+          description: 按国家码过滤埋点日志。
+          schema:
+            type: string
+            example: us
+        - name: path
+          in: query
+          required: false
+          description: 按页面路径精确过滤埋点日志。
+          schema:
+            type: string
+            example: /us/courses
+        - name: limit
+          in: query
+          required: false
+          description: 分页大小，最大 100。
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          description: 分页偏移量，从 0 开始。
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: sort_by
+          in: query
+          required: false
+          description: 排序字段。
+          schema:
+            type: string
+            enum: [occurred_at, created_at, event_type, country_code, path, duration_seconds]
+            default: occurred_at
+        - name: sort_direction
+          in: query
+          required: false
+          description: 排序方向。
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: 成功返回埋点日志、分页信息和聚合指标
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/site-analytics.yaml#/AdminSiteAnalyticsLogResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/site-analytics/logs/bulk-delete:
+    post:
+      tags: [Admin Site Analytics]
+      summary: 批量删除网站埋点日志
+      operationId: admin-bulk-delete-site-analytics-logs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [deleted_count]
+                properties:
+                  deleted_count:
+                    type: integer
+                    example: 3
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/site-analytics/logs/{id}:
+    delete:
+      tags: [Admin Site Analytics]
+      summary: 删除单条网站埋点日志
+      operationId: admin-delete-site-analytics-log
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 埋点日志主键 ID。
+          schema:
+            type: string
+            example: sae_01HX123ABC
+      responses:
+        "204":
+          description: 删除成功
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
   /admin/homepage-content:
     get:
       tags: [Admin Homepage Content]
