@@ -1,6 +1,7 @@
 "use client"
 
 import { setAddresses } from "@lib/data/cart"
+import { CheckoutFieldsConfig, DEFAULT_CHECKOUT_FIELDS } from "@lib/data/checkout-config"
 import compareAddresses from "@lib/util/compare-addresses"
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
@@ -17,10 +18,20 @@ import { SubmitButton } from "../submit-button"
 const Addresses = ({
   cart,
   customer,
+  fieldConfig,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  fieldConfig?: CheckoutFieldsConfig
 }) => {
+  const config = fieldConfig ?? DEFAULT_CHECKOUT_FIELDS
+
+  // 虚拟购物车检测：全部商品均为虚拟产品时启用简化模式
+  const isVirtualCart =
+    (cart?.items?.length ?? 0) > 0 &&
+    cart!.items!.every(
+      (item: any) => item.product?.metadata?.is_virtual === true
+    )
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -69,9 +80,11 @@ const Addresses = ({
               checked={sameAsBilling}
               onChange={toggleSameAsBilling}
               cart={cart}
+              fieldConfig={config.shipping}
+              isVirtualCart={isVirtualCart}
             />
 
-            {!sameAsBilling && (
+            {!sameAsBilling && !isVirtualCart && (
               <div>
                 <Heading
                   level="h2"
@@ -80,7 +93,7 @@ const Addresses = ({
                   Billing address
                 </Heading>
 
-                <BillingAddress cart={cart} />
+                <BillingAddress cart={cart} fieldConfig={config.billing} />
               </div>
             )}
             <SubmitButton className="mt-6" data-testid="submit-address-button">

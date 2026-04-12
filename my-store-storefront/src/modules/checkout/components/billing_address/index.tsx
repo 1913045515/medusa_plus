@@ -1,9 +1,17 @@
+import { CheckoutSectionConfig, DEFAULT_CHECKOUT_FIELDS } from "@lib/data/checkout-config"
 import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
 import React, { useState } from "react"
 import CountrySelect from "../country-select"
 
-const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
+const BillingAddress = ({
+  cart,
+  fieldConfig,
+}: {
+  cart: HttpTypes.StoreCart | null
+  fieldConfig?: CheckoutSectionConfig
+}) => {
+  const fc = fieldConfig ?? DEFAULT_CHECKOUT_FIELDS.billing
   const [formData, setFormData] = useState<any>({
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
@@ -30,82 +38,103 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="First name"
-          name="billing_address.first_name"
-          autoComplete="given-name"
-          value={formData["billing_address.first_name"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-first-name-input"
-        />
-        <Input
-          label="Last name"
-          name="billing_address.last_name"
-          autoComplete="family-name"
-          value={formData["billing_address.last_name"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-last-name-input"
-        />
-        <Input
-          label="Address"
-          name="billing_address.address_1"
-          autoComplete="address-line1"
-          value={formData["billing_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-address-input"
-        />
-        <Input
-          label="Company"
-          name="billing_address.company"
-          value={formData["billing_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="billing-company-input"
-        />
-        <Input
-          label="Postal code"
-          name="billing_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["billing_address.postal_code"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-postal-input"
-        />
-        <Input
-          label="City"
-          name="billing_address.city"
-          autoComplete="address-level2"
-          value={formData["billing_address.city"]}
-          onChange={handleChange}
-        />
+        {fc.first_name.visible && (
+          <Input
+            label="First name"
+            name="billing_address.first_name"
+            autoComplete="given-name"
+            value={formData["billing_address.first_name"]}
+            onChange={handleChange}
+            required={fc.first_name.required}
+            data-testid="billing-first-name-input"
+          />
+        )}
+        {fc.last_name.visible && (
+          <Input
+            label="Last name"
+            name="billing_address.last_name"
+            autoComplete="family-name"
+            value={formData["billing_address.last_name"]}
+            onChange={handleChange}
+            required={fc.last_name.required}
+            data-testid="billing-last-name-input"
+          />
+        )}
+        {fc.address_1.visible && (
+          <Input
+            label="Address"
+            name="billing_address.address_1"
+            autoComplete="address-line1"
+            value={formData["billing_address.address_1"]}
+            onChange={handleChange}
+            required={fc.address_1.required}
+            data-testid="billing-address-input"
+          />
+        )}
+        {fc.company.visible && (
+          <Input
+            label="Company"
+            name="billing_address.company"
+            value={formData["billing_address.company"]}
+            onChange={handleChange}
+            autoComplete="organization"
+            required={fc.company.required}
+            data-testid="billing-company-input"
+          />
+        )}
+        {fc.postal_code.visible && (
+          <Input
+            label="Postal code"
+            name="billing_address.postal_code"
+            autoComplete="postal-code"
+            value={formData["billing_address.postal_code"]}
+            onChange={handleChange}
+            required={fc.postal_code.required}
+            data-testid="billing-postal-input"
+          />
+        )}
+        {fc.city.visible && (
+          <Input
+            label="City"
+            name="billing_address.city"
+            autoComplete="address-level2"
+            value={formData["billing_address.city"]}
+            onChange={handleChange}
+            required={fc.city.required}
+          />
+        )}
+        {/* country_code.visible 系统锁定，始终显示 */}
         <CountrySelect
           name="billing_address.country_code"
           autoComplete="country"
           region={cart?.region}
           value={formData["billing_address.country_code"]}
           onChange={handleChange}
-          required
+          required={fc.country_code.required}
           data-testid="billing-country-select"
         />
-        <Input
-          label="State / Province"
-          name="billing_address.province"
-          autoComplete="address-level1"
-          value={formData["billing_address.province"]}
-          onChange={handleChange}
-          data-testid="billing-province-input"
-        />
-        <Input
-          label="Phone"
-          name="billing_address.phone"
-          autoComplete="tel"
-          value={formData["billing_address.phone"]}
-          onChange={handleChange}
-          data-testid="billing-phone-input"
-        />
+        {fc.province.visible && (
+          <Input
+            label="State / Province"
+            name="billing_address.province"
+            autoComplete="address-level1"
+            value={formData["billing_address.province"]}
+            onChange={handleChange}
+            required={fc.province.required}
+            data-testid="billing-province-input"
+          />
+        )}
+        {fc.phone.visible && (
+          <Input
+            label="Phone"
+            name="billing_address.phone"
+            autoComplete="tel"
+            value={formData["billing_address.phone"]}
+            onChange={handleChange}
+            required={fc.phone.required}
+            data-testid="billing-phone-input"
+          />
+        )}
       </div>
     </>
   )

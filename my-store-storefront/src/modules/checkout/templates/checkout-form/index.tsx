@@ -1,3 +1,4 @@
+import { getCheckoutFieldConfig } from "@lib/data/checkout-config"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { HttpTypes } from "@medusajs/types"
@@ -19,6 +20,7 @@ export default async function CheckoutForm({
 
   const shippingMethods = await listCartShippingMethods(cart.id)
   const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
+  const fieldConfig = await getCheckoutFieldConfig()
 
   if (!shippingMethods || !paymentMethods) {
     return null
@@ -26,7 +28,7 @@ export default async function CheckoutForm({
 
   return (
     <div className="w-full grid grid-cols-1 gap-y-8">
-      <Addresses cart={cart} customer={customer} />
+      <Addresses cart={cart} customer={customer} fieldConfig={fieldConfig} />
 
       <Shipping cart={cart} availableShippingMethods={shippingMethods} />
 

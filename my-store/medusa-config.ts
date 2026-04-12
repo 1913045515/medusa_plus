@@ -60,5 +60,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/store-settings",
     },
+    {
+      resolve: "./src/modules/email-proxy",
+    },
   ],
 })
