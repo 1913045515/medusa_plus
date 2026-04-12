@@ -170,18 +170,32 @@ export default async function orderPlacedHandler({
     }
 
     // 3. 检查是否需要创建游客账号
+    // 判断依据：是否已有 emailpass 登录身份（auth identity）
+    // 仅检查 customer 记录不够：Medusa 在下单流程中可能已自动关联 customer，
+    // 但该 customer 并没有登录密码，仍属于需要初始化账号的新用户。
     let password: string | null = null
     let isNewAccount = false
 
-    const customerModuleService = container.resolve(Modules.CUSTOMER)
-    const existingCustomers = await customerModuleService.listCustomers({ email })
+    const authModuleService = container.resolve(Modules.AUTH)
+    const existingIdentities = await authModuleService.listAuthIdentities({
+      provider_identities: { provider: "emailpass", entity_id: email },
+    })
 
-    if (existingCustomers.length === 0) {
-      // 新用户：创建账号
+    if (existingIdentities.length === 0) {
+      // 没有 emailpass 登录身份 → 生成随机密码、确保 customer 存在、创建 auth identity
       password = generateRandomPassword()
-      const customer = await customerModuleService.createCustomers({ email })
 
-      const authModuleService = container.resolve(Modules.AUTH)
+      const customerModuleService = container.resolve(Modules.CUSTOMER)
+      const existingCustomers = await customerModuleService.listCustomers({ email })
+
+      let customerId: string
+      if (existingCustomers.length === 0) {
+        const customer = await customerModuleService.createCustomers({ email })
+        customerId = customer.id
+      } else {
+        customerId = existingCustomers[0].id
+      }
+
       await authModuleService.createAuthIdentities({
         provider_identities: [
           {
@@ -190,11 +204,11 @@ export default async function orderPlacedHandler({
             provider_metadata: { password },
           },
         ],
-        app_metadata: { customer_id: customer.id },
+        app_metadata: { customer_id: customerId },
       })
 
       isNewAccount = true
-      console.log(`[OrderPlaced] 游客账号已创建: ${email}`)
+      console.log(`[OrderPlaced] 游客账号已创建（auth identity）: ${email}`)
 
       // 4a. 发送注册成功邮件
       try {
@@ -214,7 +228,7 @@ export default async function orderPlacedHandler({
         console.error("[OrderPlaced] 注册邮件发送失败:", e)
       }
     } else {
-      console.log(`[OrderPlaced] 邮箱 ${email} 已有账号`)
+      console.log(`[OrderPlaced] 邮箱 ${email} 已有登录身份，跳过账号创建`)
     }
 
     // 5. 构建订单商品 HTML
