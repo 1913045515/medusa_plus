@@ -57,5 +57,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/site-analytics",
     },
+    {
+      resolve: "./src/modules/store-settings",
+    },
   ],
 })

@@ -23,9 +23,10 @@ type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
   locales: Locale[] | null
   currentLocale: string | null
+  cartEnabled?: boolean
 }
 
-const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
+const SideMenu = ({ regions, locales, currentLocale, cartEnabled = true }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
 
@@ -74,7 +75,9 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                     </div>
                     <div className="flex min-h-0 flex-1 flex-col gap-y-4">
                       <ul className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1 no-scrollbar">
-                        {Object.entries(SideMenuItems).map(([name, href]) => {
+                        {Object.entries(SideMenuItems)
+                          .filter(([name]) => cartEnabled || name !== "Cart")
+                          .map(([name, href]) => {
                           return (
                             <li key={name}>
                               <LocalizedClientLink

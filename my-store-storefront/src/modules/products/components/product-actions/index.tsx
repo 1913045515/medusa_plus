@@ -21,6 +21,7 @@ type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
+  cartEnabled?: boolean
 }
 
 const optionsAsKeymap = (
@@ -35,6 +36,7 @@ const optionsAsKeymap = (
 export default function ProductActions({
   product,
   disabled,
+  cartEnabled = true,
 }: ProductActionsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -152,6 +154,13 @@ export default function ProductActions({
     }
   }
 
+  const handleBuyNow = async () => {
+    const ok = await handleAddToCart()
+    if (ok) {
+      router.push(`/${countryCode}/checkout?step=address`)
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col gap-y-2" ref={actionsRef}>
@@ -182,8 +191,12 @@ export default function ProductActions({
         <Button
           type="button"
           onClick={async () => {
-            const ok = await handleAddToCart()
-            if (ok) setShowCartSuccess(true)
+            if (!cartEnabled) {
+              await handleBuyNow()
+            } else {
+              const ok = await handleAddToCart()
+              if (ok) setShowCartSuccess(true)
+            }
           }}
           disabled={
             !inStock ||
@@ -201,7 +214,9 @@ export default function ProductActions({
             ? "Select variant"
             : !inStock || !isValidVariant
             ? "Out of stock"
-            : "Add to cart"}
+            : cartEnabled
+            ? "Add to cart"
+            : "Buy Now"}
         </Button>
         <MobileActions
           product={product}
@@ -214,6 +229,8 @@ export default function ProductActions({
           show={!inView}
           optionsDisabled={!!disabled || isAdding}
           onAddedToCart={() => setShowCartSuccess(true)}
+          cartEnabled={cartEnabled}
+          countryCode={countryCode}
         />
       </div>
 

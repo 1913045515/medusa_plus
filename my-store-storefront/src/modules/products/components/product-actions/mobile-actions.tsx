@@ -10,6 +10,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
+import { useRouter } from "next/navigation"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
@@ -22,6 +23,8 @@ type MobileActionsProps = {
   show: boolean
   optionsDisabled: boolean
   onAddedToCart?: () => void
+  cartEnabled?: boolean
+  countryCode?: string
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -35,8 +38,11 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   show,
   optionsDisabled,
   onAddedToCart,
+  cartEnabled = true,
+  countryCode,
 }) => {
   const { state, open, close } = useToggleState()
+  const router = useRouter()
 
   const price = getProductPrice({
     product: product,
@@ -58,8 +64,12 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     const didAdd = await handleAddToCart()
 
     if (didAdd) {
-      close()
-      onAddedToCart?.()
+      if (!cartEnabled && countryCode) {
+        router.push(`/${countryCode}/checkout?step=address`)
+      } else {
+        close()
+        onAddedToCart?.()
+      }
     }
   }
 
@@ -140,7 +150,9 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   ? "Select variant"
                   : !inStock
                   ? "Out of stock"
-                  : "Add to cart"}
+                  : cartEnabled
+                  ? "Add to cart"
+                  : "Buy Now"}
               </Button>
             </div>
           </div>
