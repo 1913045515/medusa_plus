@@ -1,6 +1,7 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { Modules } from "@medusajs/framework/utils"
 import crypto from "crypto"
+import { kdf as scryptKdf } from "scrypt-kdf"
 import { EMAIL_PROXY_MODULE } from "../modules/email-proxy"
 import EmailProxyService from "../modules/email-proxy/service"
 import { SmtpConfig } from "../modules/email-proxy/types"
@@ -103,6 +104,7 @@ function getEmailTemplates(setting: any): EmailTemplatesConfig {
       const merged: EmailTemplatesConfig = {
         guest_register: { ...DEFAULT_EMAIL_TEMPLATES.guest_register },
         order_placed: { ...DEFAULT_EMAIL_TEMPLATES.order_placed },
+        password_reset: { ...DEFAULT_EMAIL_TEMPLATES.password_reset },
       }
 
       // guest_register 模板必须包含 {{email}} 和 {{password}}，否则使用默认模板
@@ -201,7 +203,9 @@ export default async function orderPlacedHandler({
           {
             provider: "emailpass",
             entity_id: email,
-            provider_metadata: { password },
+            provider_metadata: {
+              password: (await scryptKdf(password, { logN: 15, r: 8, p: 1 })).toString("base64"),
+            },
           },
         ],
         app_metadata: { customer_id: customerId },

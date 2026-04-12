@@ -1,9 +1,11 @@
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
+import { getPasswordResetDictionary } from "@lib/i18n/dictionaries"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import { useActionState } from "react"
+import { useParams } from "next/navigation"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -11,6 +13,8 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const { countryCode } = useParams() as { countryCode?: string }
+  const dict = getPasswordResetDictionary(countryCode)
 
   return (
     <div
@@ -46,6 +50,16 @@ const Login = ({ setCurrentView }: Props) => {
           Sign in
         </SubmitButton>
       </form>
+      <div className="w-full flex justify-end mt-2">
+        <button
+          type="button"
+          onClick={() => setCurrentView(LOGIN_VIEW.FORGOT_PASSWORD)}
+          className="text-small-regular text-ui-fg-subtle underline hover:text-ui-fg-base"
+          data-testid="forgot-password-button"
+        >
+          {dict.forgotPasswordLink}
+        </button>
+      </div>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Not a member?{" "}
         <button

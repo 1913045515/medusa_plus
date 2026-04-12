@@ -104,6 +104,79 @@ export async function signup(_currentState: unknown, formData: FormData) {
   }
 }
 
+// ─── OTP 注册流程 Server Actions ─────────────────────────────────
+
+/** Step 1: 发送邮箱验证码 */
+export async function sendEmailOtp(
+  email: string
+): Promise<{ success: true } | { error: string; cooldown_seconds?: number }> {
+  try {
+    await sdk.client.fetch("/store/auth/email-otp/send", {
+      method: "POST",
+      body: { email },
+    })
+    return { success: true }
+  } catch (err: any) {
+    const body = err?.response?.json ? await err.response.json().catch(() => null) : null
+    const message = body?.message ?? err?.message ?? "发送失败 / Send failed"
+    const cooldown_seconds = body?.cooldown_seconds
+    return { error: message, ...(cooldown_seconds ? { cooldown_seconds } : {}) }
+  }
+}
+
+/** Step 2: 验证 OTP，成功返回 verifiedToken */
+export async function verifyEmailOtp(
+  email: string,
+  otp: string
+): Promise<{ success: true; verified_token: string } | { error: string }> {
+  try {
+    const res = await sdk.client.fetch<{ success: boolean; verified_token: string }>(
+      "/store/auth/email-otp/verify",
+      { method: "POST", body: { email, otp } }
+    )
+    return { success: true, verified_token: res.verified_token }
+  } catch (err: any) {
+    const body = err?.response?.json ? await err.response.json().catch(() => null) : null
+    const message = body?.message ?? err?.message ?? "验证失败 / Verification failed"
+    return { error: message }
+  }
+}
+
+/** Step 3: 使用 verifiedToken 完成注册并自动登录 */
+export async function registerWithOtp(
+  _currentState: unknown,
+  formData: FormData
+): Promise<string | null> {
+  const verified_token = formData.get("verified_token") as string
+  const first_name = formData.get("first_name") as string
+  const last_name = formData.get("last_name") as string
+  const phone = formData.get("phone") as string
+  const password = formData.get("password") as string
+  const email = formData.get("email") as string
+
+  try {
+    const res = await sdk.client.fetch<{ token: string }>(
+      "/store/auth/register-with-otp",
+      {
+        method: "POST",
+        body: { verified_token, first_name, last_name, phone, password },
+      }
+    )
+
+    await setAuthToken(res.token)
+
+    const customerCacheTag = await getCacheTag("customers")
+    revalidateTag(customerCacheTag)
+
+    await transferCart()
+
+    return null // null 表示成功
+  } catch (err: any) {
+    const body = err?.response?.json ? await err.response.json().catch(() => null) : null
+    return body?.message ?? err?.message ?? "注册失败 / Registration failed"
+  }
+}
+
 export async function login(_currentState: unknown, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string

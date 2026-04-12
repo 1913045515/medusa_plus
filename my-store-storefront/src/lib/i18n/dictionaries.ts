@@ -272,3 +272,120 @@ export function getOrderDictionary(locale?: string | null): OrderDictionary {
   if (!locale) return orderEn
   return orderDictionaries[locale] ?? (locale.startsWith("zh") ? orderZh : orderEn)
 }
+
+// ─── Password Reset Dictionary ────────────────────────────────────────────────
+
+export type PasswordResetDictionary = {
+  // Forgot password page
+  forgotTitle: string
+  forgotSubtitle: string
+  emailLabel: string
+  sendButton: string
+  sending: string
+  networkError: string
+  // Success state
+  emailSentTitle: string
+  emailSentDesc: string
+  emailSentHint: string
+  backToLogin: string
+  // Reset password page
+  resetTitle: string
+  resetSubtitle: (email: string) => string
+  emailAddressLabel: string
+  newPasswordLabel: string
+  confirmPasswordLabel: string
+  resetButton: string
+  resetting: string
+  // Validation errors (client-side)
+  passwordTooShort: string
+  passwordMismatch: string
+  // Token invalid page
+  linkInvalidTitle: string
+  linkInvalidDesc: string
+  linkInvalidHint: string
+  backToLoginPage: string
+  // Success state
+  resetSuccessTitle: string
+  resetSuccessDesc: string
+  // Validating state
+  validatingLink: string
+  // No token
+  invalidLinkDesc: string
+  // Login component
+  forgotPasswordLink: string
+}
+
+const prZh: PasswordResetDictionary = {
+  forgotTitle: "忘记密码",
+  forgotSubtitle: "请输入您的注册邮箱，我们将向您发送密码重置链接。",
+  emailLabel: "邮箱地址",
+  sendButton: "发送重置邮件",
+  sending: "发送中...",
+  networkError: "网络错误，请稍后重试。",
+  emailSentTitle: "邮件已发送",
+  emailSentDesc: "如果该邮箱已注册，您将收到一封包含密码重置链接的邮件。",
+  emailSentHint: "链接有效期为 10 分钟，请尽快操作。请检查垃圾邮件箱。",
+  backToLogin: "返回登录",
+  resetTitle: "重置密码",
+  resetSubtitle: (email: string) => `为账号 ${email} 设置新密码`,
+  emailAddressLabel: "邮箱地址",
+  newPasswordLabel: "新密码（至少 8 位）",
+  confirmPasswordLabel: "确认新密码",
+  resetButton: "确认重置密码",
+  resetting: "重置中...",
+  passwordTooShort: "密码不能少于 8 位",
+  passwordMismatch: "两次输入的密码不一致",
+  linkInvalidTitle: "链接无效",
+  linkInvalidDesc: "此重置链接已失效或已过期。",
+  linkInvalidHint: "重置链接仅有效 10 分钟且只能使用一次，请重新申请。",
+  backToLoginPage: "返回登录页",
+  resetSuccessTitle: "密码重置成功",
+  resetSuccessDesc: "您的密码已更新，正在跳转到登录页...",
+  validatingLink: "验证链接中...",
+  invalidLinkDesc: "无效的重置链接，请重新申请。",
+  forgotPasswordLink: "忘记密码？",
+}
+
+const prEn: PasswordResetDictionary = {
+  forgotTitle: "Forgot Password",
+  forgotSubtitle: "Enter your email address and we'll send you a password reset link.",
+  emailLabel: "Email address",
+  sendButton: "Send reset email",
+  sending: "Sending...",
+  networkError: "Network error. Please try again later.",
+  emailSentTitle: "Email sent",
+  emailSentDesc: "If that email is registered, you'll receive a password reset link shortly.",
+  emailSentHint: "The link is valid for 10 minutes. Please also check your spam folder.",
+  backToLogin: "Back to sign in",
+  resetTitle: "Reset Password",
+  resetSubtitle: (email: string) => `Set a new password for ${email}`,
+  emailAddressLabel: "Email address",
+  newPasswordLabel: "New password (min. 8 characters)",
+  confirmPasswordLabel: "Confirm new password",
+  resetButton: "Reset password",
+  resetting: "Resetting...",
+  passwordTooShort: "Password must be at least 8 characters",
+  passwordMismatch: "Passwords do not match",
+  linkInvalidTitle: "Link invalid",
+  linkInvalidDesc: "This reset link is invalid or has expired.",
+  linkInvalidHint: "Reset links are valid for 10 minutes and can only be used once. Please request a new one.",
+  backToLoginPage: "Back to sign in",
+  resetSuccessTitle: "Password reset",
+  resetSuccessDesc: "Your password has been updated. Redirecting to sign in...",
+  validatingLink: "Verifying link...",
+  invalidLinkDesc: "Invalid reset link. Please request a new one.",
+  forgotPasswordLink: "Forgot password?",
+}
+
+const prDictionaries: Record<string, PasswordResetDictionary> = {
+  "zh-CN": prZh,
+  zh: prZh,
+  en: prEn,
+  "en-US": prEn,
+}
+
+export function getPasswordResetDictionary(locale?: string | null): PasswordResetDictionary {
+  if (!locale) return prEn
+  return prDictionaries[locale] ?? (locale.startsWith("zh") ? prZh : prEn)
+}
+

@@ -63,5 +63,11 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/email-proxy",
     },
+    {
+      resolve: "./src/modules/password-reset",
+    },
+    {
+      resolve: "./src/modules/email-otp",
+    },
   ],
 })

@@ -1,4 +1,4 @@
-import { defineRouteConfig } from "@medusajs/admin-sdk"
+﻿import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { DocumentText } from "@medusajs/icons"
 import { useEffect, useState } from "react"
 import {
@@ -30,11 +30,12 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 type EmailTemplate = { subject: string; html: string }
-type EmailTemplatesConfig = { guest_register: EmailTemplate; order_placed: EmailTemplate }
+type EmailTemplatesConfig = { guest_register: EmailTemplate; order_placed: EmailTemplate; password_reset: EmailTemplate }
 
 const REQUIRED_VARIABLES: Record<string, string[]> = {
   guest_register: ["{{email}}", "{{password}}"],
   order_placed: [],
+  password_reset: ["{{reset_link}}"],
 }
 
 const VARIABLE_DOCS: Record<string, { name: string; desc: string }[]> = {
@@ -60,7 +61,7 @@ function TemplateEditor({
   onChange,
   onReset,
 }: {
-  templateKey: "guest_register" | "order_placed"
+  templateKey: "guest_register" | "order_placed" | "password_reset"
   template: EmailTemplate
   onChange: (t: EmailTemplate) => void
   onReset?: () => void
@@ -177,13 +178,13 @@ export default function EmailTemplatesPage() {
   }, [])
 
   const handleChange = (
-    key: "guest_register" | "order_placed",
+    key: "guest_register" | "order_placed" | "password_reset",
     tpl: EmailTemplate
   ) => {
     setTemplates((prev) => prev ? { ...prev, [key]: tpl } : prev)
   }
 
-  const handleResetTemplate = (key: "guest_register" | "order_placed") => {
+  const handleResetTemplate = (key: "guest_register" | "order_placed" | "password_reset") => {
     if (!defaultTemplates) return
     setTemplates((prev) => prev ? { ...prev, [key]: defaultTemplates[key] } : prev)
     toast.success(`已重置为默认模板，点击「保存模板」生效`)
@@ -234,6 +235,9 @@ export default function EmailTemplatesPage() {
           <Tabs.Trigger value="order_placed">
             订单确认邮件
           </Tabs.Trigger>
+          <Tabs.Trigger value="password_reset">
+            找回密码邮件
+          </Tabs.Trigger>
         </Tabs.List>
 
         <div className="mt-6">
@@ -266,6 +270,23 @@ export default function EmailTemplatesPage() {
               template={templates.order_placed}
               onChange={(t) => handleChange("order_placed", t)}
               onReset={defaultTemplates ? () => handleResetTemplate("order_placed") : undefined}
+            />
+          </Tabs.Content>
+
+          <Tabs.Content value="password_reset">
+            <div className="border border-ui-border-base rounded-lg p-4 mb-4 bg-ui-bg-subtle">
+              <Text weight="plus" className="text-sm">触发场景</Text>
+              <Text className="text-xs text-ui-fg-muted mt-1">
+                用户在登录页点击"忘记密码"并提交邮箱后，系统发送此邮件。邮件中包含
+                <code className="mx-1">{"{{reset_link}}"}</code>
+                重置链接，有效期 10 分钟，点击一次后失效。
+              </Text>
+            </div>
+            <TemplateEditor
+              templateKey="password_reset"
+              template={templates.password_reset}
+              onChange={(t) => handleChange("password_reset", t)}
+              onReset={defaultTemplates ? () => handleResetTemplate("password_reset") : undefined}
             />
           </Tabs.Content>
         </div>
