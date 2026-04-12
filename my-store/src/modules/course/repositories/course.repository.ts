@@ -24,7 +24,6 @@ export interface ICourseRepository {
 const STATIC_COURSES: CourseRecord[] = [
   {
     id: "course_demo_1",
-    product_id: null,
     handle: "demo-course-1",
     title: "React 从零到一",
     description: "系统学习 React 核心概念，包含 Hooks、状态管理与项目实战。",
@@ -45,7 +44,6 @@ const STATIC_COURSES: CourseRecord[] = [
   },
   {
     id: "course_demo_2",
-    product_id: null,
     handle: "demo-course-2",
     title: "Next.js 全栈开发",
     description: "深入 Next.js 13+ App Router，Server Components 与全栈部署实战。",
@@ -95,7 +93,6 @@ export class CourseStaticRepository implements ICourseRepository {
     const record: CourseRecord = {
       ...input,
       id: input.id ?? `course_${Date.now()}`,
-      product_id: input.product_id ?? null,
       translations: input.translations ?? null,
       thumbnail_asset: input.thumbnail_asset ?? null,
       created_at: now,

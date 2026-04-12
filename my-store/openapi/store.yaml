@@ -26,6 +26,8 @@ tags:
     description: 课程列表与课时管理
   - name: Lessons
     description: 课时播放地址获取
+  - name: Course Purchases
+    description: 下单成功后的课程授权与虚拟交付快照写入
   - name: Homepage
     description: 首页模板读取
   - name: Product Detail
@@ -281,6 +283,52 @@ paths:
                 $ref: './components/schemas/common.yaml#/Error'
               example:
                 message: Lesson not found
+
+  /store/course-purchases/from-order:
+    post:
+      tags: [Course Purchases]
+      summary: 根据订单写入课程购买记录和虚拟交付快照
+      operationId: store-create-course-purchases-from-order
+      description: |
+        在下单成功后根据订单中的虚拟商品写入课程购买授权，并将虚拟交付快照保存到订单项 metadata 中。
+      parameters:
+        - $ref: './components/parameters.yaml#/PublishableKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [order_id]
+              properties:
+                order_id:
+                  type: string
+                  example: order_01H...
+      responses:
+        "200":
+          description: 成功返回授权写入与快照更新结果
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/virtual-product.yaml#/StoreCoursePurchaseFromOrderResponse'
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "401":
+          description: 未授权或无法确定 customer
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+        "404":
+          description: 订单不存在
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
 
   /store/products/{id}/detail:
     get:

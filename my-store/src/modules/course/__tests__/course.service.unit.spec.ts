@@ -6,7 +6,6 @@ import type { CourseRecord } from "../types"
 
 const makeCourse = (overrides: Partial<CourseRecord> = {}): CourseRecord => ({
   id: "course_1",
-  product_id: null,
   handle: "test-course",
   title: "Test Course",
   description: null,
@@ -93,7 +92,6 @@ describe("CourseService", () => {
       const service = new CourseService(repo)
 
       const input = {
-        product_id: null,
         handle: "new-course",
         title: "New Course",
         description: null,
@@ -115,7 +113,10 @@ describe("CourseService", () => {
   describe("updateCourse", () => {
     it("returns updated record", async () => {
       const updated = makeCourse({ title: "Updated" })
-      const repo = makeRepo({ update: jest.fn().mockResolvedValue(updated) })
+      const repo = makeRepo({
+        findById: jest.fn().mockResolvedValue(makeCourse()),
+        update: jest.fn().mockResolvedValue(updated),
+      })
       const service = new CourseService(repo)
 
       const result = await service.updateCourse("course_1", { title: "Updated" })

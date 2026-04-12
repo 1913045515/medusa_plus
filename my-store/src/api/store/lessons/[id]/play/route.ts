@@ -43,7 +43,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   )
 
   if (!result.ok) {
-    return res.status(result.code).json({ message: result.message })
+    return res.status(result.code).json({ message: result.message, error_code: result.error_code })
   }
 
   res.json({

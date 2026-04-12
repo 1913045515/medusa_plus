@@ -40,6 +40,8 @@ tags:
     description: 首页静态模板管理
   - name: Admin Product Detail
     description: 产品富文本详情与图片元数据管理
+  - name: Admin Virtual Products
+    description: 虚拟产品配置管理
   - name: Admin Site Analytics
     description: 网站埋点日志查询与清理
 
@@ -755,6 +757,68 @@ paths:
             application/json:
               schema:
                 $ref: './components/schemas/product-detail.yaml#/ProductImageMetaListResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+
+  /admin/products/{id}/virtual-config:
+    get:
+      tags: [Admin Virtual Products]
+      summary: 获取商品虚拟产品配置
+      operationId: admin-get-product-virtual-config
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 商品 ID
+      responses:
+        "200":
+          description: 成功返回商品虚拟配置
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/virtual-product.yaml#/VirtualProductConfigResponse'
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
+    put:
+      tags: [Admin Virtual Products]
+      summary: 保存商品虚拟产品配置
+      operationId: admin-update-product-virtual-config
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 商品 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/virtual-product.yaml#/VirtualProductConfigInput'
+      responses:
+        "200":
+          description: 保存成功并返回当前配置
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/virtual-product.yaml#/VirtualProductConfigResponse'
+        "400":
+          description: 参数不合法
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/common.yaml#/Error'
         "401":
           description: 未授权
           content:

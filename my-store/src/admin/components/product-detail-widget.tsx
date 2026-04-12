@@ -44,26 +44,36 @@ const ProductDetailWidget = ({ data }: AdminProductDetailWidgetProps) => {
     setSaving(true)
     try {
       // Save short description via native Medusa Admin API
+      // Use null for empty string to avoid Medusa validation rejection
+      const descriptionValue = shortHtml.trim() ? shortHtml : null
       const shortRes = await fetch(`/admin/products/${productId}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: shortHtml || "" }),
+        body: JSON.stringify({ description: descriptionValue }),
       })
+      if (!shortRes.ok) {
+        const errJson = await shortRes.json().catch(() => ({}))
+        const msg = errJson?.message ?? `${t("productDetail.saveError", "Save failed")} (${shortRes.status})`
+        toast.error(msg)
+        return
+      }
       // Save long description via custom API
       const longRes = await fetch(`/admin/products/${productId}/detail`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ long_desc_html: longHtml || null }),
+        body: JSON.stringify({ long_desc_html: longHtml.trim() ? longHtml : null }),
       })
-      if (shortRes.ok && longRes.ok) {
-        toast.success(t("productDetail.saveSuccess", "Saved"))
-      } else {
-        toast.error(t("productDetail.saveError", "Save failed"))
+      if (!longRes.ok) {
+        const errJson = await longRes.json().catch(() => ({}))
+        const msg = errJson?.message ?? `${t("productDetail.saveError", "Save failed")} (${longRes.status})`
+        toast.error(msg)
+        return
       }
-    } catch {
-      toast.error(t("productDetail.saveError", "Save failed"))
+      toast.success(t("productDetail.saveSuccess", "Saved"))
+    } catch (err: any) {
+      toast.error(err?.message ?? t("productDetail.saveError", "Save failed"))
     } finally {
       setSaving(false)
     }

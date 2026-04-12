@@ -110,6 +110,8 @@
       "productPlaceholder": "选择产品（可选）",
       "noProduct": "-- 不关联 --",
       "productHint": "关联后将自动在产品 metadata 中写入 course_id",
+      "productReadonlyHint": "该产品关联由产品侧虚拟配置管理，此处为只读展示",
+      "noProductLinked": "暂无关联产品。请在对应产品的虚拟配置中选择此课程进行关联。",
       "titleHandleRequired": "标题和 handle 为必填项"
     },
     "level": {
@@ -208,6 +210,30 @@
     "setAsMain": "设为主图",
     "mainBadge": "主图",
     "empty": "暂无图片"
+  },
+  "productVirtual": {
+    "sectionTitle": "虚拟产品配置",
+    "isVirtualLabel": "是否为虚拟产品",
+    "isVirtualHint": "开启后可配置数据资料下载或虚拟课程交付信息。",
+    "typeLabel": "虚拟产品类型",
+    "typePlaceholder": "请选择虚拟产品类型",
+    "types": {
+      "resource": "数据资料",
+      "course": "虚拟课程"
+    },
+    "downloadUrlLabel": "资料下载地址",
+    "downloadUrlPlaceholder": "https://example.com/file.zip",
+    "downloadUrlHint": "客户购买后将在订单详情中看到该下载入口。",
+    "courseLabel": "关联课程",
+    "coursePlaceholder": "选择课程",
+    "courseHint": "保存后会自动同步课程的关联产品，并在订单中生成课程访问路径。",
+    "save": "保存",
+    "toast": {
+      "loadFailed": "加载虚拟产品配置失败",
+      "loadCoursesFailed": "加载课程列表失败",
+      "saved": "虚拟产品配置已保存",
+      "saveFailed": "保存虚拟产品配置失败"
+    }
   },
   "siteAnalytics": {
     "title": "网站日志",

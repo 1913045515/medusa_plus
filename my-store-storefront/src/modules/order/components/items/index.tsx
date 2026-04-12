@@ -1,6 +1,7 @@
 import repeat from "@lib/util/repeat"
 import { HttpTypes } from "@medusajs/types"
 import { Table } from "@medusajs/ui"
+import type { OrderDictionary } from "@lib/i18n/dictionaries"
 
 import Divider from "@modules/common/components/divider"
 import Item from "@modules/order/components/item"
@@ -8,9 +9,10 @@ import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
 
 type ItemsProps = {
   order: HttpTypes.StoreOrder
+  dict: OrderDictionary
 }
 
-const Items = ({ order }: ItemsProps) => {
+const Items = ({ order, dict }: ItemsProps) => {
   const items = order.items
 
   return (
@@ -29,6 +31,7 @@ const Items = ({ order }: ItemsProps) => {
                       key={item.id}
                       item={item}
                       currencyCode={order.currency_code}
+                      dict={dict}
                     />
                   )
                 })

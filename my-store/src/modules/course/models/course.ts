@@ -2,8 +2,6 @@ import { model } from "@medusajs/framework/utils"
 
 const Course = model.define("course", {
   id: model.id().primaryKey(),
-  // 一对一关联 Medusa Product
-  product_id: model.text().nullable(),
   handle: model.text(),
   title: model.text(),
   description: model.text().nullable(),

@@ -2,8 +2,6 @@
 
 export type CourseRecord = {
   id: string
-  /** 一对一关联的 Medusa Product ID */
-  product_id: string | null
   handle: string
   title: string
   description: string | null

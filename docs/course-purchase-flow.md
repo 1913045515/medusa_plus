@@ -229,6 +229,22 @@ if (cartRes?.type === "order") {
 
 > 该调用在 try/catch 中，失败不会阻断跳转到订单确认页。
 
+### 虚拟产品扩展
+
+当订单中的商品在 `product.metadata` 中被标记为虚拟商品时，`/store/course-purchases/from-order` 还会补做两件事：
+
+1. 将虚拟交付快照写入 `order_line_item.metadata.virtual_fulfillment`
+2. 如果类型为 `course`，同时写入课程购买记录，课程路径会保存为类似 `/courses/<handle>` 的相对路径
+
+当前支持的虚拟类型 code：
+
+| code | 含义 | 必填数据 |
+|------|------|----------|
+| `resource` | 数据资料 | `resource_download_url` |
+| `course` | 虚拟课程 | `virtual_course_id` |
+
+订单详情页展示时仅读取订单项快照，不再回读商品实时配置，因此商品后续修改不会影响历史订单的下载地址或课程入口。
+
 ---
 
 ## 九、调试排查指引
@@ -239,4 +255,16 @@ if (cartRes?.type === "order") {
 | `from-order` 返回 400 | 缺少 `x-publishable-api-key` | 检查前端环境变量 `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` |
 | `from-order` 返回 401 | customerId 为空 | 确保用户已登录或订单有 customer_id |
 | `from-order` 返回 500 `service.list is not a function` | 错误使用 `query.graph("course")` | 改用 `courseService.getCourse()` |
+| 订单详情没有显示课程入口/下载按钮 | 订单项缺少 `metadata.virtual_fulfillment` | 检查商品虚拟配置是否已保存，并确认下单成功后 `from-order` 返回 `snapshots_updated > 0` |
 | 购买后仍显示"购买后观看" | 前台 `purchasedCourseIds` 未刷新 | 进入课程页时预检第一个付费集的 play 接口 |
+
+---
+
+## 十、虚拟产品手工验证
+
+1. 在 Admin 商品详情中打开“虚拟产品配置”，将商品设为 `resource`，填写下载地址并保存。
+2. 使用该商品完成一次下单，检查 `POST /store/course-purchases/from-order` 返回结果中的 `snapshots_updated` 大于 0。
+3. 打开订单确认页和账户订单详情页，确认出现“下载资料”入口，点击后能打开保存的下载地址。
+4. 将商品改为 `course`，选择一个课程并保存，再次下单。
+5. 打开订单详情，确认出现“进入课程学习”入口，链接应跳转到 `/<countryCode>/courses/<handle>`。
+6. 返回课程详情页验证：已购买用户可以学习，未购买用户仍保持原有“请先购买课程”行为。

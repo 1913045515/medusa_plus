@@ -81,7 +81,7 @@ export async function getLessonPlayUrl(
       const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString("utf8"))
       if (payload.exp && Date.now() / 1000 > payload.exp) {
         await removeAuthToken()
-        return { error: "登录已过期，请重新登录", code: 401 }
+        return { error: "login_expired", code: 401, error_code: "login_expired" }
       }
     } catch {
       // 解析失败则继续，让后端决定
@@ -106,12 +106,11 @@ export async function getLessonPlayUrl(
   }
 
   if (!res.ok) {
+    const errorCode: string | undefined = data?.error_code
     return {
-      error:
-        data?.message ||
-        data?.error ||
-        "Failed to fetch video",
+      error: data?.message || data?.error || "Failed to fetch video",
       code: res.status as 401 | 403,
+      error_code: errorCode,
     }
   }
 

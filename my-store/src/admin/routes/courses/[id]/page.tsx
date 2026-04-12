@@ -51,7 +51,6 @@ type Course = {
   level: string | null
   lessons_count: number
   status: string
-  product_id: string | null
   metadata: Record<string, unknown> | null
   created_at: string
   updated_at: string
@@ -77,19 +76,12 @@ type Lesson = {
   updated_at: string
 }
 
-type Product = {
-  id: string
-  title: string
-  handle: string
-}
-
 type CourseFormData = {
   handle: string
   title: string
   description: string
   level: string
   status: string
-  product_id: string
 }
 
 type LessonFormData = {
@@ -508,7 +500,6 @@ const LessonForm = ({
 
 type CourseEditFormProps = {
   course: Course
-  products: Product[]
   onSubmit: (data: CourseFormData) => Promise<void>
   onUploadThumbnail: (file: File) => Promise<void>
   onDeleteThumbnail: () => Promise<void>
@@ -517,7 +508,6 @@ type CourseEditFormProps = {
 
 const CourseEditForm = ({
   course,
-  products,
   onSubmit,
   onUploadThumbnail,
   onDeleteThumbnail,
@@ -530,7 +520,6 @@ const CourseEditForm = ({
     description: course.description ?? "",
     level: course.level ?? "beginner",
     status: course.status,
-    product_id: course.product_id ?? "",
   })
   const [saving, setSaving] = useState(false)
 
@@ -594,22 +583,21 @@ const CourseEditForm = ({
         </Select>
       </div>
       <div className="flex flex-col gap-1">
-        <Label htmlFor="ce-product">{t("courseEditor.form.productLabel")}</Label>
-        <Select
-          value={form.product_id || "__none__"}
-          onValueChange={(v) => set("product_id", v === "__none__" ? "" : v)}
-        >
-          <Select.Trigger id="ce-product"><Select.Value placeholder={t("courseEditor.form.productPlaceholder")} /></Select.Trigger>
-          <Select.Content>
-            <Select.Item value="__none__">{t("courseEditor.form.noProduct")}</Select.Item>
-            {products.map((p) => (
-              <Select.Item key={p.id} value={p.id}>{p.title} ({p.handle})</Select.Item>
-            ))}
-          </Select.Content>
-        </Select>
-        <Text size="small" className="text-ui-fg-muted">
-          {t("courseEditor.form.productHint")}
-        </Text>
+        <Label>{t("courseEditor.form.productLabel")}</Label>
+        {course.metadata?.linked_product_id ? (
+          <div className="rounded-md border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+            <Text size="small" weight="plus" className="font-mono">
+              {course.metadata.linked_product_id as string}
+            </Text>
+            <Text size="xsmall" className="text-ui-fg-muted mt-1">
+              {t("courseEditor.form.productReadonlyHint")}
+            </Text>
+          </div>
+        ) : (
+          <Text size="small" className="text-ui-fg-muted">
+            {t("courseEditor.form.noProductLinked")}
+          </Text>
+        )}
       </div>
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>{t("common.cancel")}</Button>
@@ -628,8 +616,6 @@ const CourseDetailPage = () => {
   const [selectedLocale, setSelectedLocale] = useState(DEFAULT_LOCALE)
   const [course, setCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
-  const [products, setProducts] = useState<Product[]>([])
-  const [productsLoaded, setProductsLoaded] = useState(false)
   const [loadingCourse, setLoadingCourse] = useState(true)
   const [loadingLessons, setLoadingLessons] = useState(true)
   const [lessonDrawerOpen, setLessonDrawerOpen] = useState(false)
@@ -666,17 +652,6 @@ const CourseDetailPage = () => {
     }
   }, [id, selectedLocale, t])
 
-  const ensureProducts = useCallback(async () => {
-    if (productsLoaded) return
-    try {
-      const data = await apiFetch<{ products: Product[] }>("/products?limit=200")
-      setProducts(data.products ?? [])
-      setProductsLoaded(true)
-    } catch {
-      // ignore lazy product fetch failure
-    }
-  }, [productsLoaded])
-
   useEffect(() => {
     fetchCourse()
     fetchLessons()
@@ -684,8 +659,7 @@ const CourseDetailPage = () => {
 
   const openCourseEditDrawer = useCallback(() => {
     setCourseDrawerOpen(true)
-    void ensureProducts()
-  }, [ensureProducts])
+  }, [])
 
   const handleUpdateCourse = async (form: CourseFormData) => {
     if (!course) return
@@ -697,7 +671,6 @@ const CourseDetailPage = () => {
         description: form.description || null,
         level: form.level || null,
         status: form.status,
-        product_id: form.product_id || null,
         translations:
           selectedLocale === DEFAULT_LOCALE
             ? undefined
@@ -908,9 +881,9 @@ const CourseDetailPage = () => {
                   <Badge size="2xsmall" color="purple">
                     {t("courseDetail.lessonsUnit", { count: course.lessons_count })}
                   </Badge>
-                  {course.product_id && (
+                  {!!course.metadata?.linked_product_id && (
                     <Badge size="2xsmall" color="orange">
-                      {t("courseDetail.productLabel", { id: course.product_id })}
+                      {t("courseDetail.productLabel", { id: String(course.metadata!.linked_product_id) })}
                     </Badge>
                   )}
                 </div>
@@ -1101,7 +1074,6 @@ const CourseDetailPage = () => {
           <Drawer.Body className="overflow-y-auto">
             <CourseEditForm
               course={course}
-              products={products}
               onSubmit={handleUpdateCourse}
               onUploadThumbnail={handleUploadCourseThumbnail}
               onDeleteThumbnail={handleDeleteCourseThumbnail}

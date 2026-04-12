@@ -117,19 +117,19 @@ export class LessonService {
         video_url_expires_at?: string
         video_url_expires_in_seconds?: number
       }
-    | { ok: false; code: 401 | 403; message: string }
+    | { ok: false; code: 401 | 403; message: string; error_code: string }
   > {
     const lesson = await this.lessonRepo.findById(lessonId)
 
     if (!lesson) {
-      return { ok: false, code: 403, message: "Lesson not found" }
+      return { ok: false, code: 403, message: "Lesson not found", error_code: "lesson_not_found" }
     }
 
     if (lesson.is_free) {
       const signedVideo = await this.signMediaAsset(lesson.video_asset)
 
       if (lesson.video_asset && !signedVideo) {
-        return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试" }
+        return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试", error_code: "video_unavailable" }
       }
 
       return {
@@ -141,19 +141,19 @@ export class LessonService {
     }
 
     if (!customerId) {
-      return { ok: false, code: 401, message: "请先登录" }
+      return { ok: false, code: 401, message: "请先登录", error_code: "login_required" }
     }
 
     const purchased = await hasPurchasedFn(customerId, lesson.course_id)
 
     if (!purchased) {
-      return { ok: false, code: 403, message: "请先购买课程" }
+      return { ok: false, code: 403, message: "请先购买课程", error_code: "purchase_required" }
     }
 
     const signedVideo = await this.signMediaAsset(lesson.video_asset)
 
     if (lesson.video_asset && !signedVideo) {
-      return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试" }
+      return { ok: false, code: 403, message: "视频授权暂不可用，请稍后重试", error_code: "video_unavailable" }
     }
 
     return {

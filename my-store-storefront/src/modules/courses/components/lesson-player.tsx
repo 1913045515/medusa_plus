@@ -417,6 +417,7 @@ export default function LessonPlayer({
     open: boolean
     lesson?: Lesson
     message?: string
+    errorCode?: string
   }>({ open: false })
   const [accessExpired, setAccessExpired] = useState(false)
   const [isRefreshingAccess, setIsRefreshingAccess] = useState(false)
@@ -482,6 +483,7 @@ export default function LessonPlayer({
           open: true,
           lesson: activeLesson,
           message: r.error,
+          errorCode: r.error_code,
         })
       } finally {
         if (!cancelled) {
@@ -543,8 +545,26 @@ export default function LessonPlayer({
   const currentIndex = lessons.findIndex((l) => l.id === activeLesson.id)
   const activeVideoUrl = activePlayback?.videoUrl ?? null
 
-  // Purchase page link: MVP uses /products/<course.handle>
-  const purchaseHref = `/products/${course.handle}`
+  // Purchase page link: use linked product's handle if available, fallback to course handle
+  const linkedProductHandle =
+    typeof course.metadata?.linked_product_handle === "string" && course.metadata.linked_product_handle
+      ? course.metadata.linked_product_handle
+      : null
+  const purchaseHref = linkedProductHandle ? `/products/${linkedProductHandle}` : `/products/${course.handle}`
+
+  // Map error_code to localized message
+  const resolveErrorMessage = (errorCode?: string, fallback?: string): string => {
+    const errorCodeMap: Record<string, keyof CoursesDictionary> = {
+      login_required: "errorLoginRequired",
+      login_expired: "errorLoginExpired",
+      purchase_required: "errorPurchaseRequired",
+      video_unavailable: "errorVideoUnavailable",
+      lesson_not_found: "errorLessonNotFound",
+    }
+    const dictKey = errorCode ? errorCodeMap[errorCode] : undefined
+    if (dictKey) return dict[dictKey] as string
+    return fallback || dict.errorCannotPlay
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -575,7 +595,7 @@ export default function LessonPlayer({
                     {accessExpired
                       ? dict.refreshToContinue
                       : purchasePrompt.open
-                        ? purchasePrompt.message
+                        ? resolveErrorMessage(purchasePrompt.errorCode, purchasePrompt.message)
                         : isRefreshingAccess
                           ? dict.refreshingAccess
                           : dict.loading}

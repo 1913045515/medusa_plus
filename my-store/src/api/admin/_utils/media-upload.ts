@@ -15,6 +15,26 @@ export type ParsedAdminUpload = {
   cleanup: () => Promise<void>
 }
 
+/**
+ * Busboy defaults to Latin-1 for multipart header parsing.
+ * Modern browsers send non-ASCII filenames (e.g., Chinese) as UTF-8 bytes
+ * inside the Content-Disposition header without percent-encoding.
+ * This means Busboy decodes them as Latin-1, producing garbled text.
+ *
+ * This function detects the mis-decoding and re-interprets the raw bytes
+ * as UTF-8 if the result is clean.
+ */
+function fixFilenameEncoding(raw: string): string {
+  if (!raw || /^[\x00-\x7F]*$/.test(raw)) return raw
+  try {
+    const utf8Attempt = Buffer.from(raw, "latin1").toString("utf8")
+    if (!utf8Attempt.includes("\uFFFD")) return utf8Attempt
+  } catch {
+    // ignore — fall through to return raw
+  }
+  return raw
+}
+
 export async function parseAdminUploadRequest(
   req: MedusaRequest,
   maxFileSizeBytes: number
@@ -70,7 +90,7 @@ export async function parseAdminUploadRequest(
 
       fileFound = true
       fieldName = incomingFieldName
-      fileName = info.filename || "upload.bin"
+      fileName = fixFilenameEncoding(info.filename || "upload.bin")
       mimeType = info.mimeType || "application/octet-stream"
       tempFilePath = join(tmpdir(), `course-media-${randomUUID()}`)
 

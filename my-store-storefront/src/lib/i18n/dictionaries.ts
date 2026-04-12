@@ -34,6 +34,13 @@ export type CoursesDictionary = {
   durationHour: string
   durationMin: string
   durationMinSec: string
+  // Error code messages
+  errorLoginRequired: string
+  errorLoginExpired: string
+  errorPurchaseRequired: string
+  errorVideoUnavailable: string
+  errorLessonNotFound: string
+  errorCannotPlay: string
 }
 
 const zh: CoursesDictionary = {
@@ -65,6 +72,12 @@ const zh: CoursesDictionary = {
   durationHour: "时",
   durationMin: "分",
   durationMinSec: "秒",
+  errorLoginRequired: "请先登录",
+  errorLoginExpired: "登录已过期，请重新登录",
+  errorPurchaseRequired: "请先购买课程",
+  errorVideoUnavailable: "视频授权暂不可用，请稍后重试",
+  errorLessonNotFound: "课时不存在",
+  errorCannotPlay: "无法播放当前课时",
 }
 
 const en: CoursesDictionary = {
@@ -96,6 +109,12 @@ const en: CoursesDictionary = {
   durationHour: "h",
   durationMin: "min",
   durationMinSec: "s",
+  errorLoginRequired: "Please log in to continue",
+  errorLoginExpired: "Your session has expired. Please log in again.",
+  errorPurchaseRequired: "Purchase this course to watch",
+  errorVideoUnavailable: "Video is temporarily unavailable. Please try again later.",
+  errorLessonNotFound: "Episode not found",
+  errorCannotPlay: "Unable to play this episode",
 }
 
 const dictionaries: Record<string, CoursesDictionary> = {
@@ -183,4 +202,73 @@ const pdDictionaries: Record<string, ProductDetailDictionary> = {
 export function getProductDetailDictionary(locale?: string | null): ProductDetailDictionary {
   if (!locale) return pdEn
   return pdDictionaries[locale] ?? (locale.startsWith("zh") ? pdZh : pdEn)
+}
+
+export type OrderDictionary = {
+  orderDetailsTitle: string
+  backToOverview: string
+  thankYou: string
+  orderPlacedSuccessfully: string
+  summary: string
+  confirmationSentPrefix: string
+  orderDate: string
+  orderNumber: string
+  orderStatus: string
+  paymentStatus: string
+  virtualProduct: string
+  openCourse: string
+  downloadResource: string
+  typeResource: string
+  typeCourse: string
+  resourceLinkLabel: string
+}
+
+const orderZh: OrderDictionary = {
+  orderDetailsTitle: "订单详情",
+  backToOverview: "返回订单列表",
+  thankYou: "感谢购买！",
+  orderPlacedSuccessfully: "你的订单已提交成功。",
+  summary: "订单摘要",
+  confirmationSentPrefix: "订单确认信息已发送至",
+  orderDate: "下单时间",
+  orderNumber: "订单编号",
+  orderStatus: "订单状态",
+  paymentStatus: "支付状态",
+  virtualProduct: "虚拟交付",
+  openCourse: "进入课程学习",
+  downloadResource: "下载资料",
+  typeResource: "数据资料",
+  typeCourse: "虚拟课程",
+  resourceLinkLabel: "资料连接地址",
+}
+
+const orderEn: OrderDictionary = {
+  orderDetailsTitle: "Order details",
+  backToOverview: "Back to overview",
+  thankYou: "Thank you!",
+  orderPlacedSuccessfully: "Your order was placed successfully.",
+  summary: "Summary",
+  confirmationSentPrefix: "We have sent the order confirmation details to",
+  orderDate: "Order date",
+  orderNumber: "Order number",
+  orderStatus: "Order status",
+  paymentStatus: "Payment status",
+  virtualProduct: "Virtual fulfillment",
+  openCourse: "Open course",
+  downloadResource: "Download resource",
+  typeResource: "Resource",
+  typeCourse: "Course",
+  resourceLinkLabel: "Resource link",
+}
+
+const orderDictionaries: Record<string, OrderDictionary> = {
+  "zh-CN": orderZh,
+  zh: orderZh,
+  en: orderEn,
+  "en-US": orderEn,
+}
+
+export function getOrderDictionary(locale?: string | null): OrderDictionary {
+  if (!locale) return orderEn
+  return orderDictionaries[locale] ?? (locale.startsWith("zh") ? orderZh : orderEn)
 }

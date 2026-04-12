@@ -1,0 +1,98 @@
+VirtualProductType:
+  type: string
+  enum: [resource, course]
+  description: 虚拟产品类型 code，仅存储稳定 code，不存储本地化文案。
+
+VirtualProductConfig:
+  type: object
+  required:
+    - is_virtual
+    - virtual_product_type
+    - resource_download_url
+    - virtual_course_id
+    - virtual_course_path
+  properties:
+    is_virtual:
+      type: boolean
+      example: true
+    virtual_product_type:
+      allOf:
+        - $ref: '#/VirtualProductType'
+      nullable: true
+    resource_download_url:
+      type: string
+      nullable: true
+      example: https://example.com/files/report.zip
+    virtual_course_id:
+      type: string
+      nullable: true
+      example: course_demo_1
+    virtual_course_path:
+      type: string
+      nullable: true
+      example: /courses/demo-course-1
+
+VirtualProductConfigInput:
+  type: object
+  required:
+    - is_virtual
+  properties:
+    is_virtual:
+      type: boolean
+      example: true
+    virtual_product_type:
+      allOf:
+        - $ref: '#/VirtualProductType'
+      nullable: true
+    resource_download_url:
+      type: string
+      nullable: true
+      example: https://example.com/files/report.zip
+    virtual_course_id:
+      type: string
+      nullable: true
+      example: course_demo_1
+
+VirtualProductConfigResponse:
+  type: object
+  required: [config]
+  properties:
+    config:
+      $ref: '#/VirtualProductConfig'
+
+StoreCoursePurchaseFromOrderResponse:
+  type: object
+  required: [created, snapshots_updated, rows, warnings]
+  properties:
+    created:
+      type: integer
+      example: 1
+      description: 新增的课程购买授权记录数量。
+    snapshots_updated:
+      type: integer
+      example: 2
+      description: 已写入虚拟交付快照的订单项数量。
+    rows:
+      type: array
+      items:
+        type: object
+        properties:
+          course_id:
+            type: string
+            example: course_demo_1
+          product_id:
+            type: string
+            nullable: true
+            example: prod_01H...
+    warnings:
+      type: array
+      items:
+        type: object
+        required: [item_id, reason]
+        properties:
+          item_id:
+            type: string
+            example: orli_01H...
+          reason:
+            type: string
+            example: missing_virtual_course_id

@@ -110,6 +110,8 @@
       "productPlaceholder": "Select product (optional)",
       "noProduct": "-- None --",
       "productHint": "Once linked, course_id will be written to the product's metadata automatically.",
+      "productReadonlyHint": "Product link is managed from the product's virtual config and is read-only here.",
+      "noProductLinked": "No product linked. Go to the product's virtual config and select this course to link it.",
       "titleHandleRequired": "Title and handle are required"
     },
     "level": {
@@ -208,6 +210,30 @@
     "setAsMain": "Set as Main",
     "mainBadge": "Main",
     "empty": "No images available"
+  },
+  "productVirtual": {
+    "sectionTitle": "Virtual Product Configuration",
+    "isVirtualLabel": "Is virtual product",
+    "isVirtualHint": "Enable this to deliver downloadable resources or virtual courses after purchase.",
+    "typeLabel": "Virtual product type",
+    "typePlaceholder": "Select a virtual product type",
+    "types": {
+      "resource": "Resource",
+      "course": "Course"
+    },
+    "downloadUrlLabel": "Resource download URL",
+    "downloadUrlPlaceholder": "https://example.com/file.zip",
+    "downloadUrlHint": "Customers will see this download entry in order details after purchase.",
+    "courseLabel": "Linked course",
+    "coursePlaceholder": "Select a course",
+    "courseHint": "Saving will sync the course's linked product and generate the course access path for orders.",
+    "save": "Save",
+    "toast": {
+      "loadFailed": "Failed to load virtual product configuration",
+      "loadCoursesFailed": "Failed to load courses",
+      "saved": "Virtual product configuration saved",
+      "saveFailed": "Failed to save virtual product configuration"
+    }
   },
   "siteAnalytics": {
     "title": "Website Logs",

@@ -15,15 +15,6 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "product_id": {
-          "name": "product_id",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "handle": {
           "name": "handle",
           "type": "text",

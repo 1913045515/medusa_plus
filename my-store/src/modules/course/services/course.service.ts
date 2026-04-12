@@ -9,12 +9,11 @@ import type {
   StoredS3MediaAsset,
   SignedMediaAsset,
 } from "../types"
-import { Modules } from "@medusajs/framework/utils"
 import type { CourseMediaService } from "./media-asset.service"
 
 // ─── CourseService ────────────────────────────────────────────────────────────
-// 依赖 ICourseRepository 接口，不关心底层是静态 JSON 还是 ORM。
-// 切换数据库时：构造函数注入不同的 Repository 实现即可。
+// SSOT: product.metadata.virtual_course_id 是产品与课程关联的唯一数据源。
+// course 表不再存储 product_id，不再做任何双向同步。
 
 export class CourseService {
   constructor(
@@ -77,59 +76,16 @@ export class CourseService {
     return await Promise.all(courses.map((course) => this.serializeStoreCourse(course)))
   }
 
-  private resolveProductModule(): any | null {
-    const anyRepo = this.courseRepo as any
-    const scope = anyRepo?.scope
-    if (!scope?.resolve) return null
-
-    try {
-      return scope.resolve(Modules.PRODUCT)
-    } catch {
-      return null
-    }
-  }
-
-  private async bindProductCourse(productId: string, courseId: string) {
-    const productModule = this.resolveProductModule()
-    if (!productModule) {
-      throw new Error("Product module not available in current request scope")
-    }
-
-    const product = await productModule.retrieveProduct(productId, {
-      select: ["id", "metadata"],
-    })
-
-    const existingMeta = product?.metadata ?? {}
-
-    await productModule.updateProducts(productId, {
-      metadata: {
-        ...existingMeta,
-        course_id: courseId,
-      },
-    })
-  }
-
   async createCourse(input: CreateCourseInput): Promise<CourseRecord> {
-    const created = await this.courseRepo.create(input)
-
-    if (created.product_id) {
-      await this.bindProductCourse(created.product_id, created.id)
-    }
-
-    return created
+    return this.courseRepo.create(input)
   }
 
-  async updateCourse(
-    id: string,
-    input: UpdateCourseInput
-  ): Promise<CourseRecord> {
+  async updateCourse(id: string, input: UpdateCourseInput): Promise<CourseRecord> {
+    const existing = await this.courseRepo.findById(id)
+    if (!existing) throw new Error(`Course ${id} not found`)
+
     const updated = await this.courseRepo.update(id, input)
     if (!updated) throw new Error(`Course ${id} not found`)
-
-    // 如果更新时传了 product_id，则重新绑定
-    if (updated.product_id) {
-      await this.bindProductCourse(updated.product_id, updated.id)
-    }
 
     return updated
   }

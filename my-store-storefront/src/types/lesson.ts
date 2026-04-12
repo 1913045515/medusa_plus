@@ -24,6 +24,7 @@ export type LessonPlaySuccess = {
 export type LessonPlayError = {
   error: string
   code: 401 | 403
+  error_code?: string
 }
 
 export type LessonPlayResponse = LessonPlaySuccess | LessonPlayError
