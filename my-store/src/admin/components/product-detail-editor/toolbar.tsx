@@ -1,9 +1,11 @@
 import { Button, clx } from "@medusajs/ui"
 import type { Editor } from "@tiptap/react"
 import { useTranslation } from "react-i18next"
+import { useRef } from "react"
 
 type ToolbarProps = {
   editor: Editor | null
+  onImageUpload?: (file: File) => Promise<string>
 }
 
 const ToolbarButton = ({
@@ -30,13 +32,31 @@ const ToolbarButton = ({
   </button>
 )
 
-export default function EditorToolbar({ editor }: ToolbarProps) {
+export default function EditorToolbar({ editor, onImageUpload }: ToolbarProps) {
   const { t } = useTranslation()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   if (!editor) return null
 
   const addImage = () => {
-    const url = window.prompt(t("productDetail.imageUrlPrompt", "Image URL"))
-    if (url) editor.chain().focus().setImage({ src: url }).run()
+    if (onImageUpload) {
+      // Trigger file picker instead of URL prompt
+      fileInputRef.current?.click()
+    } else {
+      const url = window.prompt(t("productDetail.imageUrlPrompt", "Image URL"))
+      if (url) editor.chain().focus().setImage({ src: url }).run()
+    }
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !onImageUpload) return
+    e.target.value = ""
+    try {
+      const url = await onImageUpload(file)
+      editor.chain().focus().setImage({ src: url }).run()
+    } catch {
+      // Error is handled by the caller's onImageUpload implementation
+    }
   }
 
   const addLink = () => {
@@ -102,9 +122,19 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
       </ToolbarButton>
 
       {/* Image & Link */}
-      <ToolbarButton onClick={addImage} title={t("productDetail.insertImage", "Insert Image")}>
+      <ToolbarButton onClick={addImage} title={onImageUpload ? t("productDetail.uploadImage", "Upload Image") : t("productDetail.insertImage", "Insert Image")}>
         🖼
       </ToolbarButton>
+      {/* Hidden file input for image upload */}
+      {onImageUpload && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      )}
       <ToolbarButton active={editor.isActive("link")} onClick={addLink} title={t("productDetail.insertLink", "Insert Link")}>
         🔗
       </ToolbarButton>

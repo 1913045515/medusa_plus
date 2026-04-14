@@ -457,3 +457,100 @@ front 指 `my-store-storefront/`。
 
 - 必须基于 Medusa v2 的模块化与路由扩展方式进行衍生实现（module/service/repository + store/admin routes）。
 - 不引入与当前架构冲突的新框架或“第二套后端/前端”实现方式；若确需新增依赖，必须说明原因与替代方案。
+---
+
+## 十、国际化（i18n）强制规范
+
+### 10.1 基本原则
+
+**所有新增或变动的 Admin UI 功能，必须支持国际化。禁止在代码中写固定的中文或英文字符串。**
+
+### 10.2 使用方式
+
+```typescript
+// ✅ 正确：所有文本通过 t() 获取
+import { useTranslation } from "react-i18next"
+
+export default function MyPage() {
+  const { t } = useTranslation()
+  return <Heading>{t("myModule.title")}</Heading>
+}
+
+// ❌ 错误：直接写固定文本
+return <Heading>我的模块</Heading>
+return <Heading>My Module</Heading>
+```
+
+### 10.3 翻译文件
+
+- 英文：`my-store/src/admin/i18n/json/en.json`
+- 中文：`my-store/src/admin/i18n/json/zh-CN.json`
+
+每新增功能模块，须在两个文件中同步添加对应的命名空间键。常用键结构：
+
+```json
+{
+  "myModule": {
+    "title": "...",
+    "new": "...",
+    "edit": "...",
+    "empty": "...",
+    "loading": "...",
+    "col": { "name": "...", "updatedAt": "...", "actions": "..." },
+    "form": { "fieldName": "..." },
+    "confirmDelete": { "title": "...", "desc": "..." },
+    "toast": { "created": "...", "updated": "...", "deleted": "...", "saveFailed": "...", "deleteFailed": "...", "loadFailed": "..." }
+  }
+}
+```
+
+### 10.4 覆盖范围
+
+必须 i18n 化的内容包括但不限于：
+- 页面标题、按钮文字、表头、表格空状态
+- 抽屉/弹窗标题、表单标签
+- `toast.success/error` 的消息文字
+- `usePrompt` 的 `title`、`description`、`confirmText`、`cancelText`
+
+---
+
+## 十一、富文本编辑器规范
+
+### 11.1 统一组件
+
+**所有 Admin 页面的富文本编辑器，必须使用 `ProductDetailEditor` 组件：**
+
+```
+my-store/src/admin/components/product-detail-editor/
+  index.tsx      ← 主组件，支持 onImageUpload prop
+  toolbar.tsx    ← 工具栏，支持图片上传（文件选择 + 粘贴 + 拖放）
+```
+
+### 11.2 使用方式
+
+```typescript
+import ProductDetailEditor from "../../components/product-detail-editor"
+
+// 基础用法
+<ProductDetailEditor value={content} onChange={setContent} />
+
+// 带图片上传（推荐）
+<ProductDetailEditor
+  value={content}
+  onChange={setContent}
+  onImageUpload={async (file: File): Promise<string> => {
+    // 上传到 S3 并返回可访问的 URL（建议返回签名 URL）
+    const form = new FormData()
+    form.append("file", file)
+    const res = await fetch("/admin/your-content-images", { method: "POST", body: form, credentials: "include" })
+    const data = await res.json()
+    return data.url
+  }}
+/>
+```
+
+### 11.3 禁止事项
+
+- ❌ 禁止直接使用原始 `TipTapEditor` 或其他自定义富文本实现
+- ❌ 禁止为新模块重新实现一套富文本组件
+- ✅ 如需扩展编辑器功能，应修改 `product-detail-editor/` 中的共享组件

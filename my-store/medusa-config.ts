@@ -69,5 +69,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/email-otp",
     },
+    {
+      resolve: "./src/modules/blog",
+    },
   ],
 })

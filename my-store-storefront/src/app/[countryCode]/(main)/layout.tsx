@@ -30,7 +30,7 @@ export default async function PageLayout(props: {
   }
 
   return (
-    <>
+    <div className="flex flex-col flex-1">
       <SiteAnalyticsTracker />
       <Nav />
       {customer && cart && (
@@ -44,8 +44,8 @@ export default async function PageLayout(props: {
           shippingOptions={shippingOptions}
         />
       )}
-      {props.children}
+      <div className="flex-1">{props.children}</div>
       <Footer />
-    </>
+    </div>
   )
 }

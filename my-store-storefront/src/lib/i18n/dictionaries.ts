@@ -389,3 +389,149 @@ export function getPasswordResetDictionary(locale?: string | null): PasswordRese
   return prDictionaries[locale] ?? (locale.startsWith("zh") ? prZh : prEn)
 }
 
+// ─── Blog Dictionary ──────────────────────────────────────────────────────────
+
+export type BlogDictionary = {
+  // List page
+  pageTitle: string
+  searchPlaceholder: string
+  searchButton: string
+  pinnedPosts: string
+  noPosts: string
+  loadingMore: string
+  /** Use {{n}} as placeholder for the count */
+  showingAll: string
+  categories: string
+  tags: string
+  // Detail page
+  home: string
+  blog: string
+  /** Use {{n}} as placeholder */
+  minuteRead: string
+  /** Use {{n}} as placeholder */
+  reads: string
+  /** Use {{n}} as placeholder */
+  words: string
+  tableOfContents: string
+  shareArticle: string
+  copied: string
+  copyLink: string
+  prevPost: string
+  nextPost: string
+  relatedPosts: string
+  /** Use {{n}} as placeholder */
+  commentCount: string
+  noComments: string
+  commentPlaceholder: string
+  submitComment: string
+  submittingComment: string
+  loginToComment: string
+  login: string
+  commentSubmitted: string
+  commentFailed: string
+  sessionExpired: string
+  passwordRequired: string
+  passwordPlaceholder: string
+  passwordConfirm: string
+  // Card strings
+  pinned: string
+  readMore: string
+  // Category/tag page prefixes
+  categoryPrefix: string
+  tagPrefix: string
+}
+
+const blogZh: BlogDictionary = {
+  pageTitle: "博客",
+  searchPlaceholder: "搜索文章...",
+  searchButton: "搜索",
+  pinnedPosts: "置顶文章",
+  noPosts: "暂无文章",
+  loadingMore: "加载中...",
+  showingAll: "已显示全部 {{n}} 篇文章",
+  categories: "分类",
+  tags: "标签",
+  home: "首页",
+  blog: "博客",
+  minuteRead: "约 {{n}} 分钟阅读",
+  reads: "{{n}} 次阅读",
+  words: "{{n}} 字",
+  tableOfContents: "目录",
+  shareArticle: "分享文章",
+  copied: "✓ 已复制",
+  copyLink: "🔗 复制链接",
+  prevPost: "← 上一篇",
+  nextPost: "下一篇 →",
+  relatedPosts: "相关文章",
+  commentCount: "评论 ({{n}})",
+  noComments: "暂无评论，快来发表第一条评论吧！",
+  commentPlaceholder: "写下你的评论...",
+  submitComment: "提交评论",
+  submittingComment: "提交中...",
+  loginToComment: "后再评论",
+  login: "登录",
+  commentSubmitted: "评论已提交，待审核后显示",
+  commentFailed: "评论提交失败，请重试",
+  sessionExpired: "登录已过期，请重新登录",
+  passwordRequired: "🔒 该文章需要密码访问",
+  passwordPlaceholder: "请输入密码",
+  passwordConfirm: "确认",
+  pinned: "置顶",
+  readMore: "阅读全文 →",
+  categoryPrefix: "分类",
+  tagPrefix: "标签",
+}
+
+const blogEn: BlogDictionary = {
+  pageTitle: "Blog",
+  searchPlaceholder: "Search posts...",
+  searchButton: "Search",
+  pinnedPosts: "Pinned Posts",
+  noPosts: "No posts yet",
+  loadingMore: "Loading...",
+  showingAll: "Showing all {{n}} posts",
+  categories: "Categories",
+  tags: "Tags",
+  home: "Home",
+  blog: "Blog",
+  minuteRead: "~{{n}} min read",
+  reads: "{{n}} views",
+  words: "{{n}} words",
+  tableOfContents: "Contents",
+  shareArticle: "Share",
+  copied: "✓ Copied",
+  copyLink: "🔗 Copy link",
+  prevPost: "← Previous",
+  nextPost: "Next →",
+  relatedPosts: "Related Posts",
+  commentCount: "Comments ({{n}})",
+  noComments: "No comments yet. Be the first to comment!",
+  commentPlaceholder: "Write a comment...",
+  submitComment: "Submit",
+  submittingComment: "Submitting...",
+  loginToComment: "to comment",
+  login: "Log in",
+  commentSubmitted: "Comment submitted, pending review.",
+  commentFailed: "Failed to submit comment. Please try again.",
+  sessionExpired: "Session expired. Please log in again.",
+  passwordRequired: "🔒 This post is password protected",
+  passwordPlaceholder: "Enter password",
+  passwordConfirm: "Confirm",
+  pinned: "Pinned",
+  readMore: "Read more →",
+  categoryPrefix: "Category",
+  tagPrefix: "Tag",
+}
+
+const blogDictionaries: Record<string, BlogDictionary> = {
+  "zh-CN": blogZh,
+  zh: blogZh,
+  en: blogEn,
+  "en-US": blogEn,
+}
+
+export function getBlogDictionary(locale?: string | null): BlogDictionary {
+  if (!locale) return blogEn
+  return blogDictionaries[locale] ?? (locale.startsWith("zh") ? blogZh : blogEn)
+}
+

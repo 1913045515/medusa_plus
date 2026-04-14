@@ -200,7 +200,10 @@
     "insertImage": "插入图片",
     "insertLink": "插入链接",
     "imageUrlPrompt": "图片地址",
-    "linkUrlPrompt": "链接地址"
+    "linkUrlPrompt": "链接地址",
+    "uploadImage": "上传图片",
+    "uploadingImage": "正在上传图片…",
+    "imageUploadFailed": "图片上传失败"
   },
   "productImages": {
     "sectionTitle": "产品图片管理",
@@ -281,6 +284,278 @@
       "selectRowsFirst": "请先选择需要删除的日志",
       "bulkDeleted": "已删除 {{count}} 条日志",
       "bulkDeleteFailed": "批量删除日志失败"
+    }
+  },
+  "blog": {
+    "menuLabel": "博客",
+    "title": "博客文章",
+    "newPost": "新建文章",
+    "editPost": "编辑文章",
+    "saveDraft": "保存草稿",
+    "publish": "发布",
+    "archive": "归档",
+    "preview": "预览",
+    "back": "返回",
+    "sort": "排序权重",
+    "sortHint": "数值越大显示越靠前（置顶优先级高于排序）",
+    "loading": "加载中…",
+    "empty": "暂无文章",
+    "pinned": "置顶",
+    "duplicate": "复制",
+    "categoriesNav": "分类管理",
+    "tagsNav": "标签管理",
+    "groupsNav": "用户组",
+    "batchDelete": "批量删除 ({{count}})",
+    "status": {
+      "draft": "草稿",
+      "scheduled": "定时发布",
+      "published": "已发布",
+      "archived": "已归档"
+    },
+    "filter": {
+      "allStatuses": "全部状态",
+      "searchPlaceholder": "搜索标题…"
+    },
+    "col": {
+      "title": "标题",
+      "status": "状态",
+      "visibility": "可见范围",
+      "readCount": "阅读数",
+      "wordCount": "字数",
+      "updatedAt": "修改时间",
+      "actions": "操作"
+    },
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页",
+      "info": "{{page}} / {{total}}"
+    },
+    "confirmDelete": {
+      "title": "确认删除",
+      "desc": "此操作将删除该博客文章，不可恢复（软删除）。",
+      "batchTitle": "确认批量删除 {{count}} 篇文章",
+      "batchDesc": "此操作不可撤销（软删除）。"
+    },
+    "form": {
+      "titleLabel": "标题 *",
+      "slugLabel": "URL 别名 (slug)",
+      "slugPlaceholder": "留空则自动生成",
+      "contentLabel": "内容",
+      "excerptLabel": "摘要",
+      "excerptHint": "留空则自动截取前200字",
+      "excerptPlaceholder": "文章摘要…",
+      "publishSettings": "发布设置",
+      "status": "状态",
+      "scheduledAt": "定时发布时间",
+      "isPinned": "置顶",
+      "allowComments": "允许评论",
+      "sort": "排序权重（越大越靠前）",
+      "categoryLabel": "分类",
+      "selectCategory": "选择分类",
+      "tagsLabel": "标签",
+      "noTags": "暂无标签",
+      "coverLabel": "封面图",
+      "coverNewHint": "创建文章后，可在编辑页上传封面图到 S3",
+      "passwordLabel": "密码保护（可选）",
+      "passwordPlaceholder": "留空则无密码",
+      "seoSettings": "SEO 设置",
+      "seoTitle": "SEO 标题",
+      "seoTitlePlaceholder": "留空则使用文章标题",
+      "seoDescription": "SEO 描述",
+      "seoDescriptionPlaceholder": "留空则使用摘要"
+    },
+    "versions": {
+      "selectHint": "全选（最新版本不可删除）",
+      "batchDelete": "批量删除 ({{count}})",
+      "latest": "最新",
+      "restore": "恢复",
+      "deleteOne": "删除",
+      "empty": "暂无版本历史",
+      "restored": "已恢复版本",
+      "restoreFailed": "恢复失败",
+      "batchDeleted": "已删除所选版本",
+      "batchDeleteFailed": "删除失败"
+    },
+    "comments": {
+      "approve": "批准",
+      "reject": "拒绝",
+      "delete": "删除",
+      "empty": "暂无评论",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "deleted": "已删除",
+      "actionFailed": "操作失败",
+      "deleteFailed": "删除失败",
+      "searching": "搜索中…",
+      "noSearchResult": "无结果",
+      "status": {
+        "pending": "待审核",
+        "approved": "已批准",
+        "rejected": "已拒绝"
+      }
+    },
+    "visibility": {
+      "label": "可见范围",
+      "all": "所有用户",
+      "user": "指定用户",
+      "group": "用户组",
+      "searchUser": "搜索并添加指定用户",
+      "searchUserPlaceholder": "输入邮箱或昵称搜索",
+      "searchNoResult": "未找到匹配用户",
+      "selectGroup": "选择用户组（可多选）",
+      "noGroups": "暂无用户组，请先创建"
+    },
+    "cover": {
+      "label": "封面图",
+      "uploadHint": "选择图片文件上传（JPG/PNG/WebP，最大 10MB）",
+      "uploaded": "上传成功",
+      "uploadFailed": "上传失败",
+      "deleted": "封面图已删除",
+      "deleteFailed": "删除失败"
+    },
+    "tab": {
+      "content": "内容",
+      "versions": "版本历史",
+      "comments": "评论"
+    },
+    "toast": {
+      "loadFailed": "加载失败",
+      "saveFailed": "保存失败",
+      "saved": "保存成功",
+      "titleRequired": "标题不能为空",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败",
+      "batchDeleted": "已删除 {{count}} 篇文章",
+      "batchDeleteFailed": "批量删除失败",
+      "duplicated": "已复制为草稿",
+      "duplicateFailed": "复制失败"
+    }
+  },
+  "blogCategory": {
+    "menuLabel": "博客分类",
+    "title": "博客分类",
+    "new": "新建分类",
+    "edit": "编辑分类",
+    "empty": "暂无分类",
+    "loading": "加载中…",
+    "confirmDelete": {
+      "title": "确认删除",
+      "desc": "删除分类"
+    },
+    "col": {
+      "name": "名称",
+      "slug": "Slug",
+      "parent": "父分类",
+      "postCount": "文章数",
+      "updatedAt": "修改时间",
+      "actions": "操作"
+    },
+    "form": {
+      "name": "名称 *",
+      "slug": "Slug（留空自动生成）",
+      "description": "描述",
+      "coverImage": "封面图",
+      "parent": "父分类（可选）",
+      "noParent": "无父分类",
+      "coverUploadHint": "上传图片（JPG/PNG/WebP，最大 10MB）",
+      "coverNewHint": "新建后可在编辑页上传封面图"
+    },
+    "toast": {
+      "loadFailed": "加载失败",
+      "saveFailed": "保存失败",
+      "saved": "已保存",
+      "deleteFailed": "删除失败",
+      "deleted": "已删除",
+      "nameRequired": "名称不能为空"
+    }
+  },
+  "blogTag": {
+    "menuLabel": "博客标签",
+    "title": "博客标签",
+    "new": "新建标签",
+    "edit": "编辑标签",
+    "empty": "暂无标签",
+    "loading": "加载中…",
+    "confirmDelete": {
+      "title": "确认删除",
+      "desc": "删除标签（不影响已关联文章的内容）"
+    },
+    "col": {
+      "name": "名称",
+      "slug": "Slug",
+      "updatedAt": "修改时间",
+      "actions": "操作"
+    },
+    "form": {
+      "name": "名称 *",
+      "slug": "Slug（留空自动生成）",
+      "coverImage": "封面图",
+      "coverUploadHint": "上传图片（JPG/PNG/WebP，最大 10MB）"
+    },
+    "cover": {
+      "uploaded": "封面图已上传",
+      "uploadFailed": "上传失败",
+      "deleted": "封面图已删除",
+      "deleteFailed": "删除失败"
+    },
+    "toast": {
+      "loadFailed": "加载失败",
+      "saveFailed": "保存失败",
+      "saved": "已保存",
+      "deleteFailed": "删除失败",
+      "deleted": "已删除",
+      "nameRequired": "名称不能为空"
+    }
+  },
+  "blogUserGroup": {
+    "menuLabel": "博客用户组",
+    "title": "博客用户组",
+    "new": "新建用户组",
+    "edit": "编辑用户组",
+    "back": "返回",
+    "empty": "暂无用户组",
+    "confirmDeleteTitle": "确认删除用户组",
+    "confirmDeleteDesc": "将同时从文章可见范围中移除该用户组",
+    "created": "用户组已创建",
+    "updated": "用户组已更新",
+    "deleted": "用户组已删除",
+    "deleteFailed": "删除失败",
+    "saveFailed": "保存失败",
+    "nameRequired": "名称不能为空",
+    "memberManagement": "成员管理",
+    "addMember": "添加成员",
+    "searchByEmailOrName": "搜索用户（邮箱或昵称）",
+    "searchPlaceholder": "输入邮箱或昵称搜索",
+    "noResults": "未找到匹配用户",
+    "registeredAt": "注册时间",
+    "selected": "已选择",
+    "confirm": "确认添加",
+    "remove": "移除",
+    "noMembers": "暂无成员",
+    "notFound": "用户组不存在",
+    "loadFailed": "加载失败",
+    "addFailed": "添加失败",
+    "removeFailed": "移除失败",
+    "memberAdded": "已添加成员",
+    "memberRemoved": "已移除",
+    "selectCustomerFirst": "请先从搜索结果中选择用户",
+    "confirmRemove": "确认移除",
+    "confirmRemoveDesc": "从用户组中移除该成员",
+    "col": {
+      "id": "用户 ID",
+      "name": "姓名",
+      "email": "邮箱",
+      "description": "描述",
+      "updatedAt": "修改时间",
+      "actions": "操作",
+      "customerCreatedAt": "用户注册时间",
+      "customerUpdatedAt": "用户更新时间",
+      "joinedAt": "加入时间"
+    },
+    "members": "成员管理",
+    "form": {
+      "name": "名称 *",
+      "description": "描述"
     }
   }
 }

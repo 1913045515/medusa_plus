@@ -200,7 +200,10 @@
     "insertImage": "Insert Image",
     "insertLink": "Insert Link",
     "imageUrlPrompt": "Image URL",
-    "linkUrlPrompt": "Link URL"
+    "linkUrlPrompt": "Link URL",
+    "uploadImage": "Upload Image",
+    "uploadingImage": "Uploading image…",
+    "imageUploadFailed": "Image upload failed"
   },
   "productImages": {
     "sectionTitle": "Product Image Management",
@@ -281,6 +284,278 @@
       "selectRowsFirst": "Select logs to delete first",
       "bulkDeleted": "Deleted {{count}} logs",
       "bulkDeleteFailed": "Failed to bulk delete logs"
+    }
+  },
+  "blog": {
+    "menuLabel": "Blog",
+    "title": "Blog Posts",
+    "newPost": "New Post",
+    "editPost": "Edit Post",
+    "saveDraft": "Save Draft",
+    "publish": "Publish",
+    "archive": "Archive",
+    "preview": "Preview",
+    "back": "Back",
+    "sort": "Sort Weight",
+    "sortHint": "Higher value = higher position (pinned takes priority over sort)",
+    "loading": "Loading…",
+    "empty": "No posts yet",
+    "pinned": "Pinned",
+    "duplicate": "Copy",
+    "categoriesNav": "Categories",
+    "tagsNav": "Tags",
+    "groupsNav": "User Groups",
+    "batchDelete": "Delete ({{count}})",
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "filter": {
+      "allStatuses": "All statuses",
+      "searchPlaceholder": "Search titles…"
+    },
+    "col": {
+      "title": "Title",
+      "status": "Status",
+      "visibility": "Visibility",
+      "readCount": "Views",
+      "wordCount": "Words",
+      "updatedAt": "Updated",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next",
+      "info": "{{page}} / {{total}}"
+    },
+    "confirmDelete": {
+      "title": "Confirm delete",
+      "desc": "This will delete the post (soft delete, cannot be undone).",
+      "batchTitle": "Delete {{count}} posts?",
+      "batchDesc": "This action cannot be undone (soft delete)."
+    },
+    "form": {
+      "titleLabel": "Title *",
+      "slugLabel": "URL Alias (slug)",
+      "slugPlaceholder": "Leave blank to auto-generate",
+      "contentLabel": "Content",
+      "excerptLabel": "Excerpt",
+      "excerptHint": "Leave blank to auto-extract first 200 characters",
+      "excerptPlaceholder": "Post excerpt…",
+      "publishSettings": "Publish Settings",
+      "status": "Status",
+      "scheduledAt": "Scheduled time",
+      "isPinned": "Pinned",
+      "allowComments": "Allow Comments",
+      "sort": "Sort Weight (higher = top)",
+      "categoryLabel": "Category",
+      "selectCategory": "Select category",
+      "tagsLabel": "Tags",
+      "noTags": "No tags yet",
+      "coverLabel": "Cover Image",
+      "coverNewHint": "Create the post first, then upload a cover image here.",
+      "passwordLabel": "Password (optional)",
+      "passwordPlaceholder": "Leave blank for no password",
+      "seoSettings": "SEO Settings",
+      "seoTitle": "SEO Title",
+      "seoTitlePlaceholder": "Leave blank to use post title",
+      "seoDescription": "SEO Description",
+      "seoDescriptionPlaceholder": "Leave blank to use excerpt"
+    },
+    "versions": {
+      "selectHint": "Select all (latest version cannot be deleted)",
+      "batchDelete": "Delete ({{count}})",
+      "latest": "latest",
+      "restore": "Restore",
+      "deleteOne": "Delete",
+      "empty": "No version history",
+      "restored": "Version restored",
+      "restoreFailed": "Restore failed",
+      "batchDeleted": "Selected versions deleted",
+      "batchDeleteFailed": "Failed to delete versions"
+    },
+    "comments": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete",
+      "empty": "No comments",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "deleted": "Deleted",
+      "actionFailed": "Action failed",
+      "deleteFailed": "Delete failed",
+      "searching": "Searching…",
+      "noSearchResult": "No results",
+      "status": {
+        "pending": "Pending review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    },
+    "visibility": {
+      "label": "Visibility",
+      "all": "All users",
+      "user": "Specific users",
+      "group": "User groups",
+      "searchUser": "Search and add specific users",
+      "searchUserPlaceholder": "Search by email or name",
+      "searchNoResult": "No matching users found",
+      "selectGroup": "Select user groups (multi-select)",
+      "noGroups": "No user groups yet, create one first"
+    },
+    "cover": {
+      "label": "Cover Image",
+      "uploadHint": "Upload image (JPG/PNG/WebP, max 10MB)",
+      "uploaded": "Uploaded successfully",
+      "uploadFailed": "Upload failed",
+      "deleted": "Cover image deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "tab": {
+      "content": "Content",
+      "versions": "Version History",
+      "comments": "Comments"
+    },
+    "toast": {
+      "loadFailed": "Failed to load",
+      "saveFailed": "Failed to save",
+      "saved": "Saved",
+      "titleRequired": "Title is required",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed",
+      "batchDeleted": "Deleted {{count}} posts",
+      "batchDeleteFailed": "Batch delete failed",
+      "duplicated": "Copied as draft",
+      "duplicateFailed": "Copy failed"
+    }
+  },
+  "blogCategory": {
+    "menuLabel": "Blog Categories",
+    "title": "Blog Categories",
+    "new": "New Category",
+    "edit": "Edit Category",
+    "empty": "No categories yet",
+    "loading": "Loading…",
+    "confirmDelete": {
+      "title": "Confirm delete",
+      "desc": "Delete this category"
+    },
+    "col": {
+      "name": "Name",
+      "slug": "Slug",
+      "parent": "Parent Category",
+      "postCount": "Post Count",
+      "updatedAt": "Updated",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name *",
+      "slug": "Slug (auto-generated if blank)",
+      "description": "Description",
+      "coverImage": "Cover Image",
+      "parent": "Parent Category (optional)",
+      "noParent": "No parent",
+      "coverUploadHint": "Upload image (JPG/PNG/WebP, max 10MB)",
+      "coverNewHint": "You can upload a cover image after creating the category"
+    },
+    "toast": {
+      "loadFailed": "Failed to load",
+      "saveFailed": "Failed to save",
+      "saved": "Saved",
+      "deleteFailed": "Failed to delete",
+      "deleted": "Deleted",
+      "nameRequired": "Name is required"
+    }
+  },
+  "blogTag": {
+    "menuLabel": "Blog Tags",
+    "title": "Blog Tags",
+    "new": "New Tag",
+    "edit": "Edit Tag",
+    "empty": "No tags yet",
+    "loading": "Loading…",
+    "confirmDelete": {
+      "title": "Confirm delete",
+      "desc": "Deleting a tag does not affect associated posts."
+    },
+    "col": {
+      "name": "Name",
+      "slug": "Slug",
+      "updatedAt": "Updated",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name *",
+      "slug": "Slug (auto-generated if blank)",
+      "coverImage": "Cover Image",
+      "coverUploadHint": "Upload image (JPG/PNG/WebP, max 10MB)"
+    },
+    "cover": {
+      "uploaded": "Cover uploaded",
+      "uploadFailed": "Cover upload failed",
+      "deleted": "Cover deleted",
+      "deleteFailed": "Cover delete failed"
+    },
+    "toast": {
+      "loadFailed": "Failed to load",
+      "saveFailed": "Failed to save",
+      "saved": "Saved",
+      "deleteFailed": "Failed to delete",
+      "deleted": "Deleted",
+      "nameRequired": "Name is required"
+    }
+  },
+  "blogUserGroup": {
+    "menuLabel": "Blog User Groups",
+    "title": "Blog User Groups",
+    "new": "New User Group",
+    "edit": "Edit User Group",
+    "back": "Back",
+    "empty": "No user groups yet",
+    "confirmDeleteTitle": "Confirm delete user group",
+    "confirmDeleteDesc": "This will remove the user group from post visibility rules.",
+    "created": "User group created",
+    "updated": "User group updated",
+    "deleted": "User group deleted",
+    "deleteFailed": "Delete failed",
+    "saveFailed": "Save failed",
+    "nameRequired": "Name is required",
+    "memberManagement": "Member Management",
+    "addMember": "Add Member",
+    "searchByEmailOrName": "Search users (email or name)",
+    "searchPlaceholder": "Search by email or nickname",
+    "noResults": "No matching users found",
+    "registeredAt": "Registered at",
+    "selected": "Selected",
+    "confirm": "Confirm Add",
+    "remove": "Remove",
+    "noMembers": "No members",
+    "notFound": "User group not found",
+    "loadFailed": "Failed to load",
+    "addFailed": "Failed to add",
+    "removeFailed": "Failed to remove",
+    "memberAdded": "Member added",
+    "memberRemoved": "Member removed",
+    "selectCustomerFirst": "Please select a user from the search results first",
+    "confirmRemove": "Confirm Remove",
+    "confirmRemoveDesc": "Remove this member from the user group",
+    "members": "Members",
+    "col": {
+      "id": "User ID",
+      "name": "Name",
+      "email": "Email",
+      "description": "Description",
+      "updatedAt": "Updated",
+      "actions": "Actions",
+      "customerCreatedAt": "Registered At",
+      "customerUpdatedAt": "Updated At",
+      "joinedAt": "Joined At"
+    },
+    "form": {
+      "name": "Name *",
+      "description": "Description"
     }
   }
 }
