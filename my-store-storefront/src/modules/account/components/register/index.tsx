@@ -1,13 +1,13 @@
 "use client"
 
 import { useActionState, useState, useEffect, useTransition, useRef } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Input from "@modules/common/components/input"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { sendEmailOtp, verifyEmailOtp, registerWithOtp } from "@lib/data/customer"
+import { sendEmailOtp, verifyEmailOtp, registerWithOtp, checkEmailExists } from "@lib/data/customer"
 import { getRegisterDict } from "@lib/i18n/register"
 
 type Props = {
@@ -18,10 +18,13 @@ type Step = "email" | "otp" | "profile"
 
 const COOLDOWN_SECONDS = 60
 
+const REGISTER_SUCCESS = "__REGISTER_SUCCESS__"
+
 const Register = ({ setCurrentView }: Props) => {
   const params = useParams()
   const countryCode = (params?.countryCode as string) ?? ""
   const t = getRegisterDict(countryCode)
+  const router = useRouter()
 
   // ── 步骤状态 ──────────────────────────────────────────────────
   const [step, setStep] = useState<Step>("email")
@@ -31,6 +34,7 @@ const Register = ({ setCurrentView }: Props) => {
   // ── Step 1: 邮箱 ──────────────────────────────────────────────
   const [emailInput, setEmailInput] = useState("")
   const [sendError, setSendError] = useState<string | null>(null)
+  const [emailAlreadyRegistered, setEmailAlreadyRegistered] = useState(false)
   const [isSending, startSending] = useTransition()
   const [cooldown, setCooldown] = useState(0)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -57,7 +61,18 @@ const Register = ({ setCurrentView }: Props) => {
       return
     }
     setSendError(null)
+    setEmailAlreadyRegistered(false)
     startSending(async () => {
+      // 先检查邮箱是否已注册
+      const checkResult = await checkEmailExists(emailInput.trim().toLowerCase())
+      if ("error" in checkResult) {
+        setSendError(checkResult.error)
+        return
+      }
+      if (checkResult.exists) {
+        setEmailAlreadyRegistered(true)
+        return
+      }
       const result = await sendEmailOtp(emailInput.trim().toLowerCase())
       if ("error" in result) {
         setSendError(result.error)
@@ -111,8 +126,16 @@ const Register = ({ setCurrentView }: Props) => {
   // ── Step 3: 注册 ──────────────────────────────────────────────
   const [registerMessage, formAction] = useActionState(registerWithOtp, null)
 
-  // 注册成功时 registerMessage 为 null 且 verifiedToken 存在
-  // 由于 transferCart + revalidateTag 会触发页面刷新，不需要额外处理
+  // 注册成功：检测到 SUCCESS 标记，看到成功提示后跳转到 account
+  useEffect(() => {
+    if (registerMessage === REGISTER_SUCCESS) {
+      const timer = setTimeout(() => {
+        router.push(`/${countryCode}/account`)
+        router.refresh()
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [registerMessage, router, countryCode])
 
   // ─────────────────────────────────────────────────────────────
 
@@ -131,10 +154,22 @@ const Register = ({ setCurrentView }: Props) => {
             required
             autoComplete="email"
             value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
+            onChange={(e) => { setEmailInput(e.target.value); setEmailAlreadyRegistered(false); setSendError(null) }}
             data-testid="email-input"
           />
           {sendError && <ErrorMessage error={sendError} data-testid="send-otp-error" />}
+          {emailAlreadyRegistered && (
+            <p className="text-small-regular text-rose-500" data-testid="email-already-registered-error">
+              {t.emailAlreadyRegistered}{" "}
+              <button
+                type="button"
+                onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
+                className="underline font-medium"
+              >
+                {t.signIn}
+              </button>
+            </p>
+          )}
           <button
             type="button"
             onClick={handleSendOtp}
@@ -200,7 +235,19 @@ const Register = ({ setCurrentView }: Props) => {
       )}
 
       {/* ── Step 3: 完整注册表单 ───────────────────────────── */}
-      {step === "profile" && (
+      {step === "profile" && registerMessage === REGISTER_SUCCESS && (
+        <div className="w-full flex flex-col items-center gap-y-4" data-testid="register-success">
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-center text-base-regular text-ui-fg-base">{t.registerSuccess}</p>
+          <p className="text-center text-small-regular text-ui-fg-subtle">{t.redirecting}</p>
+        </div>
+      )}
+
+      {step === "profile" && registerMessage !== REGISTER_SUCCESS && (
         <form className="w-full flex flex-col" action={formAction}>
           {/* 隐藏字段：携带已验证凭证 */}
           <input type="hidden" name="verified_token" value={verifiedToken} />
@@ -246,7 +293,7 @@ const Register = ({ setCurrentView }: Props) => {
             />
           </div>
 
-          {registerMessage && (
+          {registerMessage && registerMessage !== REGISTER_SUCCESS && (
             <ErrorMessage error={registerMessage} data-testid="register-error" />
           )}
 

@@ -69,18 +69,13 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const hashConfig = { logN: 15, r: 8, p: 1 }
   const passwordHash = (await scryptKdf(new_password, hashConfig)).toString("base64")
 
-  // 更新 provider_identity 中的密码
-  await authModuleService.updateAuthIdentities({
-    id: authIdentity.id,
-    provider_identities: [
-      {
-        id: providerIdentity.id,
-        provider_metadata: {
-          ...(providerIdentity.provider_metadata ?? {}),
-          password: passwordHash,
-        },
-      },
-    ],
+  // 使用 updateProviderIdentities 直接更新密码，避免触发重复插入
+  await authModuleService.updateProviderIdentities({
+    id: providerIdentity.id,
+    provider_metadata: {
+      ...(providerIdentity.provider_metadata ?? {}),
+      password: passwordHash,
+    },
   } as any)
 
   // 标记 token 为已使用

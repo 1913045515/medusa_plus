@@ -313,6 +313,9 @@ export type PasswordResetDictionary = {
   invalidLinkDesc: string
   // Login component
   forgotPasswordLink: string
+  // Email not registered
+  emailNotRegistered: string
+  goToRegister: string
 }
 
 const prZh: PasswordResetDictionary = {
@@ -344,6 +347,8 @@ const prZh: PasswordResetDictionary = {
   validatingLink: "验证链接中...",
   invalidLinkDesc: "无效的重置链接，请重新申请。",
   forgotPasswordLink: "忘记密码？",
+  emailNotRegistered: "该邮箱尚未注册，请先注册。",
+  goToRegister: "立即注册",
 }
 
 const prEn: PasswordResetDictionary = {
@@ -375,6 +380,8 @@ const prEn: PasswordResetDictionary = {
   validatingLink: "Verifying link...",
   invalidLinkDesc: "Invalid reset link. Please request a new one.",
   forgotPasswordLink: "Forgot password?",
+  emailNotRegistered: "This email is not registered. Please create an account first.",
+  goToRegister: "Sign up",
 }
 
 const prDictionaries: Record<string, PasswordResetDictionary> = {

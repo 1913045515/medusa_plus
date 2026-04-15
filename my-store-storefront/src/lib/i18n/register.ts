@@ -50,6 +50,8 @@ export const zh = {
   otpRequired: "请输入验证码",
   passwordTooShort: "密码不能少于8位",
   emailAlreadyRegistered: "该邮箱已注册，请直接登录",
+  registerSuccess: "注册成功！欢迎加入！",
+  redirecting: "正在跳转到账号中心...",
 } as const
 
 export const en = {
@@ -91,6 +93,8 @@ export const en = {
   otpRequired: "Verification code is required",
   passwordTooShort: "Password must be at least 8 characters",
   emailAlreadyRegistered: "This email is already registered. Please sign in.",
+  registerSuccess: "Registration successful! Welcome!",
+  redirecting: "Redirecting to your account...",
 } as const
 
 /** 根据 countryCode URL 参数推断语言 */

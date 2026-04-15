@@ -4,13 +4,6 @@ import { useEffect, useState, useRef } from "react"
 import { useSearchParams, useRouter, useParams } from "next/navigation"
 import { getPasswordResetDictionary } from "@lib/i18n/dictionaries"
 
-function getBackendUrl(): string {
-  if (typeof window !== "undefined") {
-    return `${window.location.origin}/medusa-api`
-  }
-  return process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-}
-
 type ValidateResult = { valid: boolean; email?: string; message?: string }
 
 export default function ResetPasswordTemplate() {
@@ -32,7 +25,7 @@ export default function ResetPasswordTemplate() {
   useEffect(() => {
     if (!token || validatedRef.current) return
     validatedRef.current = true
-    fetch(`${getBackendUrl()}/store/password-reset/validate?token=${encodeURIComponent(token)}`)
+    fetch(`/api/password-reset/validate?token=${encodeURIComponent(token)}`)
       .then((r) => r.json())
       .then((data: ValidateResult) => setValidateResult(data))
       .catch(() => setValidateResult({ valid: false, message: dict.networkError }))
@@ -54,7 +47,7 @@ export default function ResetPasswordTemplate() {
 
     setSubmitting(true)
     try {
-      const res = await fetch(`${getBackendUrl()}/store/password-reset/confirm`, {
+      const res = await fetch(`/api/password-reset/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, new_password: newPassword }),

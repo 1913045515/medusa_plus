@@ -106,6 +106,22 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
 // ─── OTP 注册流程 Server Actions ─────────────────────────────────
 
+/** 检查邮箱是否已注册，返回 { exists: boolean } */
+export async function checkEmailExists(
+  email: string
+): Promise<{ exists: boolean } | { error: string }> {
+  try {
+    const res = await sdk.client.fetch<{ exists: boolean }>(
+      "/store/auth/check-email",
+      { method: "POST", body: { email: email.trim().toLowerCase() } }
+    )
+    return { exists: res.exists }
+  } catch (err: any) {
+    const body = err?.response?.json ? await err.response.json().catch(() => null) : null
+    return { error: body?.message ?? err?.message ?? "检查失败 / Check failed" }
+  }
+}
+
 /** Step 1: 发送邮箱验证码 */
 export async function sendEmailOtp(
   email: string
@@ -170,7 +186,7 @@ export async function registerWithOtp(
 
     await transferCart()
 
-    return null // null 表示成功
+    return "__REGISTER_SUCCESS__"
   } catch (err: any) {
     const body = err?.response?.json ? await err.response.json().catch(() => null) : null
     return body?.message ?? err?.message ?? "注册失败 / Registration failed"

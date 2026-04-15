@@ -4,16 +4,10 @@ import { useState } from "react"
 import { useParams } from "next/navigation"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import { getPasswordResetDictionary } from "@lib/i18n/dictionaries"
+import { checkEmailExists } from "@lib/data/customer"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
-}
-
-function getBackendUrl(): string {
-  if (typeof window !== "undefined") {
-    return `${window.location.origin}/medusa-api`
-  }
-  return process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 }
 
 const ForgotPassword = ({ setCurrentView }: Props) => {
@@ -24,17 +18,33 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [emailNotRegistered, setEmailNotRegistered] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setEmailNotRegistered(false)
     setLoading(true)
     try {
-      await fetch(`${getBackendUrl()}/store/password-reset/request`, {
+      // 先检查邮箱是否已注册
+      const checkResult = await checkEmailExists(email.trim().toLowerCase())
+      if ("error" in checkResult) {
+        setError(dict.networkError)
+        return
+      }
+      if (!checkResult.exists) {
+        setEmailNotRegistered(true)
+        return
+      }
+      const res = await fetch("/api/password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       })
+      if (!res.ok) {
+        setError(dict.networkError)
+        return
+      }
       setSubmitted(true)
     } catch {
       setError(dict.networkError)
@@ -87,7 +97,7 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
               autoComplete="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setEmailNotRegistered(false); setError(null) }}
               className="w-full border border-ui-border-base rounded px-3 py-2 text-base-regular text-ui-fg-base bg-ui-bg-field focus:outline-none focus:ring-1 focus:ring-ui-border-interactive"
               data-testid="forgot-email-input"
             />
@@ -95,6 +105,18 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
         </div>
         {error && (
           <p className="text-small-regular text-rose-500 mt-2">{error}</p>
+        )}
+        {emailNotRegistered && (
+          <p className="text-small-regular text-rose-500 mt-2" data-testid="email-not-registered-error">
+            {dict.emailNotRegistered}{" "}
+            <button
+              type="button"
+              onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
+              className="underline font-medium"
+            >
+              {dict.goToRegister}
+            </button>
+          </p>
         )}
         <button
           type="submit"
