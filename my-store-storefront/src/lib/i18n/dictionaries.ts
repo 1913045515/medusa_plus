@@ -316,6 +316,15 @@ export type PasswordResetDictionary = {
   // Email not registered
   emailNotRegistered: string
   goToRegister: string
+  // Login component
+  welcomeBack: string
+  signInSubtitle: string
+  emailInputLabel: string
+  emailInputTitle: string
+  passwordInputLabel: string
+  signInButton: string
+  notAMember: string
+  joinUs: string
 }
 
 const prZh: PasswordResetDictionary = {
@@ -349,6 +358,14 @@ const prZh: PasswordResetDictionary = {
   forgotPasswordLink: "忘记密码？",
   emailNotRegistered: "该邮箱尚未注册，请先注册。",
   goToRegister: "立即注册",
+  welcomeBack: "欢迎回来",
+  signInSubtitle: "登录以获得更优质的购物体验。",
+  emailInputLabel: "邮箱",
+  emailInputTitle: "请输入有效的邮箱地址。",
+  passwordInputLabel: "密码",
+  signInButton: "立即登录",
+  notAMember: "还没有账号？",
+  joinUs: "立即注册",
 }
 
 const prEn: PasswordResetDictionary = {
@@ -382,6 +399,14 @@ const prEn: PasswordResetDictionary = {
   forgotPasswordLink: "Forgot password?",
   emailNotRegistered: "This email is not registered. Please create an account first.",
   goToRegister: "Sign up",
+  welcomeBack: "Welcome back",
+  signInSubtitle: "Sign in to access an enhanced shopping experience.",
+  emailInputLabel: "Email",
+  emailInputTitle: "Enter a valid email address.",
+  passwordInputLabel: "Password",
+  signInButton: "Sign in",
+  notAMember: "Not a member?",
+  joinUs: "Join us",
 }
 
 const prDictionaries: Record<string, PasswordResetDictionary> = {

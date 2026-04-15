@@ -21,23 +21,23 @@ const Login = ({ setCurrentView }: Props) => {
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
+      <h1 className="text-large-semi uppercase mb-6">{dict.welcomeBack}</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+        {dict.signInSubtitle}
       </p>
       <form className="w-full" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
           <Input
-            label="Email"
+            label={dict.emailInputLabel}
             name="email"
             type="email"
-            title="Enter a valid email address."
+            title={dict.emailInputTitle}
             autoComplete="email"
             required
             data-testid="email-input"
           />
           <Input
-            label="Password"
+            label={dict.passwordInputLabel}
             name="password"
             type="password"
             autoComplete="current-password"
@@ -47,7 +47,7 @@ const Login = ({ setCurrentView }: Props) => {
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
         <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          Sign in
+          {dict.signInButton}
         </SubmitButton>
       </form>
       <div className="w-full flex justify-end mt-2">
@@ -61,13 +61,13 @@ const Login = ({ setCurrentView }: Props) => {
         </button>
       </div>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
+        {dict.notAMember}{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
           className="underline"
           data-testid="register-button"
         >
-          Join us
+          {dict.joinUs}
         </button>
         .
       </span>
