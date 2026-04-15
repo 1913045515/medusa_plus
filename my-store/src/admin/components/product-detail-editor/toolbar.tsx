@@ -6,6 +6,9 @@ import { useRef } from "react"
 type ToolbarProps = {
   editor: Editor | null
   onImageUpload?: (file: File) => Promise<string>
+  /** When provided, file picker triggers this instead of the legacy onImageUpload path.
+   *  Handles the full flow: insert placeholder → upload → replace with image. */
+  onUploadFile?: (file: File) => void
 }
 
 const ToolbarButton = ({
@@ -32,14 +35,15 @@ const ToolbarButton = ({
   </button>
 )
 
-export default function EditorToolbar({ editor, onImageUpload }: ToolbarProps) {
+export default function EditorToolbar({ editor, onImageUpload, onUploadFile }: ToolbarProps) {
   const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
   if (!editor) return null
 
+  const canUpload = !!(onUploadFile || onImageUpload)
+
   const addImage = () => {
-    if (onImageUpload) {
-      // Trigger file picker instead of URL prompt
+    if (canUpload) {
       fileInputRef.current?.click()
     } else {
       const url = window.prompt(t("productDetail.imageUrlPrompt", "Image URL"))
@@ -49,13 +53,19 @@ export default function EditorToolbar({ editor, onImageUpload }: ToolbarProps) {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !onImageUpload) return
+    if (!file) return
     e.target.value = ""
-    try {
-      const url = await onImageUpload(file)
-      editor.chain().focus().setImage({ src: url }).run()
-    } catch {
-      // Error is handled by the caller's onImageUpload implementation
+    if (onUploadFile) {
+      // Preferred: index.tsx manages placeholder + insert
+      onUploadFile(file)
+    } else if (onImageUpload) {
+      // Fallback: legacy direct insert
+      try {
+        const url = await onImageUpload(file)
+        editor.chain().focus().setImage({ src: url }).run()
+      } catch {
+        // Handled by caller
+      }
     }
   }
 
@@ -122,11 +132,11 @@ export default function EditorToolbar({ editor, onImageUpload }: ToolbarProps) {
       </ToolbarButton>
 
       {/* Image & Link */}
-      <ToolbarButton onClick={addImage} title={onImageUpload ? t("productDetail.uploadImage", "Upload Image") : t("productDetail.insertImage", "Insert Image")}>
+      <ToolbarButton onClick={addImage} title={canUpload ? t("productDetail.uploadImage", "Upload Image") : t("productDetail.insertImage", "Insert Image")}>
         🖼
       </ToolbarButton>
       {/* Hidden file input for image upload */}
-      {onImageUpload && (
+      {canUpload && (
         <input
           ref={fileInputRef}
           type="file"

@@ -1,15 +1,8 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { BlogService } from "../../../../modules/blog/services/blog.service"
-import { blogMediaService } from "../../../../modules/blog/services/media.service"
 
 function getBlogService(req: MedusaRequest) {
   return new BlogService(req.scope)
-}
-
-async function withSignedCoverImage(post: any): Promise<any> {
-  if (!post?.cover_image) return post
-  const signed = await blogMediaService.signUrl(post.cover_image)
-  return { ...post, cover_image_signed_url: signed }
 }
 
 // GET /admin/blogs/:id
@@ -18,7 +11,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const post = await svc.getPostById(req.params.id)
   if (!post) return res.status(404).json({ message: "Post not found" })
   const tags = await svc.getPostTags(req.params.id)
-  res.json({ post: await withSignedCoverImage({ ...post, tags }) })
+  res.json({ post: { ...post, tags } })
 }
 
 // PATCH /admin/blogs/:id

@@ -50,7 +50,7 @@ export default function EditBlogPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [allGroups, setAllGroups] = useState<UserGroup[]>([])
-  const [coverSignedUrl, setCoverSignedUrl] = useState<string | null>(null)
+  const [coverUploading, setCoverUploading] = useState(false)
 
   // Customer search for visibility=user
   const [userSearchQuery, setUserSearchQuery] = useState("")
@@ -100,7 +100,6 @@ export default function EditBlogPage() {
       setCategories(catData.categories)
       setTags(tagData.tags)
       setAllGroups(groupData.groups || [])
-      setCoverSignedUrl(post.cover_image_signed_url || null)
 
       const visUserIds: string[] = post.visibility_user_ids || []
       const visGroupIds: string[] = post.visibility_group_ids || []
@@ -207,6 +206,64 @@ export default function EditBlogPage() {
         ? prev.tag_ids.filter((t) => t !== tagId)
         : [...prev.tag_ids, tagId],
     }))
+  }
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !id) return
+    e.target.value = ""
+    setCoverUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      const res = await fetch(`/admin/blogs/${id}/media/cover-image`, {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error((err as any).message ?? `Upload failed: ${res.status}`)
+      }
+      const data = await res.json()
+      set("cover_image", data.cover_image)
+      toast.success(t("blog.cover.uploaded", "封面已上传"))
+    } catch (e: any) {
+      toast.error(t("blog.toast.saveFailed"), { description: e.message })
+    } finally {
+      setCoverUploading(false)
+    }
+  }
+
+  const handleCoverDelete = async () => {
+    if (!id) return
+    try {
+      const res = await fetch(`/admin/blogs/${id}/media/cover-image`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+      if (!res.ok) throw new Error(`Delete failed: ${res.status}`)
+      set("cover_image", "")
+      toast.success(t("blog.cover.deleted", "封面已删除"))
+    } catch (e: any) {
+      toast.error(t("blog.toast.saveFailed"), { description: e.message })
+    }
+  }
+
+  const uploadBlogContentImage = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append("file", file)
+    const res = await fetch("/admin/blog-content-images", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error((err as any).message ?? `Upload failed: ${res.status}`)
+    }
+    const data = await res.json()
+    return data.url as string
   }
 
   const handleSave = async (status?: string) => {
@@ -348,6 +405,7 @@ export default function EditBlogPage() {
               <ProductDetailEditor
                 value={form.content}
                 onChange={(html) => set("content", html)}
+                onImageUpload={uploadBlogContentImage}
               />
             </div>
             <div>
@@ -436,12 +494,33 @@ export default function EditBlogPage() {
               </div>
             </div>
 
-            {coverSignedUrl && (
-              <div className="border border-ui-border-base rounded-md p-4 space-y-2">
-                <Text className="font-semibold">{t("blog.cover.label")}</Text>
-                <img src={coverSignedUrl} alt="cover" className="w-full rounded object-cover max-h-40" />
-              </div>
-            )}
+            <div className="border border-ui-border-base rounded-md p-4 space-y-2">
+              <Text className="font-semibold">{t("blog.cover.label")}</Text>
+              {form.cover_image ? (
+                <>
+                  <img src={form.cover_image} alt="cover" className="w-full rounded object-cover max-h-40" />
+                  <Button
+                    variant="danger"
+                    size="small"
+                    onClick={handleCoverDelete}
+                  >
+                    {t("common.delete")}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Text className="text-xs text-ui-fg-muted block">{t("blog.form.coverUploadHint", "选择图片上传为封面")}</Text>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                    disabled={coverUploading}
+                    className="block w-full text-sm file:mr-2 file:rounded file:border file:border-ui-border-base file:px-2 file:py-1 file:text-xs"
+                    onChange={handleCoverUpload}
+                  />
+                  {coverUploading && <Text className="text-xs text-ui-fg-muted">{t("common.loading")}</Text>}
+                </>
+              )}
+            </div>
 
             <div className="border border-ui-border-base rounded-md p-4 space-y-2">
               <Text className="font-semibold">{t("blog.visibility.label")}</Text>

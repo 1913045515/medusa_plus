@@ -32,10 +32,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     // Update the post cover_image URL
     await svc.updatePost(req.params.id, { cover_image: asset.permanent_url })
 
-    const signedUrl = await blogMediaService.signUrl(asset.permanent_url)
+    // Bucket is public — return permanent URL directly
     return res.status(200).json({
       cover_image: asset.permanent_url,
-      cover_image_signed_url: signedUrl,
       asset,
     })
   } finally {

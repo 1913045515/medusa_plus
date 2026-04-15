@@ -7,7 +7,6 @@ import type { BlogDictionary } from "@lib/i18n/dictionaries"
 import DOMPurify from "isomorphic-dompurify"
 import "@modules/products/components/product-richtext/richtext.css"
 
-/** Replace {{n}} placeholder in a template string */
 function fmt(template: string, n: number): string {
   return template.replace("{{n}}", String(n))
 }
@@ -63,15 +62,12 @@ export default function BlogDetailTemplate({ post, related = [], adjacent, comme
   const [currentUrl, setCurrentUrl] = useState("")
   const contentRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    setCurrentUrl(window.location.href)
-  }, [])
+  useEffect(() => { setCurrentUrl(window.location.href) }, [])
 
   useEffect(() => {
     if (post?.content) {
       const items = extractToc(post.content)
       setToc(items)
-      // Re-attach IDs in actual DOM
       if (contentRef.current) {
         contentRef.current.querySelectorAll("h2, h3").forEach((el, idx) => {
           if (!el.id) el.id = `heading-${idx}`
@@ -80,14 +76,12 @@ export default function BlogDetailTemplate({ post, related = [], adjacent, comme
     }
   }, [post?.content])
 
-  // Record view
   useEffect(() => {
     if (post?.id) {
       fetch(`/api/blog/view/${post.id}`, { method: "POST" }).catch(() => {})
     }
   }, [post?.id])
 
-  // Active heading tracking
   useEffect(() => {
     if (toc.length === 0) return
     const observer = new IntersectionObserver(
@@ -95,7 +89,7 @@ export default function BlogDetailTemplate({ post, related = [], adjacent, comme
         const visible = entries.filter((e) => e.isIntersecting)
         if (visible.length > 0) setActiveHeading(visible[0].target.id)
       },
-      { rootMargin: "-80px 0px -70% 0px" }
+      { rootMargin: "-80px 0px -60% 0px" }
     )
     toc.forEach(({ id }) => {
       const el = document.getElementById(id)
@@ -111,32 +105,39 @@ export default function BlogDetailTemplate({ post, related = [], adjacent, comme
     })
   }
 
-  // Password form
+  // ── Password gate ──────────────────────────────────────────────
   if (passwordProtected && !post) {
     return (
-      <div className="max-w-md mx-auto mt-20 px-4 text-center">
-        <h1 className="text-xl font-bold mb-4">{dict?.passwordRequired ?? "🔒 该文章需要密码访问"}</h1>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            window.location.href = `/blog/${slug}?password=${encodeURIComponent(password)}`
-          }}
-          className="space-y-3"
-        >
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={dict?.passwordPlaceholder ?? "请输入密码"}
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <span className="text-4xl">🔒</span>
+            <h1 className="mt-4 text-xl font-semibold text-neutral-900">
+              {dict?.passwordRequired ?? "This article is password protected"}
+            </h1>
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              window.location.href = `/blog/${slug}?password=${encodeURIComponent(password)}`
+            }}
+            className="space-y-3"
           >
-            {dict?.passwordConfirm ?? "确认"}
-          </button>
-        </form>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={dict?.passwordPlaceholder ?? "Enter password"}
+              className="w-full border border-neutral-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+            />
+            <button
+              type="submit"
+              className="w-full bg-neutral-900 text-white py-3 rounded-xl text-sm font-medium hover:bg-neutral-700 transition-colors"
+            >
+              {dict?.passwordConfirm ?? "Continue"}
+            </button>
+          </form>
+        </div>
       </div>
     )
   }
@@ -145,232 +146,295 @@ export default function BlogDetailTemplate({ post, related = [], adjacent, comme
 
   const safeContent = sanitizeHtml(post.content || "")
   const readTime = readTimeMinutes(post.word_count)
+  const coverSrc = (post as any).cover_image_signed_url || post.cover_image
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-neutral-500 mb-6 flex-wrap">
-        <Link href="/" className="hover:text-neutral-700">{dict?.home ?? "Home"}</Link>
-        <span>/</span>
-        <Link href="/blog" className="hover:text-neutral-700">{dict?.blog ?? "Blog"}</Link>
-        <span>/</span>
-        <span className="text-neutral-900 font-medium truncate max-w-[200px]">{post.title}</span>
-      </nav>
+    <div className="bg-white">
+      {/* ── Page wrapper ─────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-      <div className="flex gap-8">
-        {/* Article */}
-        <article className="flex-1 min-w-0">
-          {/* Cover */}
-          {(post.cover_image_signed_url || post.cover_image) && (
-            <div className="relative w-full h-64 sm:h-80 rounded-xl overflow-hidden mb-6">
-              <Image src={(post.cover_image_signed_url || post.cover_image)!} alt={post.title} fill className="object-cover" />
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-1.5 text-xs text-neutral-400 mb-10">
+          <Link href="/" className="hover:text-neutral-700 transition-colors">{dict?.home ?? "Home"}</Link>
+          <span>/</span>
+          <Link href="/blog" className="hover:text-neutral-700 transition-colors">{dict?.blog ?? "Blog"}</Link>
+          <span>/</span>
+          <span className="text-neutral-600 truncate max-w-[240px]">{post.title}</span>
+        </nav>
+
+        {/* ── Two-column layout ─────────────────────────────── */}
+        <div className="flex gap-16 items-start">
+
+          {/* ── Main article column ───────────────────────── */}
+          <article className="flex-1 min-w-0">
+
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-950 leading-[1.15] tracking-tight mb-6">
+              {post.title}
+            </h1>
+
+            {/* Meta bar */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-neutral-400 mb-8">
+              {post.published_at && (
+                <time dateTime={post.published_at}>
+                  {new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                </time>
+              )}
+              <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:block" />
+              <span>{dict ? fmt(dict.minuteRead, readTime) : `${readTime} min read`}</span>
+              <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:block" />
+              <span>{dict ? fmt(dict.reads, post.read_count) : `${post.read_count} views`}</span>
+              <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:block" />
+              <span>{dict ? fmt(dict.words, post.word_count) : `${post.word_count} words`}</span>
             </div>
-          )}
 
-          {/* Title */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-4 leading-tight">
-            {post.title}
-          </h1>
-
-          {/* Meta bar */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-500 mb-6 pb-6 border-b border-neutral-200">
-            {post.published_at && (
-              <span>{new Date(post.published_at).toLocaleDateString("zh-CN")}</span>
+            {/* Cover image — after meta */}
+            {coverSrc && (
+              <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden mb-10 shadow-md">
+                <Image
+                  src={coverSrc}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
             )}
-            <span>{dict ? fmt(dict.minuteRead, readTime) : `约 ${readTime} 分钟阅读`}</span>
-            <span>{dict ? fmt(dict.reads, post.read_count) : `${post.read_count} 次阅读`}</span>
-            <span>{dict ? fmt(dict.words, post.word_count) : `${post.word_count} 字`}</span>
-            {post.tags && post.tags.map((tag) => (
-              <Link
-                key={tag.id}
-                href={`/blog/tag/${tag.slug}`}
-                className="bg-neutral-100 hover:bg-neutral-200 px-2 py-0.5 rounded-full text-neutral-600 transition-colors"
-              >
-                #{tag.name}
-              </Link>
-            ))}
-          </div>
 
-          {/* Mobile TOC toggle */}
+            {/* Tags row */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-8">
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag.id}
+                    href={`/blog/tag/${tag.slug}`}
+                    className="text-xs border border-neutral-200 text-neutral-500 hover:border-neutral-900 hover:text-neutral-900 px-3 py-1 rounded-full transition-colors"
+                  >
+                    #{tag.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Mobile TOC */}
+            {toc.length >= 2 && (
+              <div className="lg:hidden mb-8 border border-neutral-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setTocOpen(!tocOpen)}
+                  className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-neutral-700 bg-neutral-50"
+                >
+                  <span>{dict?.tableOfContents ?? "Table of Contents"}</span>
+                  <span className="text-neutral-400">{tocOpen ? "▲" : "▼"}</span>
+                </button>
+                {tocOpen && (
+                  <ul className="px-4 py-3 space-y-2 bg-white">
+                    {toc.map((item) => (
+                      <li key={item.id} style={{ paddingLeft: item.level === 3 ? "1rem" : 0 }}>
+                        <a
+                          href={`#${item.id}`}
+                          className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors block py-0.5"
+                          onClick={() => setTocOpen(false)}
+                        >
+                          {item.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            {/* ── Article body ────────────────────────────── */}
+            <div
+              ref={contentRef}
+              className="product-richtext prose-neutral max-w-none"
+              dangerouslySetInnerHTML={{ __html: safeContent }}
+            />
+
+            {/* ── Post navigation ─────────────────────────── */}
+            {adjacent && (adjacent.prev || adjacent.next) && (
+              <div className="mt-16 pt-10 border-t border-neutral-100 grid grid-cols-2 gap-6">
+                {adjacent.prev ? (
+                  <Link
+                    href={`/blog/${adjacent.prev.slug}`}
+                    className="group"
+                  >
+                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
+                      ← {dict?.prevPost ?? "Previous"}
+                    </p>
+                    <p className="text-sm font-medium text-neutral-700 group-hover:text-neutral-950 line-clamp-2 transition-colors">
+                      {adjacent.prev.title}
+                    </p>
+                  </Link>
+                ) : <div />}
+                {adjacent.next ? (
+                  <Link
+                    href={`/blog/${adjacent.next.slug}`}
+                    className="group text-right"
+                  >
+                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
+                      {dict?.nextPost ?? "Next"} →
+                    </p>
+                    <p className="text-sm font-medium text-neutral-700 group-hover:text-neutral-950 line-clamp-2 transition-colors">
+                      {adjacent.next.title}
+                    </p>
+                  </Link>
+                ) : <div />}
+              </div>
+            )}
+
+            {/* ── Related posts ───────────────────────────── */}
+            {related.length > 0 && (
+              <div className="mt-16">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-6">
+                  {dict?.relatedPosts ?? "Related Articles"}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {related.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/blog/${p.slug}`}
+                      className="group block"
+                    >
+                      {p.cover_image && (
+                        <div className="relative h-40 w-full rounded-xl overflow-hidden mb-3">
+                          <Image
+                            src={p.cover_image}
+                            alt={p.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <p className="text-sm font-semibold text-neutral-800 line-clamp-2 group-hover:text-neutral-500 transition-colors">
+                        {p.title}
+                      </p>
+                      {p.excerpt && (
+                        <p className="text-xs text-neutral-400 mt-1 line-clamp-2">{p.excerpt}</p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Comments ────────────────────────────────── */}
+            {post.allow_comments && (
+              <div className="mt-16">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-6">
+                  {dict ? fmt(dict.commentCount, comments.length) : `${comments.length} Comment${comments.length !== 1 ? "s" : ""}`}
+                </h2>
+                {comments.length === 0 && (
+                  <p className="text-sm text-neutral-400 mb-8">
+                    {dict?.noComments ?? "No comments yet. Be the first to share your thoughts."}
+                  </p>
+                )}
+                {comments.length > 0 && (
+                  <div className="space-y-5 mb-8">
+                    {comments.map((c) => (
+                      <div key={c.id} className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-semibold text-neutral-500 shrink-0">
+                          {c.customer_id.slice(-2).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-neutral-400 mb-1.5">
+                            {new Date(c.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                          </p>
+                          <p className="text-sm text-neutral-700 leading-relaxed">{c.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <CommentForm postId={post.id} customer={customer} dict={dict} />
+              </div>
+            )}
+
+            {/* ── Share — after comments, before footer ──── */}
+            <div className="mt-14 pt-10 border-t border-neutral-100">
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-5">
+                {dict?.shareArticle ?? "Share"}
+              </p>
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={handleCopy}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-neutral-200 rounded-full text-neutral-600 hover:border-neutral-900 hover:text-neutral-900 transition-colors"
+                >
+                  🔗 {copied ? (dict?.copied ?? "Copied!") : (dict?.copyLink ?? "Copy link")}
+                </button>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(post.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-neutral-200 rounded-full text-neutral-600 hover:border-neutral-900 hover:text-neutral-900 transition-colors"
+                >
+                  𝕏 Twitter
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-neutral-200 rounded-full text-neutral-600 hover:border-neutral-900 hover:text-neutral-900 transition-colors"
+                >
+                  Facebook
+                </a>
+                <a
+                  href={`https://service.weibo.com/share/share.php?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(post.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-neutral-200 rounded-full text-neutral-600 hover:border-neutral-900 hover:text-neutral-900 transition-colors"
+                >
+                  微博
+                </a>
+              </div>
+            </div>
+
+          </article>
+
+          {/* ── Desktop TOC Sidebar ───────────────────────── */}
           {toc.length >= 2 && (
-            <div className="lg:hidden mb-4">
-              <button
-                onClick={() => setTocOpen(!tocOpen)}
-                className="flex items-center gap-2 text-sm font-medium text-neutral-700 border border-neutral-200 rounded-lg px-3 py-2"
-              >
-                📋 {dict?.tableOfContents ?? "目录"} {tocOpen ? "▲" : "▼"}
-              </button>
-              {tocOpen && (
-                <ul className="mt-2 border border-neutral-200 rounded-lg p-3 space-y-1">
+            <aside className="hidden lg:block w-52 shrink-0">
+              <div className="sticky top-28">
+                <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
+                  {dict?.tableOfContents ?? "On this page"}
+                </p>
+                <ul className="space-y-1 border-l border-neutral-100">
                   {toc.map((item) => (
-                    <li key={item.id} style={{ paddingLeft: item.level === 3 ? "1rem" : 0 }}>
+                    <li
+                      key={item.id}
+                      style={{ paddingLeft: item.level === 3 ? "1.25rem" : "0.75rem" }}
+                    >
                       <a
                         href={`#${item.id}`}
-                        className="text-sm text-blue-600 hover:underline block"
-                        onClick={() => setTocOpen(false)}
+                        className={`block text-xs py-1 transition-colors leading-snug ${
+                          activeHeading === item.id
+                            ? "text-neutral-950 font-semibold border-l-2 border-neutral-950 -ml-[3px] pl-[calc(0.75rem+1px)]"
+                            : "text-neutral-400 hover:text-neutral-700"
+                        }`}
+                        style={
+                          item.level === 3
+                            ? activeHeading === item.id
+                              ? { paddingLeft: "calc(1.25rem + 1px)", marginLeft: "-3px" }
+                              : {}
+                            : undefined
+                        }
                       >
                         {item.text}
                       </a>
                     </li>
                   ))}
                 </ul>
-              )}
-            </div>
-          )}
-
-          {/* Content */}
-          <div
-            ref={contentRef}
-            className="product-richtext"
-            dangerouslySetInnerHTML={{ __html: safeContent }}
-          />
-
-          {/* Social Share */}
-          <div className="mt-8 pt-6 border-t border-neutral-200">
-            <p className="text-sm font-medium text-neutral-700 mb-3">{dict?.shareArticle ?? "分享文章"}</p>
-            <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={handleCopy}
-                className="px-3 py-1.5 text-sm border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors"
-              >
-                {copied ? (dict?.copied ?? "✓ 已复制") : (dict?.copyLink ?? "🔗 复制链接")}
-              </button>
-              <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(post.title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 text-sm bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors"
-              >
-                𝕏 Twitter
-              </a>
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Facebook
-              </a>
-              <a
-                href={`https://service.weibo.com/share/share.php?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(post.title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-              >
-                微博
-              </a>
-            </div>
-          </div>
-
-          {/* Adjacent Navigation */}
-          {adjacent && (adjacent.prev || adjacent.next) && (
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              {adjacent.prev ? (
-                <Link
-                  href={`/blog/${adjacent.prev.slug}`}
-                  className="group p-4 border border-neutral-200 rounded-lg hover:border-blue-300 transition-colors"
-                >
-                  <p className="text-xs text-neutral-400 mb-1">{dict?.prevPost ?? "← 上一篇"}</p>
-                  <p className="text-sm font-medium text-neutral-700 group-hover:text-blue-600 line-clamp-2">
-                    {adjacent.prev.title}
-                  </p>
-                </Link>
-              ) : <div />}
-              {adjacent.next ? (
-                <Link
-                  href={`/blog/${adjacent.next.slug}`}
-                  className="group p-4 border border-neutral-200 rounded-lg hover:border-blue-300 transition-colors text-right"
-                >
-                  <p className="text-xs text-neutral-400 mb-1">{dict?.nextPost ?? "下一篇 →"}</p>
-                  <p className="text-sm font-medium text-neutral-700 group-hover:text-blue-600 line-clamp-2">
-                    {adjacent.next.title}
-                  </p>
-                </Link>
-              ) : <div />}
-            </div>
-          )}
-
-          {/* Related Posts */}
-          {related.length > 0 && (
-            <div className="mt-10">
-              <h2 className="text-lg font-semibold text-neutral-900 mb-4">{dict?.relatedPosts ?? "相关文章"}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {related.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/blog/${p.slug}`}
-                    className="group block border border-neutral-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    {p.cover_image && (
-                      <div className="relative h-32 w-full">
-                        <Image src={p.cover_image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform" />
-                      </div>
-                    )}
-                    <div className="p-3">
-                      <p className="text-sm font-medium text-neutral-800 line-clamp-2 group-hover:text-blue-600">{p.title}</p>
-                      {p.excerpt && <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{p.excerpt}</p>}
-                    </div>
-                  </Link>
-                ))}
               </div>
-            </div>
+            </aside>
           )}
 
-          {/* Comments */}
-          {post.allow_comments && (
-            <div className="mt-10">
-              <h2 className="text-lg font-semibold text-neutral-900 mb-4">{dict ? fmt(dict.commentCount, comments.length) : `评论 (${comments.length})`}</h2>
-              {comments.length === 0 && (
-                <p className="text-sm text-neutral-400 mb-4">{dict?.noComments ?? "暂无评论，快来发表第一条评论吧！"}</p>
-              )}
-              <div className="space-y-4 mb-6">
-                {comments.map((c) => (
-                  <div key={c.id} className="p-4 border border-neutral-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-7 h-7 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-medium">
-                        {c.customer_id.slice(-2).toUpperCase()}
-                      </span>
-                      <span className="text-xs text-neutral-400">
-                        {new Date(c.created_at).toLocaleString("zh-CN")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-neutral-700">{c.content}</p>
-                  </div>
-                ))}
-              </div>
-              {/* Comment form — client component */}
-              <CommentForm postId={post.id} customer={customer} dict={dict} />
-            </div>
-          )}
-        </article>
-
-        {/* Desktop TOC Sidebar */}
-        {toc.length >= 2 && (
-          <aside className="hidden lg:block w-56 shrink-0">
-            <div className="sticky top-24">
-              <h3 className="text-sm font-semibold text-neutral-700 mb-3">{dict?.tableOfContents ?? "目录"}</h3>
-              <ul className="space-y-1">
-                {toc.map((item) => (
-                  <li key={item.id} style={{ paddingLeft: item.level === 3 ? "0.75rem" : 0 }}>
-                    <a
-                      href={`#${item.id}`}
-                      className={`block text-xs py-0.5 transition-colors hover:text-blue-600 ${
-                        activeHeading === item.id ? "text-blue-600 font-medium" : "text-neutral-500"
-                      }`}
-                    >
-                      {item.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        )}
+        </div>
       </div>
     </div>
   )
 }
 
+// ── Comment form ────────────────────────────────────────────────
 function CommentForm({ postId, customer, dict }: { postId: string; customer?: { id: string } | null; dict?: BlogDictionary }) {
   const [content, setContent] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -378,12 +442,11 @@ function CommentForm({ postId, customer, dict }: { postId: string; customer?: { 
 
   if (!customer) {
     return (
-      <p className="text-sm text-neutral-500">
-        请先{" "}
-        <Link href="/account/login" className="text-blue-600 hover:underline">
-          {dict?.login ?? "登录"}
+      <p className="text-sm text-neutral-400">
+        <Link href="/account/login" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">
+          {dict?.login ?? "Sign in"}
         </Link>{" "}
-        {dict?.loginToComment ?? "后再评论"}
+        {dict?.loginToComment ?? "to leave a comment."}
       </p>
     )
   }
@@ -398,12 +461,12 @@ function CommentForm({ postId, customer, dict }: { postId: string; customer?: { 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       })
-      if (res.status === 401) { setMessage(dict?.sessionExpired ?? "登录已过期，请重新登录"); return }
-      if (!res.ok) throw new Error("提交失败")
+      if (res.status === 401) { setMessage(dict?.sessionExpired ?? "Session expired, please sign in again."); return }
+      if (!res.ok) throw new Error("Failed")
       setContent("")
-      setMessage(dict?.commentSubmitted ?? "评论已提交，待审核后显示")
+      setMessage(dict?.commentSubmitted ?? "Your comment has been submitted for review.")
     } catch {
-      setMessage(dict?.commentFailed ?? "评论提交失败，请重试")
+      setMessage(dict?.commentFailed ?? "Failed to submit. Please try again.")
     } finally {
       setSubmitting(false)
     }
@@ -414,17 +477,17 @@ function CommentForm({ postId, customer, dict }: { postId: string; customer?: { 
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder={dict?.commentPlaceholder ?? "写下你的评论..."}
+        placeholder={dict?.commentPlaceholder ?? "Share your thoughts…"}
         rows={4}
-        className="w-full border border-neutral-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        className="w-full border border-neutral-200 rounded-xl px-4 py-3 text-sm text-neutral-700 placeholder-neutral-300 focus:outline-none focus:ring-2 focus:ring-neutral-900 resize-none transition-shadow"
       />
-      {message && <p className="text-sm text-neutral-500">{message}</p>}
+      {message && <p className="text-sm text-neutral-400">{message}</p>}
       <button
         type="submit"
         disabled={submitting || !content.trim()}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+        className="bg-neutral-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-neutral-700 transition-colors disabled:opacity-40"
       >
-        {submitting ? (dict?.submittingComment ?? "提交中...") : (dict?.submitComment ?? "提交评论")}
+        {submitting ? (dict?.submittingComment ?? "Posting…") : (dict?.submitComment ?? "Post comment")}
       </button>
     </form>
   )

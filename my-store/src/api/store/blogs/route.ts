@@ -1,6 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { BlogService } from "../../../modules/blog/services/blog.service"
-import { blogMediaService } from "../../../modules/blog/services/media.service"
 
 // GET /store/blogs
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -25,14 +24,6 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     limit: query.limit ? parseInt(query.limit, 10) : 12,
   })
 
-  // Sign cover images in parallel
-  const posts = await Promise.all(
-    result.posts.map(async (post: any) => {
-      if (!post.cover_image) return post
-      const cover_image_signed_url = await blogMediaService.signUrl(post.cover_image)
-      return { ...post, cover_image_signed_url }
-    })
-  )
-
-  res.json({ ...result, posts })
+  // Bucket is public — cover_image permanent URL is directly accessible
+  res.json(result)
 }

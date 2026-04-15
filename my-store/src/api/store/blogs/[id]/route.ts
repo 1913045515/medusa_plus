@@ -1,6 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { BlogService } from "../../../../modules/blog/services/blog.service"
-import { blogMediaService } from "../../../../modules/blog/services/media.service"
 
 // GET /store/blogs/:id
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -58,6 +57,6 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   }
 
   const tags = await svc.getPostTags(post.id)
-  const cover_image_signed_url = await blogMediaService.signUrl(post.cover_image || "")
-  res.json({ post: { ...post, tags, cover_image_signed_url } })
+  // Bucket is public — cover_image permanent URL is directly accessible
+  res.json({ post: { ...post, tags } })
 }

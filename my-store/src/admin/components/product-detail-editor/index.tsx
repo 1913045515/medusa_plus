@@ -1,4 +1,5 @@
-import { useEditor, EditorContent } from "@tiptap/react"
+import { useEditor, EditorContent, ReactNodeViewRenderer, NodeViewWrapper } from "@tiptap/react"
+import { Node, mergeAttributes } from "@tiptap/core"
 import StarterKit from "@tiptap/starter-kit"
 import Image from "@tiptap/extension-image"
 import Link from "@tiptap/extension-link"
@@ -15,29 +16,102 @@ import { useTranslation } from "react-i18next"
 import EditorToolbar from "./toolbar"
 import { toast } from "@medusajs/ui"
 
+// ─── Image upload placeholder node ───────────────────────────────────────────
+
+function ImageUploadingView() {
+  return (
+    <NodeViewWrapper>
+      <div
+        contentEditable={false}
+        className="my-2 select-none rounded border border-ui-border-base bg-ui-bg-subtle px-4 py-3"
+      >
+        <p className="mb-1.5 text-xs text-ui-fg-muted">正在上传图片…</p>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-ui-bg-component">
+          <div className="h-full animate-pulse rounded-full bg-ui-fg-interactive" style={{ width: "55%" }} />
+        </div>
+      </div>
+    </NodeViewWrapper>
+  )
+}
+
+const ImageUploadPlaceholderNode = Node.create({
+  name: "imageUploadPlaceholder",
+  group: "block",
+  atom: true,
+  addAttributes() {
+    return { uploadId: { default: null } }
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes({ "data-type": "image-upload-placeholder", "data-upload-id": HTMLAttributes.uploadId })]
+  },
+  parseHTML() {
+    return [{ tag: 'div[data-type="image-upload-placeholder"]' }]
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageUploadingView)
+  },
+})
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function replacePlaceholder(
+  editor: ReturnType<typeof useEditor>,
+  uploadId: string,
+  replacement: "image" | "remove",
+  imageUrl?: string
+) {
+  if (!editor) return
+  const { state } = editor
+  let foundPos = -1
+  let foundSize = 0
+  state.doc.descendants((node, pos) => {
+    if (foundPos !== -1) return false
+    if (node.type.name === "imageUploadPlaceholder" && node.attrs.uploadId === uploadId) {
+      foundPos = pos
+      foundSize = node.nodeSize
+    }
+  })
+  if (foundPos === -1) return
+  if (replacement === "image" && imageUrl) {
+    const imageNode = editor.state.schema.nodes.image?.create({ src: imageUrl })
+    if (imageNode) {
+      editor.view.dispatch(editor.state.tr.replaceWith(foundPos, foundPos + foundSize, imageNode))
+    }
+  } else {
+    editor.view.dispatch(editor.state.tr.delete(foundPos, foundPos + foundSize))
+  }
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 type ProductDetailEditorProps = {
   value: string
   onChange: (html: string) => void
   /** Optional image upload handler. When provided, pasting/dropping images and
    *  clicking the image toolbar button will trigger upload instead of URL prompt.
-   *  Receives the File and must return the URL to embed in the editor. */
+   *  Should return the public URL to embed in the editor. */
   onImageUpload?: (file: File) => Promise<string>
 }
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ProductDetailEditor({ value, onChange, onImageUpload }: ProductDetailEditorProps) {
   const { t } = useTranslation()
   const [isSourceMode, setIsSourceMode] = useState(false)
   const [sourceHtml, setSourceHtml] = useState(value)
 
-  // Keep upload callback in a ref so editorProps closure always has the latest version
   const onImageUploadRef = useRef(onImageUpload)
   useEffect(() => { onImageUploadRef.current = onImageUpload }, [onImageUpload])
 
+  // Always-current ref to the editor instance (safe to read inside async callbacks)
+  const editorRef = useRef<ReturnType<typeof useEditor>>(null)
+
+  // Ref to the centralised upload handler so paste/drop closures always see latest version
+  const doUploadRef = useRef<((file: File) => void) | null>(null)
+
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: { levels: [1, 2, 3, 4, 5, 6] },
-      }),
+      StarterKit.configure({ heading: { levels: [1, 2, 3, 4, 5, 6] } }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false }),
       Table.configure({ resizable: true }),
@@ -48,12 +122,12 @@ export default function ProductDetailEditor({ value, onChange, onImageUpload }: 
       Underline,
       TextStyle,
       Color,
+      ImageUploadPlaceholderNode,
     ],
     content: value,
     editorProps: {
-      handlePaste(view, event) {
-        const uploadFn = onImageUploadRef.current
-        if (!uploadFn) return false
+      handlePaste(_view, event) {
+        if (!doUploadRef.current) return false
         const items = event.clipboardData?.items
         if (!items) return false
         for (const item of Array.from(items)) {
@@ -61,41 +135,20 @@ export default function ProductDetailEditor({ value, onChange, onImageUpload }: 
             event.preventDefault()
             const file = item.getAsFile()
             if (!file) continue
-            uploadFn(file)
-              .then((url) => {
-                const node = view.state.schema.nodes.image?.create({ src: url })
-                if (node) {
-                  const tr = view.state.tr.replaceSelectionWith(node)
-                  view.dispatch(tr)
-                }
-              })
-              .catch(() => {
-                toast.error(t("productDetail.imageUploadFailed", "Image upload failed"))
-              })
+            doUploadRef.current(file)
             return true
           }
         }
         return false
       },
-      handleDrop(view, event) {
-        const uploadFn = onImageUploadRef.current
-        if (!uploadFn) return false
+      handleDrop(_view, event) {
+        if (!doUploadRef.current) return false
         const files = (event as DragEvent).dataTransfer?.files
         if (!files?.length) return false
         for (const file of Array.from(files)) {
           if (file.type.startsWith("image/")) {
             event.preventDefault()
-            uploadFn(file)
-              .then((url) => {
-                const node = view.state.schema.nodes.image?.create({ src: url })
-                if (node) {
-                  const tr = view.state.tr.replaceSelectionWith(node)
-                  view.dispatch(tr)
-                }
-              })
-              .catch(() => {
-                toast.error(t("productDetail.imageUploadFailed", "Image upload failed"))
-              })
+            doUploadRef.current(file)
             return true
           }
         }
@@ -109,7 +162,34 @@ export default function ProductDetailEditor({ value, onChange, onImageUpload }: 
     },
   })
 
-  // Sync external value changes
+  // Keep editorRef current
+  useEffect(() => { editorRef.current = editor }, [editor])
+
+  // Centralised: insert placeholder → upload → replace with image
+  const handleImageUpload = useCallback((file: File) => {
+    const uploadFn = onImageUploadRef.current
+    const ed = editorRef.current
+    if (!uploadFn || !ed) return
+
+    const uploadId = crypto.randomUUID()
+    ed.chain().focus().insertContent({ type: "imageUploadPlaceholder", attrs: { uploadId } }).run()
+
+    uploadFn(file)
+      .then((url) => {
+        replacePlaceholder(editorRef.current, uploadId, "image", url)
+      })
+      .catch(() => {
+        replacePlaceholder(editorRef.current, uploadId, "remove")
+        toast.error(t("productDetail.imageUploadFailed", "图片上传失败"))
+      })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps — reads via refs; intentionally stable
+
+  // Sync doUploadRef whenever upload capability changes
+  useEffect(() => {
+    doUploadRef.current = onImageUpload ? handleImageUpload : null
+  }, [onImageUpload, handleImageUpload])
+
+  // Sync external value changes into editor
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value, { emitUpdate: false })
@@ -128,10 +208,8 @@ export default function ProductDetailEditor({ value, onChange, onImageUpload }: 
 
   const toggleMode = useCallback(() => {
     if (isSourceMode && editor) {
-      // Switching source → visual: push source HTML into editor
       editor.commands.setContent(sourceHtml, { emitUpdate: false })
     } else if (editor) {
-      // Switching visual → source
       setSourceHtml(editor.getHTML())
     }
     setIsSourceMode((prev) => !prev)
@@ -140,7 +218,11 @@ export default function ProductDetailEditor({ value, onChange, onImageUpload }: 
   return (
     <div className="border border-ui-border-base rounded-lg overflow-hidden">
       <div className="flex items-center justify-between bg-ui-bg-subtle px-2 py-1 border-b border-ui-border-base">
-        <EditorToolbar editor={editor} onImageUpload={onImageUpload} />
+        <EditorToolbar
+          editor={editor}
+          onImageUpload={onImageUpload}
+          onUploadFile={onImageUpload ? handleImageUpload : undefined}
+        />
         <button
           type="button"
           onClick={toggleMode}

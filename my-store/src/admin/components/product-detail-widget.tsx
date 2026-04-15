@@ -40,6 +40,22 @@ const ProductDetailWidget = ({ data }: AdminProductDetailWidgetProps) => {
     setShortHtml(data.description ?? "")
   }, [data.description])
 
+  const uploadProductContentImage = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append("file", file)
+    const res = await fetch("/admin/product-content-images", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error((err as any).message ?? `Upload failed: ${res.status}`)
+    }
+    const data = await res.json()
+    return data.url as string
+  }
+
   const handleSave = useCallback(async () => {
     setSaving(true)
     try {
@@ -103,7 +119,7 @@ const ProductDetailWidget = ({ data }: AdminProductDetailWidgetProps) => {
         <p className="text-xs text-ui-fg-muted mb-3">
           {t("productDetail.shortDescHint", "Displayed on the right side of product page, next to images.")}
         </p>
-        <ProductDetailEditor value={shortHtml} onChange={setShortHtml} />
+        <ProductDetailEditor value={shortHtml} onChange={setShortHtml} onImageUpload={uploadProductContentImage} />
       </div>
 
       {/* Long Description — edits custom long_desc_html */}
@@ -119,7 +135,7 @@ const ProductDetailWidget = ({ data }: AdminProductDetailWidgetProps) => {
             {t("productDetail.loading", "Loading...")}
           </div>
         ) : (
-          <ProductDetailEditor value={longHtml} onChange={setLongHtml} />
+          <ProductDetailEditor value={longHtml} onChange={setLongHtml} onImageUpload={uploadProductContentImage} />
         )}
       </div>
     </Container>

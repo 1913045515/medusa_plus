@@ -120,6 +120,22 @@ export default function NewBlogPage() {
     }))
   }
 
+  const uploadBlogContentImage = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append("file", file)
+    const res = await fetch("/admin/blog-content-images", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error((err as any).message ?? `Upload failed: ${res.status}`)
+    }
+    const data = await res.json()
+    return data.url as string
+  }
+
   const handleSave = async (status?: string) => {
     if (!form.title.trim()) { toast.error(t("blog.toast.titleRequired")); return }
     setSaving(true)
@@ -198,6 +214,7 @@ export default function NewBlogPage() {
             <ProductDetailEditor
               value={form.content}
               onChange={(html) => set("content", html)}
+              onImageUpload={uploadBlogContentImage}
             />
           </div>
           <div>

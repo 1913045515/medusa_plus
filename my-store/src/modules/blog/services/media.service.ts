@@ -10,6 +10,7 @@ export type BlogMediaTarget =
   | { entity: "category"; entity_id: string; field: "cover_image" }
   | { entity: "tag"; entity_id: string; field: "cover_image" }
   | { entity: "content_image"; entity_id: string; field: "inline" }
+  | { entity: "product_content"; entity_id: string; field: "inline" }
 
 export type StoredBlogImage = {
   provider: "s3"
