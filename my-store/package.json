@@ -36,6 +36,7 @@
     "@medusajs/cli": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
+    "@tiptap/core": "^3.22.3",
     "@tiptap/extension-character-count": "^3.22.3",
     "@tiptap/extension-color": "^3.21.0",
     "@tiptap/extension-heading": "^3.22.3",

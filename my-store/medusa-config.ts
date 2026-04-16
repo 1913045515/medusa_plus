@@ -27,9 +27,8 @@ module.exports = defineConfig({
   },
   modules: [
     // 文件上传模块：backend_url 控制生成的图片 URL 前缀
-    // upload_dir 使用绝对路径，避免 medusa start 切换 cwd（/app/.medusa/server）导致路径偏移
-    // 生产环境：nginx 直接挂载 ./uploads 卷并在 /uploads/ location 下提供服务
-    // 本地开发：http://localhost:9000/uploads（需自行启动静态服务器预览图片）
+    // 本地开发（默认）：upload_dir="static"，Medusa dev server 自动在 /static 下提供静态文件服务
+    // Docker 生产环境：通过 UPLOAD_DIR=/app/uploads 将文件写入挂载卷，nginx 从 /uploads/ 对外服务
     {
       resolve: "@medusajs/file",
       options: {
@@ -38,8 +37,8 @@ module.exports = defineConfig({
             resolve: "@medusajs/file-local",
             id: "local",
             options: {
-              upload_dir: "/app/uploads",
-              backend_url: process.env.BACKEND_URL || "http://localhost:9000/uploads",
+              upload_dir: process.env.UPLOAD_DIR || "static",
+              backend_url: process.env.BACKEND_URL || "http://localhost:9000/static",
             },
           },
         ],
