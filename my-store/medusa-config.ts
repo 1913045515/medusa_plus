@@ -71,5 +71,11 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/blog",
     },
+    {
+      resolve: "./src/modules/content-pages",
+    },
+    {
+      resolve: "./src/modules/ticket",
+    },
   ],
 })

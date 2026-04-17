@@ -18,5 +18,35 @@ export default defineMiddlewares({
         }),
       ],
     },
+    {
+      matcher: "/admin/content-pages*",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+    {
+      matcher: "/store/content-pages*",
+      middlewares: [
+        authenticate("customer", ["bearer", "session"], {
+          allowUnauthenticated: true,
+        }),
+      ],
+    },
+    // Ticket: store routes are open (guest + logged-in), but parse auth if present
+    {
+      matcher: "/store/tickets*",
+      middlewares: [
+        authenticate("customer", ["bearer", "session"], {
+          allowUnauthenticated: true,
+        }),
+      ],
+    },
+    // Ticket: admin routes require admin authentication
+    {
+      matcher: "/admin/tickets*",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
   ],
 })

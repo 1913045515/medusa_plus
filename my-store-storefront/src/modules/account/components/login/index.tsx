@@ -4,6 +4,7 @@ import { getPasswordResetDictionary } from "@lib/i18n/dictionaries"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useActionState } from "react"
 import { useParams } from "next/navigation"
 
@@ -71,6 +72,15 @@ const Login = ({ setCurrentView }: Props) => {
         </button>
         .
       </span>
+      <div className="flex gap-3 mt-4 text-small-regular text-ui-fg-muted">
+        <LocalizedClientLink href="/content/privacy-policy" className="underline hover:text-ui-fg-subtle">
+          隐私协议
+        </LocalizedClientLink>
+        <span>·</span>
+        <LocalizedClientLink href="/content/terms-of-use" className="underline hover:text-ui-fg-subtle">
+          用户协议
+        </LocalizedClientLink>
+      </div>
     </div>
   )
 }
