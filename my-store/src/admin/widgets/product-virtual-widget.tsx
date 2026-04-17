@@ -5,13 +5,13 @@ import {
   Button,
   Container,
   Heading,
-  Input,
   Label,
   Select,
   Switch,
   Text,
   toast,
 } from "@medusajs/ui"
+import FileAssetPicker, { type FileAsset } from "../components/file-asset-picker"
 
 type AdminProductVirtualWidgetProps = {
   data: { id: string }
@@ -29,13 +29,17 @@ type VirtualProductType = "resource" | "course"
 type VirtualProductConfig = {
   is_virtual: boolean
   virtual_product_type: VirtualProductType | null
-  resource_download_url: string
+  resource_file_asset_id: string
+  resource_file_asset_name: string // display name only, not persisted
+  resource_download_url: string    // legacy — read-only display, not writeable
   virtual_course_id: string
 }
 
 const emptyConfig: VirtualProductConfig = {
   is_virtual: false,
   virtual_product_type: null,
+  resource_file_asset_id: "",
+  resource_file_asset_name: "",
   resource_download_url: "",
   virtual_course_id: "",
 }
@@ -47,6 +51,7 @@ const ProductVirtualWidget = ({ data }: AdminProductVirtualWidgetProps) => {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -79,6 +84,8 @@ const ProductVirtualWidget = ({ data }: AdminProductVirtualWidgetProps) => {
         setConfig({
           is_virtual: Boolean(configJson?.config?.is_virtual),
           virtual_product_type: configJson?.config?.virtual_product_type ?? null,
+          resource_file_asset_id: configJson?.config?.resource_file_asset_id ?? "",
+          resource_file_asset_name: "",
           resource_download_url: configJson?.config?.resource_download_url ?? "",
           virtual_course_id: configJson?.config?.virtual_course_id ?? "",
         })
@@ -124,6 +131,8 @@ const ProductVirtualWidget = ({ data }: AdminProductVirtualWidgetProps) => {
     setConfig((prev) => ({
       ...prev,
       virtual_product_type: nextType,
+      resource_file_asset_id: nextType === "resource" ? prev.resource_file_asset_id : "",
+      resource_file_asset_name: nextType === "resource" ? prev.resource_file_asset_name : "",
       resource_download_url: nextType === "resource" ? prev.resource_download_url : "",
       virtual_course_id: nextType === "course" ? prev.virtual_course_id : "",
     }))
@@ -139,7 +148,7 @@ const ProductVirtualWidget = ({ data }: AdminProductVirtualWidgetProps) => {
         body: JSON.stringify({
           is_virtual: config.is_virtual,
           virtual_product_type: config.virtual_product_type,
-          resource_download_url: config.resource_download_url,
+          resource_file_asset_id: config.resource_file_asset_id || null,
           virtual_course_id: config.virtual_course_id,
         }),
       })
@@ -197,19 +206,64 @@ const ProductVirtualWidget = ({ data }: AdminProductVirtualWidgetProps) => {
             </div>
 
             {selectedType === "resource" && (
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="product-download-url">
-                  {t("productVirtual.downloadUrlLabel")} <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="product-download-url"
-                  value={config.resource_download_url}
-                  placeholder={t("productVirtual.downloadUrlPlaceholder")}
-                  onChange={(e) => setField("resource_download_url", e.target.value)}
+              <div className="flex flex-col gap-3">
+                {/* Legacy warning */}
+                {config.resource_download_url && !config.resource_file_asset_id && (
+                  <div className="rounded-lg border border-ui-tag-orange-border bg-ui-tag-orange-bg px-4 py-3">
+                    <Text size="small" className="text-ui-tag-orange-text">
+                      {t("productVirtual.fileAssetLegacyWarning")}
+                    </Text>
+                    <Text size="xsmall" className="text-ui-fg-muted mt-1 font-mono break-all">
+                      {config.resource_download_url}
+                    </Text>
+                  </div>
+                )}
+
+                {/* File asset picker */}
+                <div className="flex flex-col gap-1">
+                  <Label>
+                    {t("productVirtual.fileAssetLabel")} <span className="text-red-500">*</span>
+                  </Label>
+                  {config.resource_file_asset_id ? (
+                    <div className="flex items-center gap-2 rounded-lg border border-ui-border-base px-3 py-2">
+                      <Text size="small" className="flex-1 text-ui-fg-base">
+                        {config.resource_file_asset_name || config.resource_file_asset_id}
+                      </Text>
+                      <Button
+                        size="2xsmall"
+                        variant="secondary"
+                        onClick={() => setPickerOpen(true)}
+                      >
+                        {t("productVirtual.fileAssetChangeBtn")}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      size="small"
+                      onClick={() => setPickerOpen(true)}
+                      className="self-start"
+                    >
+                      {t("productVirtual.fileAssetSelectBtn")}
+                    </Button>
+                  )}
+                  <Text size="small" className="text-ui-fg-muted">
+                    {t("productVirtual.fileAssetHint")}
+                  </Text>
+                </div>
+
+                {/* File asset picker dialog */}
+                <FileAssetPicker
+                  open={pickerOpen}
+                  onClose={() => setPickerOpen(false)}
+                  onSelect={(asset: FileAsset) => {
+                    setConfig((prev) => ({
+                      ...prev,
+                      resource_file_asset_id: asset.id,
+                      resource_file_asset_name: asset.name,
+                    }))
+                  }}
                 />
-                <Text size="small" className="text-ui-fg-muted">
-                  {t("productVirtual.downloadUrlHint")}
-                </Text>
               </div>
             )}
 

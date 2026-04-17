@@ -8,6 +8,8 @@ import {
   validateVirtualProductInput,
   type VirtualProductInput,
 } from "../../../../../modules/virtual-product"
+import { FILE_ASSET_MODULE } from "../../../../../modules/file-asset"
+import type FileAssetModuleService from "../../../../../modules/file-asset/service"
 
 const getProductModule = (scope: MedusaRequest["scope"]) => {
   return scope.resolve(Modules.PRODUCT) as any
@@ -69,6 +71,19 @@ export const PUT = async (req: MedusaRequest, res: MedusaResponse) => {
       newCourseId = selectedCourse.id
     }
 
+    // 2b. Validate resource_file_asset_id if type=resource
+    if (body.is_virtual === true && body.virtual_product_type === "resource") {
+      const fileAssetId = typeof body.resource_file_asset_id === "string" ? body.resource_file_asset_id.trim() : null
+      if (!fileAssetId) {
+        return res.status(400).json({ message: "请为数字资料商品选择对应的文件（resource_file_asset_id）" })
+      }
+      const fileAssetService = req.scope.resolve<FileAssetModuleService>(FILE_ASSET_MODULE)
+      const assets = await fileAssetService.listFileAssets({ id: fileAssetId })
+      if (!assets[0]) {
+        return res.status(400).json({ message: "所选文件不存在，请重新选择" })
+      }
+    }
+
     // 3. Validate and write new config to product metadata
     const config = validateVirtualProductInput(body, { coursePath })
     const metadata = mergeVirtualProductMetadata(currentMetadata, config)
@@ -112,6 +127,7 @@ export const PUT = async (req: MedusaRequest, res: MedusaResponse) => {
                 const clearedMeta = mergeVirtualProductMetadata(prevMeta, {
                   is_virtual: false,
                   virtual_product_type: null,
+                  resource_file_asset_id: null,
                   resource_download_url: null,
                   virtual_course_id: null,
                   virtual_course_path: null,

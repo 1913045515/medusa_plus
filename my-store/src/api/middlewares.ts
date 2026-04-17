@@ -54,5 +54,26 @@ export default defineMiddlewares({
         authenticate("user", ["bearer", "session"]),
       ],
     },
+    // PayPal: admin configuration routes require admin authentication
+    {
+      matcher: "/admin/paypal*",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+    // File Assets: admin management routes require admin authentication
+    {
+      matcher: "/admin/file-assets*",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+    // File Assets: store download requires authenticated customer
+    {
+      matcher: "/store/file-assets*",
+      middlewares: [
+        authenticate("customer", ["bearer", "session"]),
+      ],
+    },
   ],
 })

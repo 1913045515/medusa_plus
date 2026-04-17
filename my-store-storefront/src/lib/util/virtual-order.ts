@@ -3,9 +3,17 @@ export type VirtualProductType = "resource" | "course"
 export type VirtualOrderFulfillmentSnapshot = {
   is_virtual: true
   virtual_product_type: VirtualProductType
+  resource_file_asset_id: string | null
   resource_download_url: string | null
   virtual_course_id: string | null
   virtual_course_path: string | null
+}
+
+export type ResourceDownloadInfo = {
+  /** ISO timestamp — backend-generated: Date.now() + 30 minutes */
+  download_available_until: string
+  /** Downloads remaining today (0 means exhausted) */
+  remaining_downloads: number
 }
 
 const isVirtualProductType = (value: unknown): value is VirtualProductType => {
@@ -35,6 +43,7 @@ export const readVirtualOrderFulfillment = (
   return {
     is_virtual: true,
     virtual_product_type: typeCandidate,
+    resource_file_asset_id: trimOrNull(record.resource_file_asset_id),
     resource_download_url: trimOrNull(record.resource_download_url),
     virtual_course_id: trimOrNull(record.virtual_course_id),
     virtual_course_path: trimOrNull(record.virtual_course_path),

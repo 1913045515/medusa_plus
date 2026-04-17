@@ -5,6 +5,7 @@ export type VirtualProductType = (typeof VIRTUAL_PRODUCT_TYPES)[number]
 export type VirtualProductConfig = {
   is_virtual: boolean
   virtual_product_type: VirtualProductType | null
+  resource_file_asset_id: string | null
   resource_download_url: string | null
   virtual_course_id: string | null
   virtual_course_path: string | null
@@ -13,6 +14,7 @@ export type VirtualProductConfig = {
 export type VirtualOrderFulfillmentSnapshot = {
   is_virtual: true
   virtual_product_type: VirtualProductType
+  resource_file_asset_id: string | null
   resource_download_url: string | null
   virtual_course_id: string | null
   virtual_course_path: string | null
@@ -21,6 +23,7 @@ export type VirtualOrderFulfillmentSnapshot = {
 export type VirtualProductInput = {
   is_virtual?: boolean | null
   virtual_product_type?: string | null
+  resource_file_asset_id?: string | null
   resource_download_url?: string | null
   virtual_course_id?: string | null
 }
@@ -49,6 +52,7 @@ export const readVirtualProductConfig = (metadata: Record<string, unknown> | nul
   return {
     is_virtual: isVirtual && Boolean(virtualType),
     virtual_product_type: isVirtual ? virtualType : null,
+    resource_file_asset_id: isVirtual ? trimOrNull(source.resource_file_asset_id) : null,
     resource_download_url: isVirtual ? trimOrNull(source.resource_download_url) : null,
     virtual_course_id: isVirtual ? trimOrNull(source.virtual_course_id) : null,
     virtual_course_path: isVirtual ? trimOrNull(source.virtual_course_path) : null,
@@ -65,6 +69,7 @@ export const validateVirtualProductInput = (
     return {
       is_virtual: false,
       virtual_product_type: null,
+      resource_file_asset_id: null,
       resource_download_url: null,
       virtual_course_id: null,
       virtual_course_path: null,
@@ -77,15 +82,24 @@ export const validateVirtualProductInput = (
   }
 
   if (virtualType === "resource") {
-    const downloadUrl = trimOrNull(input.resource_download_url)
-    if (!downloadUrl) {
-      throw new Error("resource_download_url is required for resource virtual products")
+    const fileAssetId = trimOrNull(input.resource_file_asset_id)
+
+    // Disallow new writes of resource_download_url without resource_file_asset_id
+    if (!fileAssetId && trimOrNull(input.resource_download_url)) {
+      throw new Error(
+        "resource_download_url 不再支持直接写入。请通过文件管理模块上传文件后选择对应文件（resource_file_asset_id）。"
+      )
+    }
+
+    if (!fileAssetId) {
+      throw new Error("请为数字资料商品选择对应的文件（resource_file_asset_id）")
     }
 
     return {
       is_virtual: true,
       virtual_product_type: "resource",
-      resource_download_url: downloadUrl,
+      resource_file_asset_id: fileAssetId,
+      resource_download_url: null,
       virtual_course_id: null,
       virtual_course_path: null,
     }
@@ -99,6 +113,7 @@ export const validateVirtualProductInput = (
   return {
     is_virtual: true,
     virtual_product_type: "course",
+    resource_file_asset_id: null,
     resource_download_url: null,
     virtual_course_id: virtualCourseId,
     virtual_course_path: trimOrNull(options?.coursePath) ?? null,
@@ -114,6 +129,7 @@ export const mergeVirtualProductMetadata = (
   if (!config.is_virtual) {
     delete next.is_virtual
     delete next.virtual_product_type
+    delete next.resource_file_asset_id
     delete next.resource_download_url
     delete next.virtual_course_id
     delete next.virtual_course_path
@@ -122,6 +138,12 @@ export const mergeVirtualProductMetadata = (
 
   next.is_virtual = true
   next.virtual_product_type = config.virtual_product_type
+
+  if (config.resource_file_asset_id) {
+    next.resource_file_asset_id = config.resource_file_asset_id
+  } else {
+    delete next.resource_file_asset_id
+  }
 
   if (config.resource_download_url) {
     next.resource_download_url = config.resource_download_url
@@ -154,6 +176,7 @@ export const buildVirtualOrderFulfillmentSnapshot = (
   return {
     is_virtual: true,
     virtual_product_type: config.virtual_product_type,
+    resource_file_asset_id: config.resource_file_asset_id,
     resource_download_url: config.resource_download_url,
     virtual_course_id: config.virtual_course_id,
     virtual_course_path: config.virtual_course_path,
@@ -178,6 +201,7 @@ export const readVirtualOrderFulfillmentSnapshot = (
   return {
     is_virtual: true,
     virtual_product_type: typeCandidate,
+    resource_file_asset_id: trimOrNull(record.resource_file_asset_id),
     resource_download_url: trimOrNull(record.resource_download_url),
     virtual_course_id: trimOrNull(record.virtual_course_id),
     virtual_course_path: trimOrNull(record.virtual_course_path),

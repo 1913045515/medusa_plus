@@ -2,6 +2,13 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+if (!process.env.PAYPAL_CONFIG_ENCRYPTION_KEY) {
+  console.warn(
+    '[PayPal] WARNING: PAYPAL_CONFIG_ENCRYPTION_KEY is not set. ' +
+    'PayPal payment configuration will not work until this environment variable is provided.'
+  )
+}
+
 process.env.COURSE_MEDIA_S3_REGION =
   process.env.COURSE_MEDIA_S3_REGION || process.env.AWS_REGION || 'ap-southeast-1'
 process.env.COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES =
@@ -79,6 +86,24 @@ module.exports = defineConfig({
     },
     {
       resolve: "./src/modules/menu",
+    },
+    {
+      resolve: "./src/modules/paypal",
+    },
+    {
+      resolve: "./src/modules/file-asset",
+    },
+    // PayPal Payment Provider
+    {
+      resolve: "@medusajs/payment",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/paypal/paypal-payment-provider",
+            id: "pp_paypal",
+          },
+        ],
+      },
     },
   ],
 })

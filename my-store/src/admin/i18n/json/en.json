@@ -227,6 +227,11 @@
     "downloadUrlLabel": "Resource download URL",
     "downloadUrlPlaceholder": "https://example.com/file.zip",
     "downloadUrlHint": "Customers will see this download entry in order details after purchase.",
+    "fileAssetLabel": "Resource file",
+    "fileAssetHint": "Select a file from the file management module. Customers can download it after purchase (30-min link, 3 downloads/day).",
+    "fileAssetSelectBtn": "Select file",
+    "fileAssetChangeBtn": "Change file",
+    "fileAssetLegacyWarning": "⚠️ This product still uses a legacy external URL. Please select a managed file above to migrate.",
     "courseLabel": "Linked course",
     "coursePlaceholder": "Select a course",
     "courseHint": "Saving will sync the course's linked product and generate the course access path for orders.",
@@ -557,5 +562,85 @@
       "name": "Name *",
       "description": "Description"
     }
+  },
+  "paypalSettings": {
+    "title": "PayPal Payment Settings",
+    "menuLabel": "PayPal Payment",
+    "description": "Configure PayPal business account API credentials with sandbox/live environment switching",
+    "environment": "Payment Environment",
+    "sandbox": "Sandbox",
+    "live": "Live",
+    "sandboxHint": "Use sandbox credentials for testing, no real transactions",
+    "liveHint": "Use live credentials for real payments, ensure sandbox testing is complete",
+    "liveWarning": "⚠️ Live environment is active — changes will affect real payment transactions",
+    "clientId": "Client ID",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Enter new Client Secret (leave blank to keep existing)",
+    "clientSecretHint": "Existing config (masked). Enter new full Secret to update.",
+    "cardFields": "Credit Card Payment Form",
+    "cardFieldsHint": "Enable PayPal hosted credit card fields (requires Advanced Credit and Debit Card Payments in PayPal dashboard)",
+    "saveConfig": "Save Configuration",
+    "testConnection": "Test Connection",
+    "showSecret": "Show",
+    "hideSecret": "Hide",
+    "loadError": "Failed to load PayPal configuration",
+    "saveSuccess": "PayPal configuration saved",
+    "saveFailed": "Save failed",
+    "testSuccess": "PayPal connection successful",
+    "testFailed": "PayPal connection failed",
+    "testFirst": "Please save configuration before testing",
+    "missingClientId": "Please enter Client ID",
+    "missingClientSecret": "Please enter complete Client Secret"
+  },
+  "fileAssets": {
+    "menuLabel": "File Management",
+    "title": "File Management",
+    "description": "Manage digital assets uploaded to private S3. Files are referenced by virtual resource products.",
+    "searchPlaceholder": "Search file name…",
+    "uploadBtn": "Upload File",
+    "columns": {
+      "name": "Name",
+      "mimeType": "Type",
+      "size": "Size",
+      "uploadedAt": "Uploaded At",
+      "actions": "Actions"
+    },
+    "empty": "No files uploaded yet.",
+    "upload": {
+      "title": "Upload File",
+      "hint": "Select a file to upload (max 500 MB). The file will be stored in the private S3 bucket.",
+      "selectFile": "Select File",
+      "dragHint": "Click to select or drag & drop a file",
+      "maxSize": "Max 500 MB",
+      "uploading": "Uploading…",
+      "success": "File uploaded successfully",
+      "failed": "Upload failed",
+      "fileTooLarge": "File exceeds 500 MB limit"
+    },
+    "delete": {
+      "title": "Delete File",
+      "confirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "referenced": "This file is referenced by {{count}} product(s). Remove the file binding from all products before deleting.",
+      "success": "File deleted",
+      "failed": "Delete failed"
+    },
+    "edit": {
+      "title": "Edit File Info",
+      "nameLabel": "Name",
+      "descriptionLabel": "Description",
+      "save": "Save",
+      "success": "File info updated",
+      "failed": "Update failed"
+    },
+    "picker": {
+      "title": "Select File",
+      "searchPlaceholder": "Search file name…",
+      "empty": "No files found.",
+      "select": "Select",
+      "cancel": "Cancel",
+      "selected": "Selected: {{name}}"
+    },
+    "noS3": "S3 is not configured. Set FILE_ASSET_S3_BUCKET, FILE_ASSET_S3_ACCESS_KEY_ID, FILE_ASSET_S3_SECRET_ACCESS_KEY environment variables.",
+    "loadFailed": "Failed to load files"
   }
 }

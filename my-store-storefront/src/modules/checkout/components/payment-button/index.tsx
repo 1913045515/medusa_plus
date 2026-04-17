@@ -1,12 +1,15 @@
 "use client"
 
-import { isManual, isStripeLike } from "@lib/constants"
+import { isManual, isPaypal, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
+import PayPalPaymentButton from "@modules/checkout/components/paypal-button"
+import { usePayPalConfig } from "@modules/checkout/components/paypal-provider"
+import PayPalCardFields from "@modules/checkout/components/paypal-card-fields"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -35,6 +38,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           data-testid={dataTestId}
         />
       )
+    case isPaypal(paymentSession?.provider_id):
+      return (
+        <PayPalButtonGroup
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
+      )
     case isManual(paymentSession?.provider_id):
       return (
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
@@ -42,6 +53,50 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     default:
       return <Button disabled>Select a payment method</Button>
   }
+}
+
+/**
+ * PayPal button group: shows PayPal native button + optionally credit card hosted fields.
+ * Task 8.5 – 8.7: PayPal integration with cancellation handling and card field fallback.
+ */
+const PayPalButtonGroup = ({
+  cart,
+  notReady,
+  "data-testid": dataTestId,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+  "data-testid"?: string
+}) => {
+  const config = usePayPalConfig()
+
+  if (!config.enabled) {
+    return (
+      <div className="p-4 border border-ui-border-base rounded-lg text-sm text-ui-fg-subtle">
+        PayPal 支付暂不可用，请选择其他付款方式或联系客服。
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* PayPal native button (PayPal account / linked card) */}
+      <PayPalPaymentButton
+        cart={cart}
+        notReady={notReady}
+        data-testid={dataTestId}
+      />
+
+      {/* Credit card hosted fields — only when enabled by admin */}
+      {config.card_fields_enabled ? (
+        <PayPalCardFields cart={cart} notReady={notReady} />
+      ) : (
+        <p className="text-xs text-ui-fg-muted text-center">
+          如需信用卡付款，请联系客服或使用 PayPal 账号付款。
+        </p>
+      )}
+    </div>
+  )
 }
 
 const StripePaymentButton = ({

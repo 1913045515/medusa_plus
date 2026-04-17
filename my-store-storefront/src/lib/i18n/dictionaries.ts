@@ -221,6 +221,12 @@ export type OrderDictionary = {
   typeResource: string
   typeCourse: string
   resourceLinkLabel: string
+  downloadFileBtn: string
+  downloadRemainingToday: string
+  downloadLimitReached: string
+  downloadExpired: string
+  downloadRefreshPage: string
+  downloadLegacyNotice: string
 }
 
 const orderZh: OrderDictionary = {
@@ -240,6 +246,12 @@ const orderZh: OrderDictionary = {
   typeResource: "数据资料",
   typeCourse: "虚拟课程",
   resourceLinkLabel: "资料连接地址",
+  downloadFileBtn: "下载文件",
+  downloadRemainingToday: "今日剩余 {{n}} 次",
+  downloadLimitReached: "今日已达下载上限",
+  downloadExpired: "下载链接已过期，请刷新页面以重新获取",
+  downloadRefreshPage: "刷新页面",
+  downloadLegacyNotice: "下载配置待管理员更新，请联系客服",
 }
 
 const orderEn: OrderDictionary = {
@@ -259,6 +271,12 @@ const orderEn: OrderDictionary = {
   typeResource: "Resource",
   typeCourse: "Course",
   resourceLinkLabel: "Resource link",
+  downloadFileBtn: "Download File",
+  downloadRemainingToday: "{{n}} download(s) left today",
+  downloadLimitReached: "Daily download limit reached",
+  downloadExpired: "Download link expired. Please refresh the page to get a new link.",
+  downloadRefreshPage: "Refresh page",
+  downloadLegacyNotice: "Download not yet configured. Please contact support.",
 }
 
 const orderDictionaries: Record<string, OrderDictionary> = {
