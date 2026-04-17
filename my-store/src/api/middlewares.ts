@@ -48,5 +48,11 @@ export default defineMiddlewares({
         authenticate("user", ["bearer", "session"]),
       ],
     },
+    {
+      matcher: "/admin/menu-items*",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
   ],
 })

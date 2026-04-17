@@ -77,5 +77,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/ticket",
     },
+    {
+      resolve: "./src/modules/menu",
+    },
   ],
 })
