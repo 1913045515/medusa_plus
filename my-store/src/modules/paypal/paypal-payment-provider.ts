@@ -218,3 +218,5 @@ export class PayPalPaymentProvider extends AbstractPaymentProvider<Record<string
     return { action: "not_supported" as any }
   }
 }
+
+export const services = [PayPalPaymentProvider]

@@ -75,21 +75,45 @@ export default function TicketDetailPage() {
   const [replyContent, setReplyContent] = useState("")
   const [sending, setSending] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Track message count to detect new user messages
+  const prevMsgCountRef = useRef<number>(0)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     if (!id) return
     try {
       const data = await apiFetch<{ ticket: Ticket; messages: TicketMessage[] }>(`/tickets/${id}`)
       setTicket(data.ticket)
-      setMessages(data.messages)
+      setMessages((prev) => {
+        const newMsgs = data.messages
+        if (newMsgs.length !== prev.length) {
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50)
+        }
+        // Detect NEW user messages since last poll
+        if (silent && newMsgs.length > prevMsgCountRef.current) {
+          const newOnes = newMsgs.slice(prevMsgCountRef.current)
+          const newUserMsgs = newOnes.filter((m) => m.sender_type === "user")
+          if (newUserMsgs.length > 0) {
+            toast.warning(`用户发来了 ${newUserMsgs.length} 条新消息，请及时回复！`)
+          }
+        }
+        prevMsgCountRef.current = newMsgs.length
+        return newMsgs
+      })
     } catch (err: any) {
-      toast.error(err.message)
+      if (!silent) toast.error(err.message)
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [id])
 
   useEffect(() => { load() }, [load])
+
+  // Real-time polling every 10 seconds
+  useEffect(() => {
+    pollRef.current = setInterval(() => load(true), 10000)
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+  }, [load])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -104,7 +128,7 @@ export default function TicketDetailPage() {
         body: JSON.stringify({ content: replyContent }),
       })
       setReplyContent("")
-      await load()
+      await load(false)
       toast.success("回复已发送")
     } catch (err: any) {
       toast.error(err.message)
@@ -121,7 +145,7 @@ export default function TicketDetailPage() {
         method: "PATCH",
         body: JSON.stringify({ status: nextStatus }),
       })
-      await load()
+      await load(false)
       toast.success(`状态已更新为：${STATUS_LABELS[nextStatus] ?? nextStatus}`)
     } catch (err: any) {
       toast.error(err.message)

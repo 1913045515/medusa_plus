@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { MagnifyingGlass, XMark, Spinner } from "@medusajs/icons"
+import { getSearchDictionary, type SearchDictionary } from "@lib/i18n/dictionaries"
 
 type BlogResult = {
   id: string
@@ -36,8 +37,13 @@ type SearchResults = {
 }
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY ||
+  ""
 
-export default function SearchModal() {
+export default function SearchModal({ locale }: { locale?: string | null }) {
+  const dict: SearchDictionary = getSearchDictionary(locale)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResults | null>(null)
@@ -80,7 +86,13 @@ export default function SearchModal() {
     try {
       const res = await fetch(
         `${BACKEND_URL}/store/search?q=${encodeURIComponent(q)}&limit=5`,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            ...(PUBLISHABLE_KEY ? { "x-publishable-api-key": PUBLISHABLE_KEY } : {}),
+          },
+        }
       )
       if (res.ok) {
         const data: SearchResults = await res.json()
@@ -112,7 +124,7 @@ export default function SearchModal() {
     return (
       <button
         onClick={() => setOpen(true)}
-        aria-label="搜索"
+        aria-label={dict.ariaLabel}
         className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-ui-bg-subtle transition-colors"
         data-testid="search-icon-button"
       >
@@ -144,7 +156,7 @@ export default function SearchModal() {
               type="text"
               value={query}
               onChange={handleInput}
-              placeholder="搜索商品、博客、课程..."
+              placeholder={dict.placeholder}
               className="flex-1 bg-transparent outline-none text-sm text-ui-fg-base placeholder:text-ui-fg-muted"
               data-testid="search-input"
             />
@@ -162,7 +174,7 @@ export default function SearchModal() {
             <div className="max-h-[60vh] overflow-y-auto py-2">
               {isEmpty && (
                 <div className="px-4 py-8 text-center text-sm text-ui-fg-muted">
-                  未找到相关内容
+                  {dict.empty}
                 </div>
               )}
 
@@ -170,7 +182,7 @@ export default function SearchModal() {
               {results && results.blogs.length > 0 && (
                 <section className="mb-2">
                   <div className="px-4 py-1.5 text-xs font-medium text-ui-fg-muted uppercase tracking-wider">
-                    博客
+                    {dict.sectionBlogs}
                   </div>
                   {results.blogs.map((blog) => (
                     <button
@@ -200,7 +212,7 @@ export default function SearchModal() {
               {results && results.products.length > 0 && (
                 <section className="mb-2">
                   <div className="px-4 py-1.5 text-xs font-medium text-ui-fg-muted uppercase tracking-wider">
-                    商品
+                    {dict.sectionProducts}
                   </div>
                   {results.products.map((product) => (
                     <button
@@ -230,7 +242,7 @@ export default function SearchModal() {
               {results && results.courses.length > 0 && (
                 <section className="mb-2">
                   <div className="px-4 py-1.5 text-xs font-medium text-ui-fg-muted uppercase tracking-wider">
-                    课程
+                    {dict.sectionCourses}
                   </div>
                   {results.courses.map((course) => (
                     <button
@@ -259,16 +271,16 @@ export default function SearchModal() {
           )}
 
           {/* Empty initial state hint */}
-          {!results && !loading && query.length < 2 && query.length > 0 && (
+          {!results && !loading && query.length >= 1 && query.length < 2 && (
             <div className="px-4 py-4 text-sm text-ui-fg-muted text-center">
-              请输入至少 2 个字符开始搜索
+              {locale?.startsWith("zh") ? "请输入至少 2 个字符开始搜索" : "Type at least 2 characters to search"}
             </div>
           )}
 
           {/* Keyboard hint */}
           {!results && !loading && query.length === 0 && (
             <div className="px-4 py-4 text-xs text-ui-fg-muted text-center">
-              搜索商品、博客文章、课程 · 按 <kbd className="px-1.5 py-0.5 rounded bg-ui-bg-subtle font-mono">Esc</kbd> 关闭
+              {dict.placeholder} · <kbd className="px-1.5 py-0.5 rounded bg-ui-bg-subtle font-mono">Esc</kbd>
             </div>
           )}
         </div>

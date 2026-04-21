@@ -585,3 +585,166 @@ export function getBlogDictionary(locale?: string | null): BlogDictionary {
   return blogDictionaries[locale] ?? (locale.startsWith("zh") ? blogZh : blogEn)
 }
 
+// ─── Search Dictionary ────────────────────────────────────────────────────────
+
+export type SearchDictionary = {
+  ariaLabel: string
+  placeholder: string
+  empty: string
+  sectionBlogs: string
+  sectionProducts: string
+  sectionCourses: string
+}
+
+const searchZh: SearchDictionary = {
+  ariaLabel: "搜索",
+  placeholder: "搜索商品、博客、课程...",
+  empty: "未找到相关内容",
+  sectionBlogs: "博客",
+  sectionProducts: "商品",
+  sectionCourses: "课程",
+}
+
+const searchEn: SearchDictionary = {
+  ariaLabel: "Search",
+  placeholder: "Search products, blogs, courses...",
+  empty: "No results found",
+  sectionBlogs: "Blogs",
+  sectionProducts: "Products",
+  sectionCourses: "Courses",
+}
+
+const searchDictionaries: Record<string, SearchDictionary> = {
+  "zh-CN": searchZh,
+  zh: searchZh,
+  en: searchEn,
+  "en-US": searchEn,
+}
+
+export function getSearchDictionary(locale?: string | null): SearchDictionary {
+  if (!locale) return searchEn
+  return searchDictionaries[locale] ?? (locale.startsWith("zh") ? searchZh : searchEn)
+}
+
+// ─── Ticket Dictionary ────────────────────────────────────────────────────────
+
+export type TicketDictionary = {
+  // Widget
+  widgetLabel: string
+  // List page
+  pageTitle: string
+  newTicket: string
+  cancelNewTicket: string
+  guestBanner: string
+  guestRegister: string
+  createTitle: string
+  titleLabel: string
+  titlePlaceholder: string
+  contentLabel: string
+  contentPlaceholder: string
+  submitTicket: string
+  submitting: string
+  loading: string
+  statusOpen: string
+  statusPending: string
+  statusResolved: string
+  statusClosed: string
+  // Chat page
+  backToList: string
+  source: string
+  guest: string
+  created: string
+  closeTicket: string
+  closing: string
+  closedNotice: string
+  noMessages: string
+  sendPlaceholder: string
+  send: string
+  sending: string
+  you: string
+  admin: string
+  unread: string
+}
+
+const ticketZh: TicketDictionary = {
+  widgetLabel: "客服支持",
+  pageTitle: "我的工单",
+  newTicket: "+ 新建工单",
+  cancelNewTicket: "取消",
+  guestBanner: "您当前以游客身份使用工单，注册账号可永久保存工单历史。",
+  guestRegister: "立即注册",
+  createTitle: "新建工单",
+  titleLabel: "标题",
+  titlePlaceholder: "请简要描述您的问题",
+  contentLabel: "描述",
+  contentPlaceholder: "请详细描述您遇到的问题...",
+  submitTicket: "提交工单",
+  submitting: "提交中...",
+  loading: "加载中...",
+  statusOpen: "待处理",
+  statusPending: "跟进中",
+  statusResolved: "已解决",
+  statusClosed: "已关闭",
+  backToList: "返回工单列表",
+  source: "来源",
+  guest: "游客",
+  created: "创建时间",
+  closeTicket: "关闭工单",
+  closing: "关闭中...",
+  closedNotice: "此工单已关闭，无法继续回复",
+  noMessages: "暂无消息",
+  sendPlaceholder: "输入消息...",
+  send: "发送",
+  sending: "发送中...",
+  you: "您",
+  admin: "客服",
+  unread: "有新消息",
+}
+
+const ticketEn: TicketDictionary = {
+  widgetLabel: "Support",
+  pageTitle: "My Tickets",
+  newTicket: "+ New Ticket",
+  cancelNewTicket: "Cancel",
+  guestBanner: "You are using tickets as a guest. Register an account to keep your ticket history.",
+  guestRegister: "Register now",
+  createTitle: "New Ticket",
+  titleLabel: "Title",
+  titlePlaceholder: "Briefly describe your issue",
+  contentLabel: "Description",
+  contentPlaceholder: "Describe your issue in detail...",
+  submitTicket: "Submit Ticket",
+  submitting: "Submitting...",
+  loading: "Loading...",
+  statusOpen: "Open",
+  statusPending: "Pending",
+  statusResolved: "Resolved",
+  statusClosed: "Closed",
+  backToList: "Back to tickets",
+  source: "From",
+  guest: "Guest",
+  created: "Created",
+  closeTicket: "Close ticket",
+  closing: "Closing...",
+  closedNotice: "This ticket is closed and cannot receive new messages.",
+  noMessages: "No messages yet",
+  sendPlaceholder: "Type a message...",
+  send: "Send",
+  sending: "Sending...",
+  you: "You",
+  admin: "Support",
+  unread: "New reply",
+}
+
+const ticketDictionaries: Record<string, TicketDictionary> = {
+  "zh-CN": ticketZh,
+  zh: ticketZh,
+  en: ticketEn,
+  "en-US": ticketEn,
+}
+
+export function getTicketDictionary(locale?: string | null): TicketDictionary {
+  if (!locale) return ticketEn
+  return ticketDictionaries[locale] ?? (locale.startsWith("zh") ? ticketZh : ticketEn)
+}
+

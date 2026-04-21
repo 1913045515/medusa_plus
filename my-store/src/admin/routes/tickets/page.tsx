@@ -1,6 +1,6 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { InformationCircle } from "@medusajs/icons"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Container,
@@ -27,6 +27,7 @@ type Ticket = {
   guest_token: string | null
   created_at: string
   updated_at: string
+  last_user_message_at?: string | null
 }
 
 type TicketStats = {
@@ -74,6 +75,22 @@ export default function TicketsPage() {
   const [statusFilter, setStatusFilter] = useState("")
   const limit = 20
 
+  // Track which tickets admin has "seen" (localStorage)
+  const ADMIN_SEEN_PREFIX = "admin_ticket_seen_"
+  const getAdminSeen = (ticketId: string): number =>
+    parseInt(localStorage.getItem(ADMIN_SEEN_PREFIX + ticketId) ?? "0", 10)
+  const markAdminSeen = (ticketId: string) =>
+    localStorage.setItem(ADMIN_SEEN_PREFIX + ticketId, String(Date.now()))
+
+  const isTicketUnread = (ticket: Ticket): boolean => {
+    if (!ticket.last_user_message_at) return false
+    const seen = getAdminSeen(ticket.id)
+    return new Date(ticket.last_user_message_at).getTime() > seen
+  }
+
+  // Ref to detect newly unread tickets across polls
+  const prevUnreadIds = useRef<Set<string>>(new Set())
+
   const loadStats = useCallback(async () => {
     try {
       const data = await apiFetch<{ stats: TicketStats }>("/tickets/stats")
@@ -92,6 +109,22 @@ export default function TicketsPage() {
       const data = await apiFetch<{ tickets: Ticket[]; count: number }>(`/tickets?${params}`)
       setTickets(data.tickets)
       setTotal(data.count)
+
+      // Detect newly unread tickets (new user messages since last check)
+      const newUnreadIds = new Set(
+        data.tickets
+          .filter((t) => {
+            if (!t.last_user_message_at) return false
+            const seen = parseInt(localStorage.getItem("admin_ticket_seen_" + t.id) ?? "0", 10)
+            return new Date(t.last_user_message_at).getTime() > seen
+          })
+          .map((t) => t.id)
+      )
+      const actuallyNew = [...newUnreadIds].filter((id) => !prevUnreadIds.current.has(id))
+      if (actuallyNew.length > 0) {
+        toast.warning(`您有 ${actuallyNew.length} 个工单收到新用户消息，请及时处理！`)
+      }
+      prevUnreadIds.current = newUnreadIds
     } catch (err: any) {
       toast.error(err.message)
     } finally {
@@ -101,6 +134,15 @@ export default function TicketsPage() {
 
   useEffect(() => { loadStats() }, [loadStats])
   useEffect(() => { loadTickets() }, [loadTickets])
+
+  // Real-time polling: refresh every 15 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadStats()
+      loadTickets()
+    }, 15000)
+    return () => clearInterval(interval)
+  }, [loadStats, loadTickets])
 
   const totalPages = Math.ceil(total / limit)
 
@@ -172,17 +214,27 @@ export default function TicketsPage() {
               </Table.Cell>
             </Table.Row>
           ) : (
-            tickets.map((ticket) => (
+            tickets.map((ticket) => {
+              const unread = isTicketUnread(ticket)
+              return (
               <Table.Row
                 key={ticket.id}
-                className="cursor-pointer hover:bg-ui-bg-subtle-hover"
-                onClick={() => navigate(`/tickets/${ticket.id}`)}
+                className={`cursor-pointer ${unread ? "bg-orange-50 hover:bg-orange-100" : "hover:bg-ui-bg-subtle-hover"}`}
+                onClick={() => {
+                  markAdminSeen(ticket.id)
+                  navigate(`/tickets/${ticket.id}`)
+                }}
               >
                 <Table.Cell>
                   <Text size="small" className="font-mono text-ui-fg-subtle">{ticket.id.slice(0, 16)}...</Text>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text weight="plus">{ticket.title}</Text>
+                  <div className="flex items-center gap-2">
+                    {unread && (
+                      <span className="inline-block w-2 h-2 rounded-full bg-orange-500 shrink-0" title="有新用户消息" />
+                    )}
+                    <Text weight="plus">{ticket.title}</Text>
+                  </div>
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="small">
@@ -203,7 +255,8 @@ export default function TicketsPage() {
                   <Text size="small">{new Date(ticket.created_at).toLocaleString("zh-CN")}</Text>
                 </Table.Cell>
               </Table.Row>
-            ))
+              )
+            })
           )}
         </Table.Body>
       </Table>

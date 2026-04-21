@@ -121,7 +121,41 @@ export class TicketService {
       .limit(limit)
       .offset((page - 1) * limit)
 
-    return { tickets, count, page, limit }
+    // Attach last_admin_reply_at and last_user_message_at for each ticket
+    const ticketIds = tickets.map((t: any) => t.id)
+    let adminReplyMap: Record<string, string | null> = {}
+    let userMsgMap: Record<string, string | null> = {}
+    if (ticketIds.length > 0) {
+      const [adminReplies, userMessages] = await Promise.all([
+        this.knex("ticket_message")
+          .whereIn("ticket_id", ticketIds)
+          .where("sender_type", "admin")
+          .whereNull("deleted_at")
+          .groupBy("ticket_id")
+          .select("ticket_id")
+          .max("created_at as last_admin_reply_at"),
+        this.knex("ticket_message")
+          .whereIn("ticket_id", ticketIds)
+          .where("sender_type", "user")
+          .whereNull("deleted_at")
+          .groupBy("ticket_id")
+          .select("ticket_id")
+          .max("created_at as last_user_message_at"),
+      ])
+      for (const row of adminReplies) {
+        adminReplyMap[row.ticket_id] = row.last_admin_reply_at
+      }
+      for (const row of userMessages) {
+        userMsgMap[row.ticket_id] = row.last_user_message_at
+      }
+    }
+    const ticketsWithUnread = tickets.map((t: any) => ({
+      ...t,
+      last_admin_reply_at: adminReplyMap[t.id] ?? null,
+      last_user_message_at: userMsgMap[t.id] ?? null,
+    }))
+
+    return { tickets: ticketsWithUnread, count, page, limit }
   }
 
   // ─── GET ───────────────────────────────────────────────────────────────────

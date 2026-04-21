@@ -1,9 +1,10 @@
 import { Metadata } from "next"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getLocale } from "@lib/data/locale-actions"
 import TicketChatClient from "@modules/ticket/components/ticket-chat-client"
 
 export const metadata: Metadata = {
-  title: "工单详情",
+  title: "Ticket Detail",
 }
 
 type Props = {
@@ -12,13 +13,14 @@ type Props = {
 
 export default async function TicketDetailPage({ params }: Props) {
   const { countryCode, id } = await params
-  const customer = await retrieveCustomer()
+  const [customer, locale] = await Promise.all([retrieveCustomer(), getLocale()])
 
   return (
     <TicketChatClient
       ticketId={id}
       customerEmail={customer?.email ?? null}
       countryCode={countryCode}
+      locale={locale}
     />
   )
 }

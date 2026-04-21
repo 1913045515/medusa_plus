@@ -4,7 +4,7 @@ import ContentPage from "./models/content-page"
 
 class ContentPagesModuleService extends MedusaService({ ContentPage }) {}
 
-export const CONTENT_PAGES_MODULE = "content-pages"
+export const CONTENT_PAGES_MODULE = "content_pages"
 
 export default Module(CONTENT_PAGES_MODULE, {
   service: ContentPagesModuleService,

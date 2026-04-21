@@ -3,7 +3,7 @@
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
 import { ArrowRightMini, XMark, ChevronDown } from "@medusajs/icons"
 import { Text, clx, useToggleState } from "@medusajs/ui"
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
@@ -18,6 +18,87 @@ type SideMenuProps = {
   currentLocale: string | null
   cartEnabled?: boolean
   menuItems?: MenuItemData[]
+  customerEmail?: string | null
+}
+
+const TICKET_LAST_VIEWED_PREFIX = "ticket_last_viewed_"
+const TICKET_UNREAD_PREFIX = "ticket_unread_"
+
+/**
+ * Fetches /store/tickets and returns true if any ticket has an unread admin reply.
+ * Falls back to guest_token from localStorage when customerEmail is not provided.
+ * Polling interval: 30 s (lightweight – only nav badge, not the chat view).
+ */
+function useHasUnreadTickets(customerEmail?: string | null): boolean {
+  const [hasUnread, setHasUnread] = useState(false)
+
+  useEffect(() => {
+    const BACKEND = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000"
+    const PUB_KEY =
+      process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ??
+      process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY ??
+      ""
+
+    const check = async () => {
+      if (typeof window === "undefined") return
+      const guestToken = localStorage.getItem("ticket_guest_token")
+      if (!customerEmail && !guestToken) {
+        setHasUnread(false)
+        return
+      }
+
+      try {
+        const params = new URLSearchParams()
+        if (customerEmail) params.set("customer_email", customerEmail)
+        else if (guestToken) params.set("guest_token", guestToken)
+
+        const res = await fetch(`${BACKEND}/store/tickets?${params}`, {
+          credentials: "include",
+          headers: { "x-publishable-api-key": PUB_KEY },
+        })
+        if (!res.ok) return
+
+        const data = await res.json()
+        const tickets: Array<{ id: string; last_admin_reply_at?: string | null }> =
+          data.tickets ?? []
+
+        let anyUnread = false
+        for (const t of tickets) {
+          if (!t.last_admin_reply_at) {
+            localStorage.removeItem(TICKET_UNREAD_PREFIX + t.id)
+            continue
+          }
+          const lastViewedMs = parseInt(
+            localStorage.getItem(TICKET_LAST_VIEWED_PREFIX + t.id) ?? "0",
+            10
+          )
+          const isUnread = new Date(t.last_admin_reply_at).getTime() > lastViewedMs
+          if (isUnread) {
+            anyUnread = true
+            localStorage.setItem(TICKET_UNREAD_PREFIX + t.id, "1")
+          } else {
+            localStorage.removeItem(TICKET_UNREAD_PREFIX + t.id)
+          }
+        }
+        setHasUnread(anyUnread)
+      } catch {
+        // Silently ignore – nav badge is non-critical
+      }
+    }
+
+    check()
+    // Re-check every 30 s (nav badge doesn't need to be as aggressive as the chat view)
+    const timer = setInterval(check, 30_000)
+    // Sync immediately when storage changes in another tab (e.g. user reads a ticket)
+    const onStorage = () => { check() }
+    window.addEventListener("storage", onStorage)
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener("storage", onStorage)
+    }
+  }, [customerEmail])
+
+  return hasUnread
 }
 
 // Fallback hardcoded items when DB is unavailable
@@ -29,21 +110,26 @@ const FALLBACK_ITEMS: MenuItemData[] = [
   { id: "account", menu_type: "front", title: "账户", href: "/account", icon: null, parent_id: null, sort_order: 4, is_visible: true, target: "_self" },
 ]
 
-function MenuItemRow({ item, close }: { item: MenuItemData; close: () => void }) {
+function MenuItemRow({ item, close, hasUnread }: { item: MenuItemData; close: () => void; hasUnread?: boolean }) {
   const [expanded, setExpanded] = useState(false)
   const hasChildren = item.children && item.children.length > 0
+  // Show unread badge if this item links to support/tickets
+  const isSupport = item.href?.includes("/support") || item.href?.includes("/ticket")
 
   return (
     <li>
       <div className="flex items-center gap-2">
         <LocalizedClientLink
           href={item.href}
-          className="flex-1 block rounded-lg px-2 py-2 text-2xl font-medium leading-8 transition-colors hover:bg-white/10 hover:text-ui-fg-disabled sm:text-[1.75rem] sm:leading-9"
+          className="flex-1 flex items-center gap-2 rounded-lg px-2 py-2 text-2xl font-medium leading-8 transition-colors hover:bg-white/10 hover:text-ui-fg-disabled sm:text-[1.75rem] sm:leading-9"
           onClick={close}
           target={item.target}
           data-testid={`menu-${item.id}-link`}
         >
           {item.title}
+          {isSupport && hasUnread && (
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 mb-auto mt-2" title="有未读消息" />
+          )}
         </LocalizedClientLink>
         {hasChildren && (
           <button
@@ -61,12 +147,15 @@ function MenuItemRow({ item, close }: { item: MenuItemData; close: () => void })
             <li key={child.id}>
               <LocalizedClientLink
                 href={child.href}
-                className="block rounded-lg px-2 py-1.5 text-base font-medium transition-colors hover:bg-white/10 hover:text-ui-fg-disabled"
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-base font-medium transition-colors hover:bg-white/10 hover:text-ui-fg-disabled"
                 onClick={close}
                 target={child.target}
                 data-testid={`menu-${child.id}-link`}
               >
                 {child.title}
+                {(child.href?.includes("/support") || child.href?.includes("/ticket")) && hasUnread && (
+                  <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" title="有未读消息" />
+                )}
               </LocalizedClientLink>
             </li>
           ))}
@@ -76,9 +165,10 @@ function MenuItemRow({ item, close }: { item: MenuItemData; close: () => void })
   )
 }
 
-const SideMenu = ({ regions, locales, currentLocale, cartEnabled = true, menuItems }: SideMenuProps) => {
+const SideMenu = ({ regions, locales, currentLocale, cartEnabled = true, menuItems, customerEmail }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
+  const hasUnread = useHasUnreadTickets(customerEmail)
 
   const items = (menuItems && menuItems.length > 0) ? menuItems : FALLBACK_ITEMS
 
@@ -94,6 +184,9 @@ const SideMenu = ({ regions, locales, currentLocale, cartEnabled = true, menuIte
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
                   Menu
+                  {hasUnread && !open && (
+                    <span className="absolute top-3 -right-2 w-2.5 h-2.5 bg-red-500 rounded-full border border-white" />
+                  )}
                 </Popover.Button>
               </div>
 
@@ -130,7 +223,7 @@ const SideMenu = ({ regions, locales, currentLocale, cartEnabled = true, menuIte
                         {items
                           .filter((item) => item.is_visible)
                           .map((item) => (
-                            <MenuItemRow key={item.id} item={item} close={close} />
+                            <MenuItemRow key={item.id} item={item} close={close} hasUnread={hasUnread} />
                           ))}
                       </ul>
                       <div className="border-t border-white/10" />
