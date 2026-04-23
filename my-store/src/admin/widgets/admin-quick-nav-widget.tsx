@@ -12,7 +12,17 @@ type MenuItem = {
   children?: MenuItem[]
 }
 
-// Resolve i18n-style key like "blog.menuLabel" → fallback to friendly name
+// Medusa built-in core routes — handled by CoreRouteSection (nav:nth-of-type(1))
+const CORE_HREFS = new Set([
+  "/app/orders",
+  "/app/products",
+  "/app/inventory",
+  "/app/customers",
+  "/app/promotions",
+  "/app/price-lists",
+])
+
+// Resolve i18n-style key like "blog.menuLabel" → friendly Chinese label
 function resolveTitle(title: string): string {
   const knownLabels: Record<string, string> = {
     "homepageEditor.menuLabel": "首页编辑",
@@ -33,13 +43,76 @@ function resolveTitle(title: string): string {
     "paypalSettings.menuLabel": "PayPal 配置",
   }
   if (knownLabels[title]) return knownLabels[title]
-  // Unknown i18n keys: strip ".menuLabel" / ".menuTitle" suffix and titlecase
   const m = title.match(/^([a-zA-Z][a-zA-Z0-9]*)\.[a-zA-Z][a-zA-Z0-9.]+$/)
   if (m) {
     const root = m[1]
     return root.charAt(0).toUpperCase() + root.slice(1).replace(/([A-Z])/g, " $1").trim()
   }
   return title
+}
+
+/**
+ * Apply DB-driven ordering and visibility to Medusa's native admin sidebar.
+ *
+ * Medusa's sidebar has two <nav> sections inside <aside>:
+ *   nav:nth-of-type(1) — CoreRouteSection  (Orders / Products / Customers …)
+ *   nav:nth-of-type(2) — ExtensionRouteSection  (our custom routes)
+ *
+ * Both sections are `display:flex; flex-direction:column` containers whose
+ * direct children are `<div class="px-3">` wrappers.  Setting `order: N`
+ * on those wrappers reorders them visually without touching the DOM tree.
+ *
+ * We use the CSS :has() pseudo-class to target each wrapper by the href of
+ * the link it contains.  :has() is supported in all modern browsers.
+ */
+function applySidebarCSS(allItems: MenuItem[]) {
+  const rules: string[] = []
+
+  // ── EXTENSION items: reorder by DB sort_order ─────────────────────────────
+  // These are items whose href is NOT a core route and NOT a /settings/* path.
+  const extItems = allItems
+    .filter((i) => {
+      if (!i.href || i.href === "#") return false
+      if (CORE_HREFS.has(i.href)) return false
+      if (i.href.startsWith("/app/settings")) return false
+      return true
+    })
+    .sort((a, b) => a.sort_order - b.sort_order)
+
+  extItems.forEach((item, idx) => {
+    const safe = item.href.replace(/"/g, '\\"')
+    if (item.is_visible) {
+      // Reorder within ExtensionRouteSection's nav (nth-of-type(2))
+      rules.push(
+        `aside nav:nth-of-type(2) > div:has(a[href="${safe}"]) { order: ${idx}; }`
+      )
+    } else {
+      // Hide from sidebar
+      rules.push(
+        `aside nav:nth-of-type(2) > div:has(a[href="${safe}"]) { display: none !important; }`
+      )
+    }
+  })
+
+  // ── CORE items: only handle visibility (cannot reorder these) ─────────────
+  allItems
+    .filter((i) => i.href && CORE_HREFS.has(i.href) && !i.is_visible)
+    .forEach((item) => {
+      const safe = item.href.replace(/"/g, '\\"')
+      rules.push(
+        `aside nav:nth-of-type(1) > div:has(a[href="${safe}"]) { display: none !important; }`
+      )
+    })
+
+  // ── Inject / update the <style> element ───────────────────────────────────
+  const styleId = "__admin_sidebar_ctrl"
+  let style = document.getElementById(styleId) as HTMLStyleElement | null
+  if (!style) {
+    style = document.createElement("style")
+    style.id = styleId
+    document.head.appendChild(style)
+  }
+  style.textContent = rules.join("\n")
 }
 
 function AdminQuickNavWidget() {
@@ -51,7 +124,8 @@ function AdminQuickNavWidget() {
       .then((r) => r.json())
       .then((data) => {
         const allItems: MenuItem[] = data.menu_items ?? []
-        // Build tree: root items with children, filter visible
+
+        // Build tree for the quick-nav bar
         const roots = allItems
           .filter((i) => !i.parent_id && i.is_visible)
           .sort((a, b) => a.sort_order - b.sort_order)
@@ -63,30 +137,8 @@ function AdminQuickNavWidget() {
         }))
         setItems(tree)
 
-        // Hide native sidebar items that are explicitly marked invisible in DB
-        // Medusa's auto-generated sidebar uses <a href="/app/..."> links — we hide
-        // any whose href matches a DB item with is_visible=false.
-        const hiddenHrefs = allItems
-          .filter((i) => !i.parent_id && !i.is_visible)
-          .map((i) => i.href)
-
-        const styleId = "__admin_menu_visibility_overrides"
-        let style = document.getElementById(styleId) as HTMLStyleElement | null
-        if (!style) {
-          style = document.createElement("style")
-          style.id = styleId
-          document.head.appendChild(style)
-        }
-        // Hide both sidebar links and any nav items pointing to hidden hrefs
-        style.textContent = hiddenHrefs.length
-          ? hiddenHrefs
-              .map((h) => {
-                // Escape attribute selector
-                const safe = h.replace(/"/g, '\\"')
-                return `nav a[href="${safe}"], aside a[href="${safe}"] { display: none !important; }`
-              })
-              .join("\n")
-          : ""
+        // Apply sidebar CSS overrides
+        applySidebarCSS(allItems)
       })
       .catch(() => {})
       .finally(() => setLoading(false))

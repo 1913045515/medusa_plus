@@ -81,7 +81,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       updated_at: now,
       parent_id: null,
       title: "扩展设置",
-      href: null,
+      href: "#",
       sort_order: 99,
       icon: "Cog",
     },

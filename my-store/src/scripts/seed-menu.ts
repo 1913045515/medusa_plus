@@ -40,7 +40,7 @@ export default async function seedMenu({ container }: ExecArgs) {
     { id: generateId(), menu_type: "admin", title: "Products",  href: "/app/products",  sort_order: 1, is_visible: true, target: "_self", icon: "Tag",          parent_id: null },
     { id: generateId(), menu_type: "admin", title: "Customers", href: "/app/customers", sort_order: 2, is_visible: true, target: "_self", icon: "Users",        parent_id: null },
     // ── "扩展设置" parent (groups all extension routes) ──
-    { id: extensionsParentId, menu_type: "admin", title: "扩展设置", href: null, sort_order: 99, is_visible: true, target: "_self", icon: "Cog", parent_id: null },
+    { id: extensionsParentId, menu_type: "admin", title: "扩展设置", href: "#", sort_order: 99, is_visible: true, target: "_self", icon: "Cog", parent_id: null },
     // ── Custom admin routes (children of 扩展设置, title = i18n key) ──
     { id: generateId(), menu_type: "admin", title: "homepageEditor.menuLabel",  href: "/app/homepage",             sort_order: 0,  is_visible: true, target: "_self", icon: "Home",         parent_id: extensionsParentId },
     { id: generateId(), menu_type: "admin", title: "courseEditor.menuLabel",    href: "/app/courses",              sort_order: 1,  is_visible: true, target: "_self", icon: "AcademicCap",  parent_id: extensionsParentId },
