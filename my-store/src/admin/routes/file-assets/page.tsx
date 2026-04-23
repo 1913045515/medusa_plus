@@ -10,6 +10,8 @@ import {
   Container,
   Heading,
   Input,
+  Label,
+  Switch,
   Table,
   Text,
   toast,
@@ -29,6 +31,7 @@ type FileAsset = {
   mime_type: string
   size_bytes: number
   description: string | null
+  is_public: boolean
   created_at: string
 }
 
@@ -58,8 +61,10 @@ const FileAssetsPage = () => {
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [uploadPublic, setUploadPublic] = useState(false)
   const [editState, setEditState] = useState<EditState | null>(null)
   const [saving, setSaving] = useState(false)
+  const [copyingId, setCopyingId] = useState<string | null>(null)
 
   const loadFiles = useCallback(async (q: string, offset: number) => {
     setLoading(true)
@@ -107,6 +112,7 @@ const FileAssetsPage = () => {
     try {
       const formData = new FormData()
       formData.append("file", file)
+      formData.append("is_public", String(uploadPublic))
       const res = await fetch(`/admin/file-assets`, {
         method: "POST",
         credentials: "include",
@@ -185,6 +191,32 @@ const FileAssetsPage = () => {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+  const handleView = async (asset: FileAsset) => {
+    try {
+      const res = await fetch(`/admin/file-assets/${asset.id}/url`, { credentials: "include" })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.message ?? "获取 URL 失败")
+      window.open(json.url, "_blank", "noopener,noreferrer")
+    } catch (err: any) {
+      toast.error(err?.message ?? "获取文件 URL 失败")
+    }
+  }
+
+  const handleCopyUrl = async (asset: FileAsset) => {
+    setCopyingId(asset.id)
+    try {
+      const res = await fetch(`/admin/file-assets/${asset.id}/url`, { credentials: "include" })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.message ?? "获取 URL 失败")
+      await navigator.clipboard.writeText(json.url)
+      toast.success("复制成功")
+    } catch (err: any) {
+      toast.error(err?.message ?? "复制失败")
+    } finally {
+      setCopyingId(null)
+    }
+  }
+
   return (
     <Container className="p-0">
       {/* Header */}
@@ -195,14 +227,26 @@ const FileAssetsPage = () => {
             {t("fileAssets.description")}
           </Text>
         </div>
-        <Button
-          variant="primary"
-          size="small"
-          isLoading={uploading}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {t("fileAssets.uploadBtn")}
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={uploadPublic}
+              onCheckedChange={setUploadPublic}
+              id="upload-public"
+            />
+            <Label htmlFor="upload-public" className="text-sm cursor-pointer">
+              {uploadPublic ? "公开（公有桶）" : "私有（私有桶）"}
+            </Label>
+          </div>
+          <Button
+            variant="primary"
+            size="small"
+            isLoading={uploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {t("fileAssets.uploadBtn")}
+          </Button>
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -259,6 +303,7 @@ const FileAssetsPage = () => {
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>{t("fileAssets.columns.name")}</Table.HeaderCell>
+            <Table.HeaderCell>类型</Table.HeaderCell>
             <Table.HeaderCell>{t("fileAssets.columns.mimeType")}</Table.HeaderCell>
             <Table.HeaderCell>{t("fileAssets.columns.size")}</Table.HeaderCell>
             <Table.HeaderCell>{t("fileAssets.columns.uploadedAt")}</Table.HeaderCell>
@@ -268,13 +313,13 @@ const FileAssetsPage = () => {
         <Table.Body>
           {loading ? (
             <Table.Row>
-              <td colSpan={5} className="py-8 text-center">
+              <td colSpan={6} className="py-8 text-center">
                 <Text className="text-ui-fg-muted">{t("common.loading")}</Text>
               </td>
             </Table.Row>
           ) : files.length === 0 ? (
             <Table.Row>
-              <td colSpan={5} className="py-8 text-center">
+              <td colSpan={6} className="py-8 text-center">
                 <Text className="text-ui-fg-muted">{t("fileAssets.empty")}</Text>
               </td>
             </Table.Row>
@@ -291,6 +336,11 @@ const FileAssetsPage = () => {
                   </div>
                 </Table.Cell>
                 <Table.Cell>
+                  <Badge size="2xsmall" color={asset.is_public ? "green" : "orange"}>
+                    {asset.is_public ? "公开" : "私有"}
+                  </Badge>
+                </Table.Cell>
+                <Table.Cell>
                   <Badge size="2xsmall" color="grey">{asset.mime_type}</Badge>
                 </Table.Cell>
                 <Table.Cell>
@@ -302,19 +352,22 @@ const FileAssetsPage = () => {
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex gap-2">
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      onClick={() => startEdit(asset)}
-                    >
-                      {t("common.edit")}
+                  <div className="flex gap-1 flex-wrap">
+                    <Button size="small" variant="secondary" onClick={() => handleView(asset)}>
+                      查看
                     </Button>
                     <Button
                       size="small"
-                      variant="danger"
-                      onClick={() => handleDelete(asset)}
+                      variant="secondary"
+                      isLoading={copyingId === asset.id}
+                      onClick={() => handleCopyUrl(asset)}
                     >
+                      分享
+                    </Button>
+                    <Button size="small" variant="secondary" onClick={() => startEdit(asset)}>
+                      {t("common.edit")}
+                    </Button>
+                    <Button size="small" variant="danger" onClick={() => handleDelete(asset)}>
                       {t("common.delete")}
                     </Button>
                   </div>

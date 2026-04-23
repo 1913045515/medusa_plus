@@ -9,6 +9,7 @@ const FileAsset = model.define("file_asset", {
   mime_type: model.text(),
   size_bytes: model.number(),
   description: model.text().nullable(),
+  is_public: model.boolean().default(false),
 })
 
 export default FileAsset

@@ -642,5 +642,26 @@
     },
     "noS3": "S3 is not configured. Set FILE_ASSET_S3_BUCKET, FILE_ASSET_S3_ACCESS_KEY_ID, FILE_ASSET_S3_SECRET_ACCESS_KEY environment variables.",
     "loadFailed": "Failed to load files"
+  },
+  "checkoutConfig": {
+    "menuLabel": "Checkout Field Config"
+  },
+  "contentPages": {
+    "menuLabel": "Content Pages"
+  },
+  "emailProxy": {
+    "menuLabel": "Email Service"
+  },
+  "emailTemplates": {
+    "menuLabel": "Email Templates"
+  },
+  "menuItems": {
+    "menuLabel": "Menu Management"
+  },
+  "storeSettings": {
+    "menuLabel": "Store Settings"
+  },
+  "tickets": {
+    "menuLabel": "Support Tickets"
   }
 }

@@ -69,6 +69,8 @@ services:
       # 本地文件上传：写入挂载卷 /app/uploads，nginx 从 /uploads/ 对外服务
       UPLOAD_DIR: /app/uploads
       BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
+      # Server-side storefront notification after menu changes (no browser CORS issues)
+      STOREFRONT_INTERNAL_URL: http://storefront:8000
       # 课程媒体 S3（私有桶，视频/附件用签名 URL）
       COURSE_MEDIA_S3_BUCKET: ${COURSE_MEDIA_S3_BUCKET}
       COURSE_MEDIA_S3_REGION: ${COURSE_MEDIA_S3_REGION:-ap-southeast-1}

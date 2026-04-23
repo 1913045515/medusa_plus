@@ -101,10 +101,19 @@ export class MenuService {
       if (parent.id === id) throw new Error("Cannot set item as its own parent")
     }
 
+    // Filter out undefined values to prevent knex "Undefined binding(s) detected" errors.
+    // Only fields explicitly provided should be updated; omitted fields stay unchanged.
+    const updateData: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        updateData[key] = value
+      }
+    }
+
     await this.knex("menu_item")
       .where("id", id)
       .whereNull("deleted_at")
-      .update({ ...data, updated_at: new Date() })
+      .update({ ...updateData, updated_at: new Date() })
     return this.knex("menu_item").where("id", id).first()
   }
 

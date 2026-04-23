@@ -1,6 +1,7 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { BarsThree, EllipsisVertical, PencilSquare, Trash, Plus } from "@medusajs/icons"
+import { BarsThree, EllipsisVertical, PencilSquare, Trash, Plus, ArrowPath } from "@medusajs/icons"
 import { useEffect, useState, useCallback } from "react"
+import { useTranslation } from "react-i18next"
 import {
   Container,
   Heading,
@@ -36,7 +37,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 
 export const config = defineRouteConfig({
-  label: "菜单管理",
+  label: "menuItems.menuLabel", translationNs: "translation",
   icon: BarsThree,
 })
 
@@ -56,6 +57,20 @@ type MenuItem = {
 type FlatMenuItem = MenuItem & { depth: number; parentTitle?: string }
 
 const BASE = "/admin"
+
+// Server-side revalidation is handled by the Medusa backend routes after each
+// write operation (POST/PUT/DELETE/reorder/reset). No browser-side storefront
+// notification is needed here.
+
+// Resolve i18n key (e.g. "blog.menuLabel") to translated label; return raw title otherwise.
+function useResolveLabel(title: string): string {
+  const { t } = useTranslation()
+  if (/^[a-zA-Z][a-zA-Z0-9]*\.[a-zA-Z][a-zA-Z0-9.]+$/.test(title)) {
+    const resolved = t(title)
+    return resolved !== title ? resolved : title
+  }
+  return title
+}
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -100,16 +115,26 @@ function SortableRow({
   item,
   onEdit,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
   dragOverId,
   activeId,
 }: {
   item: FlatMenuItem
   onEdit: (item: FlatMenuItem) => void
   onDelete: (item: FlatMenuItem) => void
+  onMoveUp: (item: FlatMenuItem) => void
+  onMoveDown: (item: FlatMenuItem) => void
+  canMoveUp: boolean
+  canMoveDown: boolean
   dragOverId: UniqueIdentifier | null
   activeId: UniqueIdentifier | null
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
+  const resolvedTitle = useResolveLabel(item.title)
+  const isI18nKey = resolvedTitle !== item.title
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -133,8 +158,9 @@ function SortableRow({
       <button
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-ui-bg-base text-ui-fg-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-        aria-label="拖拽排序"
+        className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-ui-bg-base text-ui-fg-muted shrink-0 touch-none"
+        aria-label="Drag to reorder"
+        style={{ touchAction: "none" }}
       >
         <EllipsisVertical className="w-3.5 h-3.5" />
       </button>
@@ -142,19 +168,38 @@ function SortableRow({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-ui-fg-base truncate">{item.title}</span>
+          <span className="text-sm font-medium text-ui-fg-base truncate">{resolvedTitle}</span>
+          {isI18nKey && (
+            <span className="text-xs text-ui-fg-muted font-mono bg-ui-bg-subtle px-1 rounded shrink-0">{item.title}</span>
+          )}
           {item.depth === 1 && (
-            <Badge size="xsmall" color="grey">子菜单</Badge>
+            <Badge size="xsmall" color="grey">Sub-item</Badge>
           )}
           {!item.is_visible && (
-            <Badge size="xsmall" color="orange">隐藏</Badge>
+            <Badge size="xsmall" color="orange">Hidden</Badge>
           )}
         </div>
         <div className="text-xs text-ui-fg-muted truncate mt-0.5">{item.href}</div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={() => onMoveUp(item)}
+          disabled={!canMoveUp}
+          className="p-1 rounded hover:bg-ui-bg-base text-ui-fg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          title="上移"
+        >
+          ↑
+        </button>
+        <button
+          onClick={() => onMoveDown(item)}
+          disabled={!canMoveDown}
+          className="p-1 rounded hover:bg-ui-bg-base text-ui-fg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          title="下移"
+        >
+          ↓
+        </button>
         <button
           onClick={() => onEdit(item)}
           className="p-1.5 rounded hover:bg-ui-bg-base text-ui-fg-muted"
@@ -215,14 +260,14 @@ function EditModal({
       }
       if (isNew) {
         await apiFetch("/menu-items", { method: "POST", body: JSON.stringify(body) })
-        toast.success("菜单项已创建")
+        toast.success("Menu item created")
       } else {
         await apiFetch(`/menu-items/${item!.id}`, { method: "PUT", body: JSON.stringify(body) })
-        toast.success("菜单项已更新")
+        toast.success("Menu item updated")
       }
       onSave()
     } catch (err: any) {
-      toast.error("保存失败", { description: err.message })
+      toast.error("Save failed", { description: err.message })
     } finally {
       setSaving(false)
     }
@@ -231,48 +276,48 @@ function EditModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <Heading level="h2" className="mb-4">{isNew ? "新增菜单项" : "编辑菜单项"}</Heading>
+        <Heading level="h2" className="mb-4">{isNew ? "Add Menu Item" : "Edit Menu Item"}</Heading>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-ui-fg-base mb-1">标题 *</label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="例如：首页" />
+            <label className="block text-sm font-medium text-ui-fg-base mb-1">Title *</label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Home — or i18n key like blog.menuLabel" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ui-fg-base mb-1">链接 *</label>
-            <Input value={href} onChange={(e) => setHref(e.target.value)} placeholder="例如：/" />
+            <label className="block text-sm font-medium text-ui-fg-base mb-1">URL *</label>
+            <Input value={href} onChange={(e) => setHref(e.target.value)} placeholder="e.g. / or /store" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ui-fg-base mb-1">父级菜单（可选，设置后此项成为子菜单）</label>
+            <label className="block text-sm font-medium text-ui-fg-base mb-1">Parent item (optional — sets this as a sub-item)</label>
             <select
               value={parentId}
               onChange={(e) => setParentId(e.target.value)}
               className="w-full border border-ui-border-base rounded-md px-3 py-2 text-sm"
             >
-              <option value="">无（一级菜单）</option>
+              <option value="">None (top-level)</option>
               {roots.map((r) => (
                 <option key={r.id} value={r.id}>{r.title}</option>
               ))}
             </select>
           </div>
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-ui-fg-base">是否显示</label>
+            <label className="text-sm font-medium text-ui-fg-base">Visible</label>
             <Switch checked={isVisible} onCheckedChange={setIsVisible} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ui-fg-base mb-1">打开方式</label>
+            <label className="block text-sm font-medium text-ui-fg-base mb-1">Open in</label>
             <select
               value={target}
               onChange={(e) => setTarget(e.target.value)}
               className="w-full border border-ui-border-base rounded-md px-3 py-2 text-sm"
             >
-              <option value="_self">当前窗口</option>
-              <option value="_blank">新窗口</option>
+              <option value="_self">Same window</option>
+              <option value="_blank">New tab</option>
             </select>
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-6">
-          <Button variant="secondary" onClick={onClose} disabled={saving}>取消</Button>
-          <Button onClick={handleSave} isLoading={saving}>保存</Button>
+          <Button variant="secondary" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button onClick={handleSave} isLoading={saving}>Save</Button>
         </div>
       </div>
     </div>
@@ -289,7 +334,7 @@ function MenuList({ menuType }: { menuType: string }) {
   const prompt = usePrompt()
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
@@ -363,30 +408,72 @@ function MenuList({ menuType }: { menuType: string }) {
         method: "POST",
         body: JSON.stringify({ items: payload }),
       })
-      toast.success("排序已保存")
+      toast.success("Order saved")
+      loadItems() // reload to confirm server state
     } catch (err: any) {
-      toast.error("保存排序失败", { description: err.message })
+      toast.error("Failed to save order", { description: err.message })
       loadItems() // reload on failure
     }
   }
 
   const handleDelete = async (item: FlatMenuItem) => {
     const hasChildren = items.some((i) => i.parent_id === item.id)
+    const hint = hasChildren
+      ? `"${item.title}" has sub-items. Deleting it will also remove all sub-items.`
+      : `Delete menu item "${item.title}"?`
     const confirmed = await prompt({
-      title: "确认删除",
-      description: hasChildren
-        ? `"${item.title}" 下有子菜单，删除后子菜单也会一并删除，确定继续？`
-        : `确定删除菜单项 "${item.title}"？`,
-      confirmText: "删除",
-      cancelText: "取消",
+      title: "Confirm deletion",
+      description: hint,
+      confirmText: "Delete",
+      cancelText: "Cancel",
     })
     if (!confirmed) return
     try {
       await apiFetch(`/menu-items/${item.id}`, { method: "DELETE" })
-      toast.success("已删除")
+      toast.success("Deleted")
       loadItems()
     } catch (err: any) {
-      toast.error("删除失败", { description: err.message })
+      toast.error("Delete failed", { description: err.message })
+    }
+  }
+
+  const handleMoveUp = async (item: FlatMenuItem) => {
+    const idx = items.findIndex((i) => i.id === item.id)
+    if (idx <= 0) return
+    // Find the previous sibling (same parent)
+    let prevIdx = idx - 1
+    while (prevIdx >= 0 && items[prevIdx].parent_id !== item.parent_id) prevIdx--
+    if (prevIdx < 0) return
+    const newItems = [...items]
+    ;[newItems[prevIdx], newItems[idx]] = [newItems[idx], newItems[prevIdx]]
+    setItems(newItems)
+    try {
+      const payload = extractReorderPayload(newItems)
+      await apiFetch("/menu-items/reorder", { method: "POST", body: JSON.stringify({ items: payload }) })
+      loadItems()
+    } catch (err: any) {
+      toast.error("Failed to save order", { description: err.message })
+      loadItems()
+    }
+  }
+
+  const handleMoveDown = async (item: FlatMenuItem) => {
+    const idx = items.findIndex((i) => i.id === item.id)
+    if (idx < 0 || idx >= items.length - 1) return
+    // Find the next sibling (same parent)
+    let nextIdx = idx + 1
+    while (nextIdx < items.length && items[nextIdx].parent_id !== item.parent_id) nextIdx++
+    if (nextIdx >= items.length) return
+    const newItems = [...items]
+    ;[newItems[idx], newItems[nextIdx]] = [newItems[nextIdx], newItems[idx]]
+    setItems(newItems)
+    try {
+      const payload = extractReorderPayload(newItems)
+      await apiFetch("/menu-items/reorder", { method: "POST", body: JSON.stringify({ items: payload }) })
+      loadItems()
+    } catch (err: any) {
+      toast.error("Failed to save order", { description: err.message })
+      loadItems()
     }
   }
 
@@ -394,14 +481,35 @@ function MenuList({ menuType }: { menuType: string }) {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center mb-4 gap-2">
+        <Button
+          size="small"
+          variant="secondary"
+          onClick={async () => {
+            const confirmed = window.confirm(
+              "This will delete ALL existing menu items and re-seed defaults. Continue?"
+            )
+            if (!confirmed) return
+            try {
+              await apiFetch("/menu-items/reset", { method: "POST" })
+              toast.success("Menu reset to defaults")
+              loadItems()
+            } catch (err: any) {
+              toast.error("Reset failed", { description: err.message })
+            }
+          }}
+          className="flex items-center gap-1 text-red-500"
+        >
+          <ArrowPath className="w-4 h-4" />
+          Reset to Defaults
+        </Button>
         <Button
           size="small"
           onClick={() => setEditItem(null)}
           className="flex items-center gap-1"
         >
           <Plus className="w-4 h-4" />
-          新增菜单项
+          Add Item
         </Button>
       </div>
 
@@ -419,16 +527,25 @@ function MenuList({ menuType }: { menuType: string }) {
         >
           <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <div className="border border-ui-border-base rounded-lg overflow-hidden">
-              {items.map((item) => (
-                <SortableRow
-                  key={item.id}
-                  item={item}
-                  onEdit={(i) => setEditItem(i)}
-                  onDelete={handleDelete}
-                  dragOverId={dragOverId}
-                  activeId={activeId}
-                />
-              ))}
+              {items.map((item) => {
+                // Find siblings with same parent to determine canMoveUp/canMoveDown
+                const siblings = items.filter((i) => i.parent_id === item.parent_id)
+                const sibIdx = siblings.findIndex((s) => s.id === item.id)
+                return (
+                  <SortableRow
+                    key={item.id}
+                    item={item}
+                    onEdit={(i) => setEditItem(i)}
+                    onDelete={handleDelete}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                    canMoveUp={sibIdx > 0}
+                    canMoveDown={sibIdx < siblings.length - 1}
+                    dragOverId={dragOverId}
+                    activeId={activeId}
+                  />
+                )
+              })}
             </div>
           </SortableContext>
 
@@ -445,8 +562,52 @@ function MenuList({ menuType }: { menuType: string }) {
       )}
 
       <div className="mt-3 text-xs text-ui-fg-muted">
-        提示：拖拽 ≡ 手柄排序；将一级菜单拖入子菜单区域可将其变为子菜单；点击编辑按钮可修改父级关系。
+        Tip: Drag the ≡ handle to reorder; dragging a top-level item into the sub-item zone makes it a sub-item. Use Edit to change parent.
       </div>
+
+      {/* Admin menu preview — shows how the saved items will look as navigation links */}
+      {menuType === "admin" && !loading && items.length > 0 && (
+        <div className="mt-6 border border-ui-border-base rounded-lg p-4 bg-ui-bg-subtle">
+          <p className="text-xs font-semibold text-ui-fg-muted uppercase tracking-wider mb-3">
+            Navigation Preview — Admin Quick Links
+          </p>
+          <p className="text-xs text-ui-fg-muted mb-3">
+            Admin menu items are stored in the database and can be consumed by any custom admin component. Below is a live preview of the current items as clickable navigation links.
+          </p>
+          <nav className="flex flex-wrap gap-2">
+            {items
+              .filter((i) => i.is_visible && i.depth === 0)
+              .map((item) => {
+                const children = items.filter((c) => c.parent_id === item.id && c.is_visible)
+                return (
+                  <div key={item.id} className="flex flex-col gap-1">
+                    <a
+                      href={item.href}
+                      target={item.target}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md bg-white border border-ui-border-base text-ui-fg-base hover:bg-ui-bg-base transition-colors"
+                    >
+                      {item.title}
+                    </a>
+                    {children.length > 0 && (
+                      <div className="flex flex-col gap-0.5 pl-3 border-l border-ui-border-base ml-2">
+                        {children.map((c) => (
+                          <a
+                            key={c.id}
+                            href={c.href}
+                            target={c.target}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded text-ui-fg-subtle hover:text-ui-fg-base hover:bg-ui-bg-base transition-colors"
+                          >
+                            {c.title}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+          </nav>
+        </div>
+      )}
 
       {editItem !== undefined && (
         <EditModal
@@ -468,15 +629,15 @@ export default function MenuItemsPage() {
     <Container>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Heading level="h1">菜单管理</Heading>
-          <Text className="text-ui-fg-subtle mt-1">管理前台与后台的导航菜单，拖拽排序后自动保存</Text>
+          <Heading level="h1">Menu Management</Heading>
+          <Text className="text-ui-fg-subtle mt-1">Manage front-end and admin navigation. Drag to reorder — changes save automatically and the storefront updates immediately.</Text>
         </div>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
         <Tabs.List>
-          <Tabs.Trigger value="front">前台菜单</Tabs.Trigger>
-          <Tabs.Trigger value="admin">Admin 菜单</Tabs.Trigger>
+          <Tabs.Trigger value="front">Front Menu</Tabs.Trigger>
+          <Tabs.Trigger value="admin">Admin Menu</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value="front" className="mt-4">
           <MenuList key="front" menuType="front" />

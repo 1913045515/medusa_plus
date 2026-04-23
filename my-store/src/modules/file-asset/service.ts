@@ -38,8 +38,46 @@ function loadS3Config() {
   }
 }
 
+function loadPublicS3Config() {
+  const base = loadS3Config()
+  return {
+    bucket:
+      process.env.FILE_ASSET_PUBLIC_S3_BUCKET ||
+      process.env.BLOG_MEDIA_S3_BUCKET ||
+      null,
+    // Public bucket may use a custom URL prefix (CDN) or standard S3 URL
+    urlPrefix:
+      process.env.FILE_ASSET_PUBLIC_URL_PREFIX ||
+      process.env.BLOG_MEDIA_PUBLIC_URL_PREFIX ||
+      null,
+    region:
+      process.env.FILE_ASSET_PUBLIC_S3_REGION ||
+      process.env.BLOG_MEDIA_S3_REGION ||
+      base.region,
+    accessKeyId:
+      process.env.FILE_ASSET_PUBLIC_S3_ACCESS_KEY_ID ||
+      process.env.BLOG_MEDIA_S3_ACCESS_KEY_ID ||
+      base.accessKeyId,
+    secretAccessKey:
+      process.env.FILE_ASSET_PUBLIC_S3_SECRET_ACCESS_KEY ||
+      process.env.BLOG_MEDIA_S3_SECRET_ACCESS_KEY ||
+      base.secretAccessKey,
+  }
+}
+
 function buildS3Client(): S3Client | null {
   const { bucket, region, accessKeyId, secretAccessKey } = loadS3Config()
+  if (!bucket || !region || !accessKeyId || !secretAccessKey) {
+    return null
+  }
+  return new S3Client({
+    region,
+    credentials: { accessKeyId, secretAccessKey },
+  })
+}
+
+function buildPublicS3Client(): S3Client | null {
+  const { bucket, region, accessKeyId, secretAccessKey } = loadPublicS3Config()
   if (!bucket || !region || !accessKeyId || !secretAccessKey) {
     return null
   }
@@ -66,15 +104,34 @@ class FileAssetModuleService extends MedusaService({
 }) {
   private s3Client: S3Client | null
   private s3Config: ReturnType<typeof loadS3Config>
+  private publicS3Client: S3Client | null
+  private publicS3Config: ReturnType<typeof loadPublicS3Config>
 
   constructor() {
     super(...arguments)
     this.s3Config = loadS3Config()
     this.s3Client = buildS3Client()
+    this.publicS3Config = loadPublicS3Config()
+    this.publicS3Client = buildPublicS3Client()
   }
 
   isS3Configured(): boolean {
     return this.s3Client !== null && this.s3Config.bucket !== null
+  }
+
+  isPublicS3Configured(): boolean {
+    return this.publicS3Client !== null && this.publicS3Config.bucket !== null
+  }
+
+  /** Get the permanent public URL for a file in the public bucket */
+  getPublicFileUrl(s3Key: string): string {
+    const prefix = this.publicS3Config.urlPrefix
+    const bucket = this.publicS3Config.bucket!
+    const region = this.publicS3Config.region
+    if (prefix) {
+      return `${prefix.replace(/\/$/, "")}/${s3Key}`
+    }
+    return `https://${bucket}.s3.${region}.amazonaws.com/${s3Key}`
   }
 
   async uploadToS3(
@@ -108,14 +165,50 @@ class FileAssetModuleService extends MedusaService({
     return { s3Key, s3Bucket: this.s3Config.bucket }
   }
 
-  async deleteFromS3(s3Bucket: string, s3Key: string): Promise<void> {
-    if (!this.s3Client) return
-    try {
-      await this.s3Client.send(
-        new DeleteObjectCommand({ Bucket: s3Bucket, Key: s3Key })
+  async uploadToPublicS3(
+    originalFilename: string,
+    mimeType: string,
+    sizeBytes: number,
+    body: Buffer | Readable
+  ): Promise<{ s3Key: string; s3Bucket: string; permanentUrl: string }> {
+    if (!this.publicS3Client || !this.publicS3Config.bucket) {
+      throw new Error(
+        "公有 S3 存储桶未配置。请设置 FILE_ASSET_PUBLIC_S3_BUCKET 环境变量。"
       )
+    }
+    if (sizeBytes > MAX_FILE_BYTES) {
+      throw new Error(`文件大小不能超过 500 MB（当前：${Math.round(sizeBytes / 1024 / 1024)} MB）`)
+    }
+
+    const s3Key = buildObjectKey(originalFilename)
+    const upload = new Upload({
+      client: this.publicS3Client,
+      params: {
+        Bucket: this.publicS3Config.bucket,
+        Key: s3Key,
+        Body: body,
+        ContentType: mimeType,
+        // Inline so browser can preview images/PDFs etc.
+        ContentDisposition: `inline; filename="${originalFilename.replace(/"/g, "")}"`,
+      },
+    })
+    await upload.done()
+
+    return {
+      s3Key,
+      s3Bucket: this.publicS3Config.bucket,
+      permanentUrl: this.getPublicFileUrl(s3Key),
+    }
+  }
+
+  async deleteFromS3(s3Bucket: string, s3Key: string): Promise<void> {
+    // Determine which client to use based on the bucket name
+    const isPublicBucket = this.publicS3Config.bucket && s3Bucket === this.publicS3Config.bucket
+    const client = isPublicBucket ? this.publicS3Client : this.s3Client
+    if (!client) return
+    try {
+      await client.send(new DeleteObjectCommand({ Bucket: s3Bucket, Key: s3Key }))
     } catch (err: any) {
-      // Ignore NoSuchKey — file already gone
       if (err?.Code !== "NoSuchKey" && err?.name !== "NoSuchKey") {
         throw err
       }
@@ -127,7 +220,7 @@ class FileAssetModuleService extends MedusaService({
       throw new Error("S3 is not configured.")
     }
     // Resolve the file asset to get bucket + key
-    const assets = await this.listFileAssets({ filters: { id: fileAssetId } })
+    const assets = await this.listFileAssets({ id: fileAssetId })
     const asset = assets[0]
     if (!asset) {
       throw new Error(`File asset not found: ${fileAssetId}`)
@@ -140,6 +233,25 @@ class FileAssetModuleService extends MedusaService({
     return await getSignedUrl(this.s3Client, command, {
       expiresIn: PRESIGNED_URL_EXPIRES_SECONDS,
     })
+  }
+
+  /**
+   * Generate an admin presigned URL (no customer download limits).
+   * Works for both public and private assets — always signs.
+   */
+  async generateAdminPresignedUrl(fileAssetId: string): Promise<string> {
+    const assets = await this.listFileAssets({ id: fileAssetId })
+    const asset = assets[0]
+    if (!asset) throw new Error(`File asset not found: ${fileAssetId}`)
+
+    // Pick the right client based on bucket
+    const isPublicBucket =
+      this.publicS3Config.bucket && asset.s3_bucket === this.publicS3Config.bucket
+    const client = isPublicBucket ? this.publicS3Client : this.s3Client
+    if (!client) throw new Error("S3 is not configured.")
+
+    const command = new GetObjectCommand({ Bucket: asset.s3_bucket, Key: asset.s3_key })
+    return await getSignedUrl(client, command, { expiresIn: PRESIGNED_URL_EXPIRES_SECONDS })
   }
 
   async countDownloadsByCustomerAndDate(

@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MenuService } from "../../../../modules/menu/services/menu.service"
+import { notifyStorefrontMenuRevalidate } from "../../_utils/notify-storefront"
 
 // PUT /admin/menu-items/:id
 export const PUT = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -15,6 +16,7 @@ export const PUT = async (req: MedusaRequest, res: MedusaResponse) => {
     is_visible: body.is_visible,
     target: body.target,
   })
+  notifyStorefrontMenuRevalidate()
   res.json({ menu_item: item })
 }
 
@@ -23,5 +25,6 @@ export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
   const svc = new MenuService(req.scope)
   const { id } = req.params
   await svc.deleteItem(id)
+  notifyStorefrontMenuRevalidate()
   res.json({ id, deleted: true })
 }

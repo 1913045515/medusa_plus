@@ -1,4 +1,4 @@
-﻿import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { DocumentText } from "@medusajs/icons"
 import { useEffect, useState } from "react"
 import {
@@ -307,6 +307,6 @@ export default function EmailTemplatesPage() {
 }
 
 export const config = defineRouteConfig({
-  label: "邮件模板配置",
+  label: "emailTemplates.menuLabel", translationNs: "translation",
   icon: DocumentText,
 })

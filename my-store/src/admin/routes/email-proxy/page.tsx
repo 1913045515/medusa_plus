@@ -217,6 +217,6 @@ export default function EmailProxyPage() {
 }
 
 export const config = defineRouteConfig({
-  label: "邮件代理配置",
+  label: "emailProxy.menuLabel", translationNs: "translation",
   icon: EnvelopeSolid,
 })

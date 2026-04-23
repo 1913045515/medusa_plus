@@ -1,4 +1,4 @@
-import { defineRouteConfig } from "@medusajs/admin-sdk"
+﻿import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { InformationCircle } from "@medusajs/icons"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
@@ -15,7 +15,7 @@ import {
 } from "@medusajs/ui"
 
 export const config = defineRouteConfig({
-  label: "工单管理",
+  label: "tickets.menuLabel", translationNs: "translation",
   icon: InformationCircle,
 })
 

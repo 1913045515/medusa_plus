@@ -70,7 +70,14 @@ export class ContentPageService {
     const offset = (page - 1) * limit
     const [rows, countResult] = await Promise.all([
       query.clone().orderBy("sort_order", "asc").orderBy("created_at", "desc").limit(limit).offset(offset),
-      query.clone().count("* as count").first(),
+      // Build count query from scratch to avoid mixing SELECT * with COUNT(*) (invalid SQL)
+      (() => {
+        let cq = this.knex("content_page").count("* as count")
+        if (status) cq = cq.where("status", status)
+        if (show_in_footer !== undefined) cq = cq.where("show_in_footer", show_in_footer)
+        if (q) cq = cq.whereILike("title", `%${q}%`)
+        return cq.first()
+      })(),
     ])
 
     return {

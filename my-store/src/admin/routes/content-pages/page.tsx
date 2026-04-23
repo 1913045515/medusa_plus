@@ -14,10 +14,10 @@ import {
   toast,
   usePrompt,
 } from "@medusajs/ui"
-import { TipTapEditor } from "../../components/blog/TipTapEditor"
+import ProductDetailEditor from "../../components/product-detail-editor"
 
 export const config = defineRouteConfig({
-  label: "内容页面",
+  label: "contentPages.menuLabel", translationNs: "translation",
   icon: DocumentText,
 })
 
@@ -78,6 +78,19 @@ function slugify(text: string): string {
 export default function ContentPagesPage() {
   const prompt = usePrompt()
   const [pages, setPages] = useState<ContentPage[]>([])
+
+  const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append("file", file)
+    const res = await fetch("/admin/blog-content-images", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(json?.message ?? "图片上传失败")
+    return json.url as string
+  }, [])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -339,10 +352,10 @@ export default function ContentPagesPage() {
           {/* Body editor */}
           <Container className="p-6 flex-1">
             <Label className="mb-2 block">页面内容</Label>
-            <TipTapEditor
-              content={form.body}
+            <ProductDetailEditor
+              value={form.body}
               onChange={(html) => updateField("body", html)}
-              placeholder="在此输入页面正文内容..."
+              onImageUpload={handleImageUpload}
             />
           </Container>
 

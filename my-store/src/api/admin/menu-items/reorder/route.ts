@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MenuService } from "../../../../modules/menu/services/menu.service"
+import { notifyStorefrontMenuRevalidate } from "../../_utils/notify-storefront"
 
 // POST /admin/menu-items/reorder
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -11,5 +12,6 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return
   }
   await svc.reorderItems(items)
+  notifyStorefrontMenuRevalidate()
   res.json({ success: true })
 }

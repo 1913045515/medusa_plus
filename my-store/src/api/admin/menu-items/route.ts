@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MenuService } from "../../../modules/menu/services/menu.service"
+import { notifyStorefrontMenuRevalidate } from "../_utils/notify-storefront"
 
 // GET /admin/menu-items?type=front|admin
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -23,5 +24,6 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     is_visible: body.is_visible !== undefined ? body.is_visible : true,
     target: body.target ?? "_self",
   })
+  notifyStorefrontMenuRevalidate()
   res.status(201).json({ menu_item: item })
 }

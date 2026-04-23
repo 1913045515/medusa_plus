@@ -107,6 +107,6 @@ export default function StoreSettingsPage() {
 }
 
 export const config = defineRouteConfig({
-  label: "商店设置",
+  label: "storeSettings.menuLabel", translationNs: "translation",
   icon: PencilSquare,
 })

@@ -13,6 +13,8 @@ export type ParsedAdminUpload = {
   size_bytes: number
   temp_file_path: string
   cleanup: () => Promise<void>
+  /** Extra form fields captured alongside the file */
+  fields: Record<string, string>
 }
 
 /**
@@ -62,6 +64,7 @@ export async function parseAdminUploadRequest(
     let tempFilePath = ""
     let sizeBytes = 0
     let limitReached = false
+    const extraFields: Record<string, string> = {}
     // Promise that resolves/rejects when the write stream finishes
     let writeStreamDone: Promise<void> = Promise.resolve()
 
@@ -80,6 +83,10 @@ export async function parseAdminUploadRequest(
       await cleanup()
       reject(error)
     }
+
+    busboy.on("field", (name, value) => {
+      extraFields[name] = value
+    })
 
     busboy.on("file", (incomingFieldName, file, info) => {
       if (fileFound) {
@@ -161,6 +168,7 @@ export async function parseAdminUploadRequest(
         size_bytes: sizeBytes,
         temp_file_path: tempFilePath,
         cleanup,
+        fields: extraFields,
       })
     })
 

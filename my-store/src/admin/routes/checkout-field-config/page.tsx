@@ -261,6 +261,6 @@ export default function CheckoutFieldConfigPage() {
 }
 
 export const config = defineRouteConfig({
-  label: "结算字段配置",
+  label: "checkoutConfig.menuLabel", translationNs: "translation",
   icon: CreditCard,
 })
