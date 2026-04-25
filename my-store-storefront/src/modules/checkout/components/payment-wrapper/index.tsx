@@ -47,7 +47,7 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
 
   // Always wrap with PayPalProvider so config is available when user selects PayPal
   return (
-    <PayPalProvider>
+    <PayPalProvider currencyCode={cart.currency_code}>
       <div>{children}</div>
     </PayPalProvider>
   )

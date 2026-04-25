@@ -1,22 +1,14 @@
 export default function medusaError(error: any): never {
   if (error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    const u = new URL(error.config.url, error.config.baseURL)
-    console.error("Resource:", u.toString())
-    console.error("Response data:", error.response.data)
-    console.error("Status code:", error.response.status)
-    console.error("Headers:", error.response.headers)
-
-    // Extracting the error message from the response data
-    const message = error.response.data.message || error.response.data
-
-    throw new Error(message.charAt(0).toUpperCase() + message.slice(1) + ".")
-  } else if (error.request) {
-    // The request was made but no response was received
-    throw new Error("No response received: " + error.request)
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    throw new Error("Error setting up the request: " + error.message)
+    // axios-style error (v1 SDK)
+    const message = error.response.data?.message || error.response.data
+    const msg = typeof message === "string" ? message : JSON.stringify(message)
+    throw new Error(msg.charAt(0).toUpperCase() + msg.slice(1) + ".")
   }
+
+  // Medusa v2 JS SDK (fetch-based) throws a plain Error whose message is
+  // already the human-readable string extracted from the response body.
+  // Re-throw it directly so the UI shows the real error instead of the
+  // generic "Error setting up the request: An unknown error occurred." wrapper.
+  throw error instanceof Error ? error : new Error(String(error.message ?? error))
 }

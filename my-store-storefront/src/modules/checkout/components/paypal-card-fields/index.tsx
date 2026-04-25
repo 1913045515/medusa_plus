@@ -92,16 +92,17 @@ export default function PayPalCardFields({
   const handleSubmit = async () => {
     setErrorMessage(null)
     try {
-      if (
-        !cart.payment_collection?.payment_sessions?.find(
-          (s) => s.provider_id === "pp_paypal"
-        )
-      ) {
-        await initiatePaymentSession(cart, { provider_id: "pp_paypal" })
-      }
-      const session = cart.payment_collection?.payment_sessions?.find(
-        (s) => s.provider_id === "pp_paypal"
+      const existingSession = cart.payment_collection?.payment_sessions?.find(
+        (s) => s.provider_id === "pp_paypal_paypal"
       )
+      const response =
+        existingSession?.data?.paypal_order_id && existingSession.status === "pending"
+          ? null
+          : await initiatePaymentSession(cart, { provider_id: "pp_paypal_paypal" })
+      const session =
+        (response as any)?.payment_collection?.payment_sessions?.find(
+          (s: any) => s.provider_id === "pp_paypal_paypal"
+        ) || existingSession
       const paypalOrderId = session?.data?.paypal_order_id as string | undefined
       if (!paypalOrderId) {
         throw new Error("无法获取 PayPal 订单 ID，请重试。")
@@ -120,9 +121,17 @@ export default function PayPalCardFields({
         onApprove={handleApprove}
         onError={handleError}
         createOrder={async () => {
-          const session = cart.payment_collection?.payment_sessions?.find(
-            (s) => s.provider_id === "pp_paypal"
+          const existingSession = cart.payment_collection?.payment_sessions?.find(
+            (s) => s.provider_id === "pp_paypal_paypal"
           )
+          const response =
+            existingSession?.data?.paypal_order_id && existingSession.status === "pending"
+              ? null
+              : await initiatePaymentSession(cart, { provider_id: "pp_paypal_paypal" })
+          const session =
+            (response as any)?.payment_collection?.payment_sessions?.find(
+              (s: any) => s.provider_id === "pp_paypal_paypal"
+            ) || existingSession
           const orderId = session?.data?.paypal_order_id as string | undefined
           if (!orderId) throw new Error("No PayPal order ID available")
           return orderId

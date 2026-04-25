@@ -1,5 +1,6 @@
 import {
   AbstractPaymentProvider,
+  ContainerRegistrationKeys,
   PaymentSessionStatus,
   MedusaError,
 } from "@medusajs/framework/utils"
@@ -27,12 +28,17 @@ import type {
 } from "@medusajs/types"
 import { Logger } from "@medusajs/framework/types"
 import { PayPalClient } from "./paypal-client"
-import PaypalModuleService, { decryptSecret } from "./service"
-import { PAYPAL_MODULE } from "./index"
+import { decryptSecret } from "./service"
 
 type InjectedDependencies = {
   logger: Logger
   [key: string]: unknown
+}
+
+type PaypalConfigRow = {
+  client_id: string
+  client_secret_encrypted: string
+  mode: "sandbox" | "live"
 }
 
 // Stored in payment session data
@@ -44,26 +50,48 @@ interface PayPalSessionData {
 }
 
 export class PayPalPaymentProvider extends AbstractPaymentProvider<Record<string, unknown>> {
-  static identifier = "pp_paypal"
+  static identifier = "paypal"
 
   private logger: Logger
-  private paypalService: PaypalModuleService
 
   constructor(container: InjectedDependencies, config: Record<string, unknown> = {}) {
     super(container as any, config)
     this.logger = container.logger as Logger
-    this.paypalService = container[PAYPAL_MODULE] as PaypalModuleService
+  }
+
+  private get knex() {
+    const cradle = this.container as {
+      [key: string]: unknown
+    }
+
+    const key = ContainerRegistrationKeys.PG_CONNECTION ?? "pg_connection"
+
+    if (cradle[key]) {
+      return cradle[key] as any
+    }
+
+    throw new Error("Could not resolve 'pg_connection' from payment provider container")
+  }
+
+  private async getStoredConfig(): Promise<PaypalConfigRow | null> {
+    const row = await this.knex("paypal_config")
+      .select("client_id", "client_secret_encrypted", "mode")
+      .whereNull("deleted_at")
+      .orderBy("id", "asc")
+      .first()
+
+    return (row as PaypalConfigRow | undefined) ?? null
   }
 
   private async getClient(): Promise<PayPalClient> {
-    const configs = await this.paypalService.listPaypalConfigs()
-    if (!configs || configs.length === 0) {
+    const config = await this.getStoredConfig()
+    if (!config) {
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
         "PayPal is not configured. Please set up PayPal credentials in admin settings."
       )
     }
-    const config = configs[0]
+
     let secret: string
     try {
       secret = decryptSecret(config.client_secret_encrypted)
@@ -99,7 +127,7 @@ export class PayPalPaymentProvider extends AbstractPaymentProvider<Record<string
     } catch (err: any) {
       this.logger.error("[PayPal] initiatePayment failed:", err.message)
       return {
-        id: "",
+        id: `paypal_error_${Date.now()}`,
         data: { error: err.message },
         status: PaymentSessionStatus.ERROR,
       }

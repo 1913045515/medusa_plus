@@ -18,12 +18,17 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
 type PayPalProviderProps = {
+  currencyCode?: string
   children: React.ReactNode
 }
 
-export default function PayPalProvider({ children }: PayPalProviderProps) {
+export default function PayPalProvider({
+  children,
+  currencyCode,
+}: PayPalProviderProps) {
   const [config, setConfig] = useState<PayPalConfig>({ enabled: false })
   const [loading, setLoading] = useState(true)
+  const currency = (currencyCode || "USD").toUpperCase()
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/store/paypal/config`, {
@@ -46,9 +51,10 @@ export default function PayPalProvider({ children }: PayPalProviderProps) {
 
   return (
     <PayPalScriptProvider
+      key={`${config.client_id}-${config.mode}-${currency}-${config.card_fields_enabled ? "card-fields" : "buttons"}`}
       options={{
         clientId: config.client_id,
-        currency: "USD",
+        currency,
         intent: "capture",
         components: config.card_fields_enabled
           ? "buttons,card-fields"

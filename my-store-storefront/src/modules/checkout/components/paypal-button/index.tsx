@@ -32,14 +32,20 @@ export default function PayPalPaymentButton({
     setErrorMessage(null)
     setCancelled(false)
     try {
-      // Ensure PayPal payment session is initiated, which creates PayPal order on backend
-      if (!session || session.provider_id !== "pp_paypal") {
-        await initiatePaymentSession(cart, { provider_id: "pp_paypal" })
-      }
-      // The session data should now contain paypal_order_id
-      const updatedSession = cart.payment_collection?.payment_sessions?.find(
-        (s) => s.provider_id === "pp_paypal"
+      const existingSession = cart.payment_collection?.payment_sessions?.find(
+        (s) => s.provider_id === "pp_paypal_paypal"
       )
+
+      const response =
+        existingSession?.data?.paypal_order_id && existingSession.status === "pending"
+          ? null
+          : await initiatePaymentSession(cart, { provider_id: "pp_paypal_paypal" })
+
+      const updatedSession =
+        (response as any)?.payment_collection?.payment_sessions?.find(
+          (s: any) => s.provider_id === "pp_paypal_paypal"
+        ) || existingSession
+
       const paypalOrderId = updatedSession?.data?.paypal_order_id as string | undefined
       if (!paypalOrderId) {
         throw new Error("Failed to create PayPal order. Please try again.")

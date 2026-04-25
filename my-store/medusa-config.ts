@@ -100,7 +100,7 @@ module.exports = defineConfig({
         providers: [
           {
             resolve: "./src/modules/paypal/paypal-payment-provider",
-            id: "pp_paypal",
+            id: "paypal",
           },
         ],
       },
