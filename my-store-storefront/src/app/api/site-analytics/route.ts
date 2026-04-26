@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerBackendUrl } from "@lib/util/server-backend-url"
 
-const BACKEND_URL =
+const BACKEND_URL = getServerBackendUrl(
   process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+)
 
 function getPublishableKey(): string {
   const key =

@@ -3,6 +3,7 @@
 import { setAddresses } from "@lib/data/cart"
 import { CheckoutFieldsConfig, DEFAULT_CHECKOUT_FIELDS } from "@lib/data/checkout-config"
 import compareAddresses from "@lib/util/compare-addresses"
+import { isVirtualOnlyCart } from "@lib/util/virtual-fulfillment"
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text, useToggleState } from "@medusajs/ui"
@@ -25,21 +26,22 @@ const Addresses = ({
   fieldConfig?: CheckoutFieldsConfig
 }) => {
   const config = fieldConfig ?? DEFAULT_CHECKOUT_FIELDS
-
-  // 虚拟购物车检测：全部商品均为虚拟产品时启用简化模式
-  const isVirtualCart =
-    (cart?.items?.length ?? 0) > 0 &&
-    cart!.items!.every(
-      (item: any) => item.product?.metadata?.is_virtual === true
-    )
+  const isVirtualCart = isVirtualOnlyCart(cart)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "address"
+  const headingLabel = isVirtualCart ? "Contact" : "Shipping Address"
+  const continueLabel = isVirtualCart
+    ? "Continue to payment"
+    : "Continue to delivery"
+  const summaryReady = isVirtualCart ? Boolean(cart?.email) : Boolean(cart?.shipping_address)
 
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
-    cart?.shipping_address && cart?.billing_address
+    isVirtualCart
+      ? true
+      : cart?.shipping_address && cart?.billing_address
       ? compareAddresses(cart?.shipping_address, cart?.billing_address)
       : true
   )
@@ -51,16 +53,16 @@ const Addresses = ({
   const [message, formAction] = useActionState(setAddresses, null)
 
   return (
-    <div className="bg-white">
+    <div className="rounded-[28px] border border-[#e3d5c1] bg-white/92 px-5 py-6 shadow-[0_18px_50px_rgba(74,53,24,0.07)] sm:px-7 sm:py-8">
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
+          className="flex flex-row items-baseline gap-x-2 text-[1.55rem] leading-9 text-[#231b14] sm:text-[1.75rem] sm:leading-10"
         >
-          Shipping Address
+          {headingLabel}
           {!isOpen && <CheckCircleSolid />}
         </Heading>
-        {!isOpen && cart?.shipping_address && (
+        {!isOpen && summaryReady && (
           <Text>
             <button
               onClick={handleEdit}
@@ -97,7 +99,7 @@ const Addresses = ({
               </div>
             )}
             <SubmitButton className="mt-6" data-testid="submit-address-button">
-              Continue to delivery
+              {continueLabel}
             </SubmitButton>
             <ErrorMessage error={message} data-testid="address-error-message" />
           </div>
@@ -105,13 +107,30 @@ const Addresses = ({
       ) : (
         <div>
           <div className="text-small-regular">
-            {cart && cart.shipping_address ? (
-              <div className="flex items-start gap-x-8">
-                <div className="flex items-start gap-x-1 w-full">
-                  <div
-                    className="flex flex-col w-1/3"
-                    data-testid="shipping-address-summary"
-                  >
+            {isVirtualCart ? (
+              <div className="grid gap-6 rounded-[24px] border border-[#e4d7c4] bg-[#faf4ea] p-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+                <div className="space-y-2" data-testid="digital-delivery-summary">
+                  <Text className="txt-medium-plus text-ui-fg-base">
+                    Digital delivery
+                  </Text>
+                  <Text className="txt-medium text-ui-fg-subtle">
+                    This order unlocks immediately after successful payment. No shipping address or delivery method is required.
+                  </Text>
+                </div>
+                <div className="space-y-2" data-testid="digital-contact-summary">
+                  <Text className="txt-medium-plus text-ui-fg-base">
+                    Contact
+                  </Text>
+                  <Text className="txt-medium text-ui-fg-subtle">{cart?.email}</Text>
+                </div>
+              </div>
+            ) : cart && cart.shipping_address ? (
+              <div className="grid gap-5 md:grid-cols-3">
+                <div
+                  className="rounded-[24px] border border-[#e4d7c4] bg-[#faf4ea] p-5"
+                  data-testid="shipping-address-summary"
+                >
+                  <div className="flex flex-col gap-1.5">
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
                       Shipping Address
                     </Text>
@@ -131,11 +150,13 @@ const Addresses = ({
                       {cart.shipping_address.country_code?.toUpperCase()}
                     </Text>
                   </div>
+                </div>
 
-                  <div
-                    className="flex flex-col w-1/3 "
-                    data-testid="shipping-contact-summary"
-                  >
+                <div
+                  className="rounded-[24px] border border-[#e4d7c4] bg-[#faf4ea] p-5"
+                  data-testid="shipping-contact-summary"
+                >
+                  <div className="flex flex-col gap-1.5">
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
                       Contact
                     </Text>
@@ -146,11 +167,13 @@ const Addresses = ({
                       {cart.email}
                     </Text>
                   </div>
+                </div>
 
-                  <div
-                    className="flex flex-col w-1/3"
-                    data-testid="billing-address-summary"
-                  >
+                <div
+                  className="rounded-[24px] border border-[#e4d7c4] bg-[#faf4ea] p-5"
+                  data-testid="billing-address-summary"
+                >
+                  <div className="flex flex-col gap-1.5">
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
                       Billing Address
                     </Text>

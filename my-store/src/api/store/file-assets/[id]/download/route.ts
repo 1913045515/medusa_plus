@@ -15,6 +15,8 @@ import type FileAssetModuleService from "../../../../../modules/file-asset/servi
  */
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const fileAssetId = req.params.id
+  const requestedOrderId =
+    typeof req.query.order_id === "string" ? req.query.order_id : undefined
   const authContext = (req as any).auth_context
   const customerId: string | undefined = authContext?.actor_id
 
@@ -46,7 +48,9 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
         "items.id",
         "items.metadata",
       ],
-      filters: { customer_id: customerId },
+      filters: requestedOrderId
+        ? { customer_id: customerId, id: requestedOrderId }
+        : { customer_id: customerId },
     })
 
     const orders: any[] = ordersRes?.data ?? []
@@ -81,7 +85,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const usedToday = await fileAssetService.countDownloadsByCustomerAndDate(
     customerId,
     fileAssetId,
-    today
+    today,
+    authorizedOrderId
   )
   const limit = fileAssetService.getDownloadLimitPerDay()
 

@@ -15,6 +15,8 @@ import type FileAssetModuleService from "../../../../../modules/file-asset/servi
  */
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const fileAssetId = req.params.id
+  const requestedOrderId =
+    typeof req.query.order_id === "string" ? req.query.order_id : undefined
   const authContext = (req as any).auth_context
   const customerId: string | undefined = authContext?.actor_id
 
@@ -23,17 +25,58 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   }
 
   const fileAssetService = req.scope.resolve<FileAssetModuleService>(FILE_ASSET_MODULE)
+  const query = req.scope.resolve("query") as any
 
   const assets = await fileAssetService.listFileAssets({ id: fileAssetId })
   if (!assets[0]) {
     return res.status(404).json({ message: "文件不存在" })
   }
 
+  let authorizedOrderId: string | null = null
+
+  try {
+    const ordersRes = await query.graph({
+      entity: "order",
+      fields: ["id", "status", "items.id", "items.metadata"],
+      filters: requestedOrderId
+        ? { customer_id: customerId, id: requestedOrderId }
+        : { customer_id: customerId },
+    })
+
+    const orders: any[] = ordersRes?.data ?? []
+
+    for (const order of orders) {
+      if (order.status === "canceled") continue
+
+      for (const item of order.items ?? []) {
+        const meta = (item.metadata ?? {}) as Record<string, unknown>
+        const fulfillment = meta.virtual_fulfillment as
+          | Record<string, unknown>
+          | undefined
+
+        if (fulfillment?.resource_file_asset_id === fileAssetId) {
+          authorizedOrderId = order.id
+          break
+        }
+      }
+
+      if (authorizedOrderId) break
+    }
+  } catch (err) {
+    console.error("[file-asset/status] Failed to query orders:", err)
+    return res.status(500).json({ message: "验证订单时出错" })
+  }
+
+  if (!authorizedOrderId) {
+    return res.status(403).json({ message: "您未购买该产品，无查看权限" })
+  }
+
   const today = new Date()
   const usedToday = await fileAssetService.countDownloadsByCustomerAndDate(
     customerId,
     fileAssetId,
-    today
+    today,
+    authorizedOrderId
   )
   const limit = fileAssetService.getDownloadLimitPerDay()
   const remainingDownloads = Math.max(0, limit - usedToday)
@@ -45,6 +88,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
   res.json({
     remaining_downloads: remainingDownloads,
+    order_id: authorizedOrderId,
     download_available_until: downloadAvailableUntil,
   })
 }

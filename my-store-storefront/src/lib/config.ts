@@ -1,4 +1,6 @@
 import { getLocaleHeader } from "@lib/util/get-locale-header"
+import { getServerBackendUrl } from "@lib/util/server-backend-url"
+import { isRetryableServerConnectionError } from "@lib/util/server-fetch"
 import Medusa, { FetchArgs, FetchInput } from "@medusajs/js-sdk"
 
 // 服务端（Node.js/SSR）：优先用 Docker 内网地址（docker-compose 注入），无需构建参数
@@ -9,10 +11,10 @@ function getBackendUrl(): string {
     return `${window.location.origin}/medusa-api`
   }
   // 服务端：MEDUSA_BACKEND_URL 由 docker-compose environment 注入（http://admin:9000）
-  return (
+  return getServerBackendUrl(
     process.env.MEDUSA_BACKEND_URL ||
-    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
-    "http://localhost:9000"
+      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
+      "http://localhost:9000"
   )
 }
 
@@ -43,5 +45,18 @@ sdk.client.fetch = async <T>(
     ...init,
     headers: newHeaders,
   }
-  return originalFetch(input, init)
+
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      return await originalFetch(input, init)
+    } catch (error) {
+      if (!isRetryableServerConnectionError(error) || attempt === 7) {
+        throw error
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)))
+    }
+  }
+
+  throw new Error("Medusa client fetch failed unexpectedly")
 }

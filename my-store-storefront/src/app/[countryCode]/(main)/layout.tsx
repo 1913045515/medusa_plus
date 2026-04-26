@@ -30,7 +30,7 @@ export default async function PageLayout(props: {
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex min-h-screen flex-col bg-[#f6f1e8] text-[#2b241d]">
       <SiteAnalyticsTracker />
       <Nav />
       {customer && cart && (
@@ -44,7 +44,9 @@ export default async function PageLayout(props: {
           shippingOptions={shippingOptions}
         />
       )}
-      <div className="flex-1">{props.children}</div>
+      <div className="flex-1 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.92),rgba(246,239,228,0.94)_40%,rgba(241,232,218,0.96)_100%)]">
+        {props.children}
+      </div>
       <Footer />
     </div>
   )

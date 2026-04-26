@@ -1,5 +1,6 @@
 "use client"
 
+import { isVirtualOnlyCart } from "@lib/util/virtual-fulfillment"
 import { Heading, Text, clx } from "@medusajs/ui"
 
 import PaymentButton from "../payment-button"
@@ -12,10 +13,12 @@ const Review = ({ cart }: { cart: any }) => {
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  const isVirtualCart = isVirtualOnlyCart(cart)
 
   const previousStepsCompleted =
-    cart.shipping_address &&
-    cart.shipping_methods.length > 0 &&
+    cart.email &&
+    (isVirtualCart ||
+      (cart.shipping_address && (cart.shipping_methods?.length ?? 0) > 0)) &&
     (cart.payment_collection || paidByGiftcard)
 
   return (

@@ -33,12 +33,12 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
         </LocalizedClientLink>
       </div>
       <div
-        className="flex flex-col gap-4 h-full bg-white w-full"
+        className="flex h-full w-full flex-col gap-6 rounded-[28px] border border-[#e3d5c1] bg-white/92 px-5 py-6 shadow-[0_18px_50px_rgba(74,53,24,0.07)] sm:px-7 sm:py-8"
         data-testid="order-details-container"
       >
         <OrderDetails order={order} showStatus dict={dict} />
         <Items order={order} dict={dict} />
-        <ShippingDetails order={order} />
+        <ShippingDetails order={order} dict={dict} />
         <OrderSummary order={order} />
         <Help />
       </div>

@@ -1,6 +1,13 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import {
+  getCheckoutCountryCode,
+  isVirtualCartItem,
+  isVirtualOnlyCart,
+} from "@lib/util/virtual-fulfillment"
+import { getServerBackendUrl } from "@lib/util/server-backend-url"
+import { fetchServerWithRetry } from "@lib/util/server-fetch"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -16,8 +23,9 @@ import {
 import { getRegion } from "./regions"
 import { getLocale } from "@lib/data/locale-actions"
 
-const BACKEND_URL =
+const BACKEND_URL = getServerBackendUrl(
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || process.env.MEDUSA_BACKEND_URL
+)
 
 const PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
@@ -32,7 +40,7 @@ const PUBLISHABLE_KEY =
 export async function retrieveCart(cartId?: string, fields?: string) {
   const id = cartId || (await getCartId())
   fields ??=
-    "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
+    "*items, *region, *items.product, +items.product.metadata, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
 
   if (!id) {
     return null
@@ -122,14 +130,79 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .catch(medusaError)
 }
 
+const normalizeVirtualLineItems = async (
+  cartId: string,
+  headers: Record<string, string>
+) => {
+  if (!BACKEND_URL) {
+    throw new Error("BACKEND_URL is not configured")
+  }
+
+  const fetchHeaders: Record<string, string> = {
+    "content-type": "application/json",
+  }
+
+  if (PUBLISHABLE_KEY) {
+    fetchHeaders["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+
+  if ("authorization" in headers) {
+    fetchHeaders["authorization"] = (headers as any).authorization
+  }
+
+  const response = await fetchServerWithRetry(
+    `${BACKEND_URL}/store/carts/${cartId}/normalize-virtual-line-items`,
+    {
+      method: "POST",
+      headers: fetchHeaders,
+      body: "{}",
+      cache: "no-store",
+    }
+  )
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null)
+    throw new Error(
+      payload?.message || "Failed to normalize virtual cart line items"
+    )
+  }
+
+  const cartCacheTag = await getCacheTag("carts")
+  revalidateTag(cartCacheTag)
+
+  const fulfillmentCacheTag = await getCacheTag("fulfillment")
+  revalidateTag(fulfillmentCacheTag)
+
+  return response.json().catch(() => null)
+}
+
+const syncVirtualLineItemsShippingState = async (
+  cart: HttpTypes.StoreCart,
+  headers: Record<string, string>
+) => {
+  const virtualItemsNeedingUpdate = (cart.items ?? []).filter(
+    (item) => isVirtualCartItem(item) && item.requires_shipping
+  )
+
+  if (virtualItemsNeedingUpdate.length === 0) {
+    return cart
+  }
+
+  await normalizeVirtualLineItems(cart.id, headers)
+
+  return (await retrieveCart(cart.id)) ?? cart
+}
+
 export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  isVirtualProduct = false,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  isVirtualProduct?: boolean
 }) {
   if (!variantId) {
     throw new Error("Missing variant ID when adding to cart")
@@ -156,6 +229,10 @@ export async function addToCart({
       headers
     )
     .then(async () => {
+      if (isVirtualProduct) {
+        await normalizeVirtualLineItems(cart.id, headers)
+      }
+
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
 
@@ -253,8 +330,10 @@ export async function initiatePaymentSession(
     ...(await getAuthHeaders()),
   }
 
+  const syncedCart = await syncVirtualLineItemsShippingState(cart, headers)
+
   return sdk.store.payment
-    .initiatePaymentSession(cart, data, {}, headers)
+    .initiatePaymentSession(syncedCart, data, {}, headers)
     .then(async (resp) => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -337,17 +416,27 @@ export async function submitPromotionForm(
   try {
     await applyPromotions([code])
   } catch (e: any) {
-    return e.message
+    if (e instanceof Error) {
+      return e.message
+    }
+
+    if (typeof e === "string") {
+      return e
+    }
+
+    return "Unable to continue to payment."
   }
 }
 
 // TODO: Pass a POJO instead of a form entity here
 export async function setAddresses(currentState: unknown, formData: FormData) {
+  let redirectPath = ""
+
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -384,14 +473,23 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         province: formData.get("billing_address.province"),
         phone: formData.get("billing_address.phone"),
       }
-    await updateCart(data)
+    const updatedCart = await updateCart(data)
+    const hydratedCart = (await retrieveCart(updatedCart.id)) ?? updatedCart
+    const syncedCart = await syncVirtualLineItemsShippingState(hydratedCart, {
+      ...(await getAuthHeaders()),
+    })
+    const countryCode =
+      getCheckoutCountryCode(syncedCart) ||
+      String(formData.get("shipping_address.country_code") || "")
+
+    redirectPath = `/${countryCode}/checkout?step=${
+      isVirtualOnlyCart(syncedCart) ? "payment" : "delivery"
+    }`
   } catch (e: any) {
     return e.message
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
-  )
+  redirect(redirectPath)
 }
 
 /**
@@ -410,8 +508,14 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
+  const cartBeforeCompletion = await retrieveCart(id)
+  const normalizedCart = cartBeforeCompletion
+    ? await syncVirtualLineItemsShippingState(cartBeforeCompletion, headers)
+    : null
+  const cartIdForCompletion = normalizedCart?.id ?? id
+
   const cartRes = await sdk.store.cart
-    .complete(id, {}, headers)
+    .complete(cartIdForCompletion, {}, headers)
     .then(async (cartRes) => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -421,7 +525,8 @@ export async function placeOrder(cartId?: string) {
 
   if (cartRes?.type === "order") {
     const countryCode =
-      cartRes.order.shipping_address?.country_code?.toLowerCase()
+      cartRes.order.shipping_address?.country_code?.toLowerCase() ||
+      cartRes.order.billing_address?.country_code?.toLowerCase()
 
     // 下单成功后，调用后端接口将订单中的课程商品写入 course_purchase
     if (BACKEND_URL) {
@@ -439,7 +544,7 @@ export async function placeOrder(cartId?: string) {
           fetchHeaders["authorization"] = (authHeaders as any).authorization
         }
 
-        const resp = await fetch(
+        const resp = await fetchServerWithRetry(
           `${BACKEND_URL}/store/course-purchases/from-order`,
           {
             method: "POST",
@@ -495,6 +600,11 @@ export async function updateRegion(countryCode: string, currentPath: string) {
 
 export async function listCartOptions() {
   const cartId = await getCartId()
+
+  if (!cartId) {
+    return { shipping_options: [] }
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -502,12 +612,14 @@ export async function listCartOptions() {
     ...(await getCacheOptions("shippingOptions")),
   }
 
-  return await sdk.client.fetch<{
-    shipping_options: HttpTypes.StoreCartShippingOption[]
-  }>("/store/shipping-options", {
-    query: { cart_id: cartId },
-    next,
-    headers,
-    cache: "force-cache",
-  })
+  return await sdk.client
+    .fetch<{
+      shipping_options: HttpTypes.StoreCartShippingOption[]
+    }>("/store/shipping-options", {
+      query: { cart_id: cartId },
+      next,
+      headers,
+      cache: "force-cache",
+    })
+    .catch(() => ({ shipping_options: [] }))
 }

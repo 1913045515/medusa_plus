@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { getDisplayFulfillmentStatus, isVirtualOnlyOrder } from "@lib/util/virtual-fulfillment"
 import { Text } from "@medusajs/ui"
 import type { OrderDictionary } from "@lib/i18n/dictionaries"
 
@@ -9,11 +10,25 @@ type OrderDetailsProps = {
 }
 
 const OrderDetails = ({ order, showStatus, dict }: OrderDetailsProps) => {
-  const formatStatus = (str: string) => {
+  const formatStatus = (str: string | null | undefined) => {
+    if (!str) {
+      return "Pending"
+    }
+
     const formatted = str.split("_").join(" ")
 
     return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
   }
+
+  const displayFulfillmentStatus = getDisplayFulfillmentStatus(order)
+  const paymentStatusLabel =
+    isVirtualOnlyOrder(order) && !order.payment_status
+      ? dict.digitalOrderCompleted
+      : formatStatus(order.payment_status)
+  const fulfillmentStatusLabel =
+    isVirtualOnlyOrder(order) && displayFulfillmentStatus === "completed"
+      ? dict.digitalFulfillmentDelivered
+      : formatStatus(displayFulfillmentStatus)
 
   return (
     <div>
@@ -43,7 +58,7 @@ const OrderDetails = ({ order, showStatus, dict }: OrderDetailsProps) => {
             <Text>
               {dict.orderStatus}:{" "}
               <span className="text-ui-fg-subtle " data-testid="order-status">
-                {formatStatus(order.fulfillment_status)}
+                {fulfillmentStatusLabel}
               </span>
             </Text>
             <Text>
@@ -52,7 +67,7 @@ const OrderDetails = ({ order, showStatus, dict }: OrderDetailsProps) => {
                 className="text-ui-fg-subtle "
                 sata-testid="order-payment-status"
               >
-                {formatStatus(order.payment_status)}
+                {paymentStatusLabel}
               </span>
             </Text>
           </>

@@ -144,6 +144,7 @@ export default function ProductActions({
         variantId: selectedVariant.id,
         quantity: 1,
         countryCode,
+        isVirtualProduct: product.metadata?.is_virtual === true,
       })
 
       setIsAdding(false)

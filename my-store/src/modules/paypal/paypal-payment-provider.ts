@@ -45,6 +45,7 @@ type PaypalConfigRow = {
 interface PayPalSessionData {
   paypal_order_id?: string
   paypal_capture_id?: string
+  paypal_order_amount?: string
   status?: string
   error?: string
 }
@@ -108,10 +109,23 @@ export class PayPalPaymentProvider extends AbstractPaymentProvider<Record<string
     return (input.data || {}) as PayPalSessionData
   }
 
+  private formatPayPalAmount(amount: unknown): string {
+    const normalizedAmount = Number(amount)
+
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Invalid PayPal payment amount: ${amount}`
+      )
+    }
+
+    return normalizedAmount.toFixed(2)
+  }
+
   async initiatePayment(input: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
     try {
       const client = await this.getClient()
-      const decimalAmount = (Number(input.amount) / 100).toFixed(2)
+      const decimalAmount = this.formatPayPalAmount(input.amount)
       const order = await client.createOrder(
         input.currency_code.toUpperCase(),
         decimalAmount
@@ -120,6 +134,7 @@ export class PayPalPaymentProvider extends AbstractPaymentProvider<Record<string
         id: order.id,
         data: {
           paypal_order_id: order.id,
+          paypal_order_amount: decimalAmount,
           status: order.status,
         },
         status: PaymentSessionStatus.PENDING,

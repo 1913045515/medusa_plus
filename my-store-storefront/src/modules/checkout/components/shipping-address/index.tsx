@@ -26,18 +26,27 @@ const ShippingAddress = ({
   const fc = fieldConfig ?? DEFAULT_CHECKOUT_FIELDS.shipping
   const defaultCountryCode =
     cart?.shipping_address?.country_code ||
+    cart?.billing_address?.country_code ||
     cart?.region?.countries?.[0]?.iso_2 ||
     ""
   const [formData, setFormData] = useState<Record<string, any>>({
-    "shipping_address.first_name": cart?.shipping_address?.first_name || "",
-    "shipping_address.last_name": cart?.shipping_address?.last_name || "",
-    "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
-    "shipping_address.company": cart?.shipping_address?.company || "",
-    "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
-    "shipping_address.city": cart?.shipping_address?.city || "",
+    "shipping_address.first_name":
+      cart?.shipping_address?.first_name || cart?.billing_address?.first_name || "",
+    "shipping_address.last_name":
+      cart?.shipping_address?.last_name || cart?.billing_address?.last_name || "",
+    "shipping_address.address_1":
+      cart?.shipping_address?.address_1 || cart?.billing_address?.address_1 || "",
+    "shipping_address.company":
+      cart?.shipping_address?.company || cart?.billing_address?.company || "",
+    "shipping_address.postal_code":
+      cart?.shipping_address?.postal_code || cart?.billing_address?.postal_code || "",
+    "shipping_address.city":
+      cart?.shipping_address?.city || cart?.billing_address?.city || "",
     "shipping_address.country_code": defaultCountryCode,
-    "shipping_address.province": cart?.shipping_address?.province || "",
-    "shipping_address.phone": cart?.shipping_address?.phone || "",
+    "shipping_address.province":
+      cart?.shipping_address?.province || cart?.billing_address?.province || "",
+    "shipping_address.phone":
+      cart?.shipping_address?.phone || cart?.billing_address?.phone || "",
     email: cart?.email || "",
   })
 
@@ -84,6 +93,8 @@ const ShippingAddress = ({
     // Ensure cart is not null and has a shipping_address before setting form data
     if (cart && cart.shipping_address) {
       setFormAddress(cart?.shipping_address, cart?.email)
+    } else if (cart?.billing_address) {
+      setFormAddress(cart?.billing_address, cart?.email)
     }
 
     if (cart && !cart.email && customer?.email) {
@@ -115,27 +126,37 @@ const ShippingAddress = ({
           <input
             type="hidden"
             name="shipping_address.first_name"
-            value={formData["shipping_address.first_name"] || "Virtual"}
+            value={formData["shipping_address.first_name"] || "Digital"}
           />
           <input
             type="hidden"
             name="shipping_address.last_name"
-            value={formData["shipping_address.last_name"] || "Product"}
+            value={formData["shipping_address.last_name"] || "Customer"}
           />
           <input
             type="hidden"
             name="shipping_address.address_1"
-            value={formData["shipping_address.address_1"] || "N/A"}
+            value={formData["shipping_address.address_1"] || "Digital delivery"}
           />
           <input
             type="hidden"
             name="shipping_address.city"
-            value={formData["shipping_address.city"] || "N/A"}
+            value={formData["shipping_address.city"] || "Online"}
           />
           <input
             type="hidden"
             name="shipping_address.postal_code"
             value={formData["shipping_address.postal_code"] || "00000"}
+          />
+          <input
+            type="hidden"
+            name="shipping_address.province"
+            value={formData["shipping_address.province"] || "Digital"}
+          />
+          <input
+            type="hidden"
+            name="shipping_address.phone"
+            value={formData["shipping_address.phone"] || "0000000000"}
           />
           <input type="hidden" name="same_as_billing" value="on" />
           <Input

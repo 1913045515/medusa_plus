@@ -226,9 +226,16 @@ class FileAssetModuleService extends MedusaService({
       throw new Error(`File asset not found: ${fileAssetId}`)
     }
 
+    const safeFilename = encodeURIComponent(
+      (asset.original_filename || asset.s3_key.split("/").pop() || "download")
+        .replace(/\r|\n/g, "")
+        .trim()
+    )
+
     const command = new GetObjectCommand({
       Bucket: asset.s3_bucket,
       Key: asset.s3_key,
+      ResponseContentDisposition: `attachment; filename*=UTF-8''${safeFilename}`,
     })
     return await getSignedUrl(this.s3Client, command, {
       expiresIn: PRESIGNED_URL_EXPIRES_SECONDS,
@@ -257,7 +264,8 @@ class FileAssetModuleService extends MedusaService({
   async countDownloadsByCustomerAndDate(
     customerId: string,
     fileAssetId: string,
-    date: Date
+    date: Date,
+    orderId?: string
   ): Promise<number> {
     // Count rows where customer_id + file_asset_id match and downloaded_at is within UTC day
     const startOfDay = new Date(date)
@@ -266,10 +274,9 @@ class FileAssetModuleService extends MedusaService({
     endOfDay.setUTCHours(23, 59, 59, 999)
 
     const logs = await this.listFileDownloadLogs({
-      filters: {
-        customer_id: customerId,
-        file_asset_id: fileAssetId,
-      },
+      customer_id: customerId,
+      file_asset_id: fileAssetId,
+      ...(orderId ? { order_id: orderId } : {}),
     })
     // Filter in-memory by date range (MedusaService's filterBy for dates is limited)
     const count = logs.filter((log: any) => {

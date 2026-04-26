@@ -12,6 +12,12 @@ import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import SearchModal from "@modules/layout/components/search-modal"
 
+const DEFAULT_PRIMARY_MENU_ITEMS = [
+  { id: "store", title: "Shop", href: "/store", target: "_self", is_visible: true },
+  { id: "courses", title: "Courses", href: "/courses", target: "_self", is_visible: true },
+  { id: "blog", title: "Journal", href: "/blog", target: "_self", is_visible: true },
+]
+
 export default async function Nav() {
   const [regions, locales, currentLocale, storeSettings, menuItems, customer] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
@@ -22,69 +28,103 @@ export default async function Nav() {
     retrieveCustomer().catch(() => null),
   ])
   const cartEnabled = storeSettings.cartEnabled
+  const primaryMenuItems = (menuItems.length ? menuItems : DEFAULT_PRIMARY_MENU_ITEMS)
+    .filter((item) => item.is_visible && item.href !== "/" && item.href !== "/account")
+    .slice(0, 5)
+  const accountLabel = customer ? "Account" : "Sign in"
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
-          <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} cartEnabled={cartEnabled} menuItems={menuItems} customerEmail={customer?.email ?? null} />
+    <div className="sticky top-0 inset-x-0 z-50">
+      <header className="border-b border-[#dac7b0] bg-[rgba(251,247,241,0.96)] shadow-[0_8px_24px_rgba(52,38,19,0.06)] backdrop-blur-xl">
+        <nav className="content-container flex min-h-[70px] items-center gap-3 py-3 text-sm text-[#34291f] lg:min-h-[78px] lg:gap-4 lg:py-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:max-w-[250px] lg:flex-none">
+            <div className="lg:hidden">
+              <SideMenu
+                regions={regions}
+                locales={locales}
+                currentLocale={currentLocale}
+                cartEnabled={cartEnabled}
+                menuItems={menuItems}
+                customerEmail={customer?.email ?? null}
+              />
             </div>
-          </div>
 
-          <div className="flex items-center h-full">
             <LocalizedClientLink
               href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
+              className="group flex min-w-0 flex-col text-[#241d16]"
               data-testid="nav-store-link"
             >
-              Medusa Store
+              <span className="truncate text-[1.02rem] font-semibold tracking-[0.12em] uppercase text-[#241d16] transition-colors group-hover:text-[#5b4631] sm:text-[1.1rem] lg:text-[1.2rem]">
+                Cross Stand
+              </span>
             </LocalizedClientLink>
           </div>
 
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <div className="hidden small:flex items-center gap-x-6 h-full">
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/courses"
-                data-testid="nav-courses-link"
-              >
-                Courses
-              </LocalizedClientLink>
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/blog"
-                data-testid="nav-blog-link"
-              >
-                Blog
-              </LocalizedClientLink>
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/account"
-                data-testid="nav-account-link"
-              >
-                Account
-              </LocalizedClientLink>
+          <div className="hidden flex-1 justify-center lg:flex">
+            <div className="flex items-center gap-1 rounded-full border border-[#deccb5] bg-white/90 px-3 py-2 shadow-[0_16px_40px_rgba(59,42,20,0.08)]">
+              {primaryMenuItems.map((item) => (
+                <LocalizedClientLink
+                  key={item.id}
+                  href={item.href}
+                  target={item.target}
+                  className="rounded-full px-4 py-2 text-[12px] font-semibold tracking-[0.18em] uppercase text-[#564430] transition-all duration-200 hover:bg-[#efe3d0] hover:text-[#211810]"
+                  data-testid={`desktop-nav-${item.id}-link`}
+                >
+                  {item.title}
+                </LocalizedClientLink>
+              ))}
             </div>
-            <SearchModal locale={currentLocale} />
+          </div>
+
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3 lg:max-w-[360px] lg:flex-none">
+            <div className="hidden items-center rounded-full border border-[#deccb5] bg-white/90 px-3 py-2 shadow-[0_12px_24px_rgba(74,53,24,0.06)] md:flex">
+              <SearchModal locale={currentLocale} />
+            </div>
+            <LocalizedClientLink
+              href="/account"
+              className="hidden rounded-full border border-[#dbc7ae] bg-white/90 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#4f3f2e] transition-colors hover:border-[#ccb695] hover:bg-[#f7efe1] sm:inline-flex"
+              data-testid="nav-account-link"
+            >
+              {accountLabel}
+            </LocalizedClientLink>
+            <div className="md:hidden">
+              <SearchModal locale={currentLocale} />
+            </div>
             {cartEnabled && (
-              <Suspense
-                fallback={
-                  <LocalizedClientLink
-                    className="hover:text-ui-fg-base flex gap-2"
-                    href="/cart"
-                    data-testid="nav-cart-link"
-                  >
-                    Cart (0)
-                  </LocalizedClientLink>
-                }
-              >
-                <CartButton />
-              </Suspense>
+              <div className="rounded-full border border-[#dbc7ae] bg-white/90 px-4 py-2 shadow-[0_12px_30px_rgba(74,53,24,0.07)]">
+                <Suspense
+                  fallback={
+                    <LocalizedClientLink
+                      className="flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.22em] text-[#4f3f2e]"
+                      href="/cart"
+                      data-testid="nav-cart-link"
+                    >
+                      Cart (0)
+                    </LocalizedClientLink>
+                  }
+                >
+                  <CartButton />
+                </Suspense>
+              </div>
             )}
           </div>
         </nav>
+
+        <div className="border-t border-[#eadbc7] bg-[#f8f2e9] lg:hidden">
+          <div className="content-container flex gap-2 overflow-x-auto py-2 pr-1 no-scrollbar">
+            {primaryMenuItems.map((item) => (
+              <LocalizedClientLink
+                key={item.id}
+                href={item.href}
+                target={item.target}
+                className="whitespace-nowrap rounded-full border border-[#e0ceb8] bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5c4a37] shadow-[0_8px_18px_rgba(74,53,24,0.04)] sm:px-4 sm:text-[11px]"
+                data-testid={`mobile-nav-${item.id}-link`}
+              >
+                {item.title}
+              </LocalizedClientLink>
+            ))}
+          </div>
+        </div>
       </header>
     </div>
   )

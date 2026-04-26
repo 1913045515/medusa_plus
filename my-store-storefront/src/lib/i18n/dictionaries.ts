@@ -227,6 +227,10 @@ export type OrderDictionary = {
   downloadExpired: string
   downloadRefreshPage: string
   downloadLegacyNotice: string
+  digitalOrderCompleted: string
+  digitalFulfillmentDelivered: string
+  digitalDeliveryTitle: string
+  digitalDeliverySummary: string
 }
 
 const orderZh: OrderDictionary = {
@@ -252,6 +256,10 @@ const orderZh: OrderDictionary = {
   downloadExpired: "下载链接已过期，请刷新页面以重新获取",
   downloadRefreshPage: "刷新页面",
   downloadLegacyNotice: "下载配置待管理员更新，请联系客服",
+  digitalOrderCompleted: "已完成",
+  digitalFulfillmentDelivered: "虚拟商品已直接送达",
+  digitalDeliveryTitle: "数字交付",
+  digitalDeliverySummary: "付款成功后即可获得数字商品访问权限，无需等待配送或发货。",
 }
 
 const orderEn: OrderDictionary = {
@@ -277,6 +285,10 @@ const orderEn: OrderDictionary = {
   downloadExpired: "Download link expired. Please refresh the page to get a new link.",
   downloadRefreshPage: "Refresh page",
   downloadLegacyNotice: "Download not yet configured. Please contact support.",
+  digitalOrderCompleted: "Completed",
+  digitalFulfillmentDelivered: "Virtual product delivered directly",
+  digitalDeliveryTitle: "Digital delivery",
+  digitalDeliverySummary: "Access is available right after successful payment. No shipping or parcel delivery is involved.",
 }
 
 const orderDictionaries: Record<string, OrderDictionary> = {
