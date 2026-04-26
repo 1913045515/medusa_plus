@@ -51,13 +51,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           href={`/products/${item.product_handle}`}
           className={clx("flex", {
             "w-16": type === "preview",
-            "small:w-24 w-12": type === "full",
+            "small:w-20 w-12": type === "full",
           })}
         >
           <Thumbnail
             thumbnail={item.thumbnail}
             images={item.variant?.product?.images}
             size="square"
+            className="!p-0 !shadow-none !bg-transparent !rounded-md"
           />
         </LocalizedClientLink>
       </Table.Cell>

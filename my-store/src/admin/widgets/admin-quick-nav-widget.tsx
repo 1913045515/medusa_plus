@@ -1,5 +1,6 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import { useState, useEffect } from "react"
+import { applySidebarCSS } from "../lib/sidebar-css"
 
 type MenuItem = {
   id: string
@@ -11,16 +12,6 @@ type MenuItem = {
   target: string
   children?: MenuItem[]
 }
-
-// Medusa built-in core routes — handled by CoreRouteSection (nav:nth-of-type(1))
-const CORE_HREFS = new Set([
-  "/app/orders",
-  "/app/products",
-  "/app/inventory",
-  "/app/customers",
-  "/app/promotions",
-  "/app/price-lists",
-])
 
 // Resolve i18n-style key like "blog.menuLabel" → friendly Chinese label
 function resolveTitle(title: string): string {
@@ -52,69 +43,9 @@ function resolveTitle(title: string): string {
 }
 
 /**
- * Apply DB-driven ordering and visibility to Medusa's native admin sidebar.
- *
- * Medusa's sidebar has two <nav> sections inside <aside>:
- *   nav:nth-of-type(1) — CoreRouteSection  (Orders / Products / Customers …)
- *   nav:nth-of-type(2) — ExtensionRouteSection  (our custom routes)
- *
- * Both sections are `display:flex; flex-direction:column` containers whose
- * direct children are `<div class="px-3">` wrappers.  Setting `order: N`
- * on those wrappers reorders them visually without touching the DOM tree.
- *
- * We use the CSS :has() pseudo-class to target each wrapper by the href of
- * the link it contains.  :has() is supported in all modern browsers.
+ * Apply DB-driven ordering and visibility to the admin sidebar.
+ * Logic moved to src/admin/lib/sidebar-css.ts (shared with menu-items page).
  */
-function applySidebarCSS(allItems: MenuItem[]) {
-  const rules: string[] = []
-
-  // ── EXTENSION items: reorder by DB sort_order ─────────────────────────────
-  // These are items whose href is NOT a core route and NOT a /settings/* path.
-  const extItems = allItems
-    .filter((i) => {
-      if (!i.href || i.href === "#") return false
-      if (CORE_HREFS.has(i.href)) return false
-      if (i.href.startsWith("/app/settings")) return false
-      return true
-    })
-    .sort((a, b) => a.sort_order - b.sort_order)
-
-  extItems.forEach((item, idx) => {
-    const safe = item.href.replace(/"/g, '\\"')
-    if (item.is_visible) {
-      // Reorder within ExtensionRouteSection's nav (nth-of-type(2))
-      rules.push(
-        `aside nav:nth-of-type(2) > div:has(a[href="${safe}"]) { order: ${idx}; }`
-      )
-    } else {
-      // Hide from sidebar
-      rules.push(
-        `aside nav:nth-of-type(2) > div:has(a[href="${safe}"]) { display: none !important; }`
-      )
-    }
-  })
-
-  // ── CORE items: only handle visibility (cannot reorder these) ─────────────
-  allItems
-    .filter((i) => i.href && CORE_HREFS.has(i.href) && !i.is_visible)
-    .forEach((item) => {
-      const safe = item.href.replace(/"/g, '\\"')
-      rules.push(
-        `aside nav:nth-of-type(1) > div:has(a[href="${safe}"]) { display: none !important; }`
-      )
-    })
-
-  // ── Inject / update the <style> element ───────────────────────────────────
-  const styleId = "__admin_sidebar_ctrl"
-  let style = document.getElementById(styleId) as HTMLStyleElement | null
-  if (!style) {
-    style = document.createElement("style")
-    style.id = styleId
-    document.head.appendChild(style)
-  }
-  style.textContent = rules.join("\n")
-}
-
 function AdminQuickNavWidget() {
   const [items, setItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -137,8 +68,10 @@ function AdminQuickNavWidget() {
         }))
         setItems(tree)
 
-        // Apply sidebar CSS overrides
+        // Apply sidebar CSS overrides immediately, then retry once after
+        // a short delay to handle any asynchronous sidebar rendering.
         applySidebarCSS(allItems)
+        setTimeout(() => applySidebarCSS(allItems), 300)
       })
       .catch(() => {})
       .finally(() => setLoading(false))

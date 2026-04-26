@@ -12,8 +12,8 @@ import {
   usePrompt,
   Input,
   Switch,
-  Tabs,
 } from "@medusajs/ui"
+import { applySidebarCSS } from "../../lib/sidebar-css"
 import {
   DndContext,
   DragOverlay,
@@ -342,7 +342,12 @@ function MenuList({ menuType }: { menuType: string }) {
     setLoading(true)
     try {
       const data = await apiFetch<{ menu_items: MenuItem[] }>(`/menu-items?type=${menuType}`)
-      setItems(buildFlatList(data.menu_items))
+      const flat = buildFlatList(data.menu_items)
+      setItems(flat)
+      // Immediately refresh sidebar CSS so reorders are visible without navigating away
+      if (menuType === "admin") {
+        applySidebarCSS(data.menu_items)
+      }
     } catch (err: any) {
       toast.error("加载失败", { description: err.message })
     } finally {
@@ -623,29 +628,15 @@ function MenuList({ menuType }: { menuType: string }) {
 }
 
 export default function MenuItemsPage() {
-  const [tab, setTab] = useState("front")
-
   return (
     <Container>
       <div className="flex items-center justify-between mb-6">
         <div>
           <Heading level="h1">Menu Management</Heading>
-          <Text className="text-ui-fg-subtle mt-1">Manage front-end and admin navigation. Drag to reorder — changes save automatically and the storefront updates immediately.</Text>
+          <Text className="text-ui-fg-subtle mt-1">Manage admin sidebar navigation. Drag to reorder — changes apply to the sidebar immediately.</Text>
         </div>
       </div>
-
-      <Tabs value={tab} onValueChange={setTab}>
-        <Tabs.List>
-          <Tabs.Trigger value="front">Front Menu</Tabs.Trigger>
-          <Tabs.Trigger value="admin">Admin Menu</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="front" className="mt-4">
-          <MenuList key="front" menuType="front" />
-        </Tabs.Content>
-        <Tabs.Content value="admin" className="mt-4">
-          <MenuList key="admin" menuType="admin" />
-        </Tabs.Content>
-      </Tabs>
+      <MenuList menuType="admin" />
     </Container>
   )
 }
