@@ -614,22 +614,38 @@ export default function LessonPlayer({
                   )}
 
                   {purchasePrompt.open && !activeLesson.is_free && (
-                    <div className="mt-4 flex items-center justify-center gap-3">
-                      <LocalizedClientLink
-                        href={purchaseHref}
-                        className="inline-flex items-center justify-center rounded-md bg-[#00aaff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0095dd]"
-                      >
-                        {dict.purchaseCourse}
-                      </LocalizedClientLink>
-                      <button
-                        className="inline-flex items-center justify-center rounded-md border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
-                        onClick={() => {
-                          setPurchasePrompt({ open: false })
-                          setAccessExpired(false)
-                        }}
-                      >
-                        {dict.cancel}
-                      </button>
+                    <div className="mt-4 flex flex-col items-center gap-3">
+                      {purchasePrompt.errorCode === "login_required" && (
+                        <p className="text-xs text-white/60 text-center max-w-xs">
+                          {dict.loginHintPurchased}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-center gap-3">
+                        {purchasePrompt.errorCode === "login_required" ? (
+                          <LocalizedClientLink
+                            href="/account"
+                            className="inline-flex items-center justify-center rounded-md bg-[#00aaff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0095dd]"
+                          >
+                            {dict.loginLink}
+                          </LocalizedClientLink>
+                        ) : (
+                          <LocalizedClientLink
+                            href={purchaseHref}
+                            className="inline-flex items-center justify-center rounded-md bg-[#00aaff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0095dd]"
+                          >
+                            {dict.purchaseCourse}
+                          </LocalizedClientLink>
+                        )}
+                        <button
+                          className="inline-flex items-center justify-center rounded-md border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
+                          onClick={() => {
+                            setPurchasePrompt({ open: false })
+                            setAccessExpired(false)
+                          }}
+                        >
+                          {dict.cancel}
+                        </button>
+                      </div>
                     </div>
                   )}
 

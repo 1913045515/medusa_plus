@@ -42,7 +42,8 @@ function renderTemplate(html: string, vars: Record<string, string>): string {
 
 function formatAmount(amount: number | null | undefined): string {
   if (amount == null) return "0.00"
-  return (amount / 100).toFixed(2)
+  // Medusa v2 prices are already in major currency units (e.g. 15 = $15.00)
+  return Number(amount).toFixed(2)
 }
 
 function buildOrderItemsHtml(items: any[]): string {
@@ -105,6 +106,7 @@ function getEmailTemplates(setting: any): EmailTemplatesConfig {
         guest_register: { ...DEFAULT_EMAIL_TEMPLATES.guest_register },
         order_placed: { ...DEFAULT_EMAIL_TEMPLATES.order_placed },
         password_reset: { ...DEFAULT_EMAIL_TEMPLATES.password_reset },
+        email_verification: { ...DEFAULT_EMAIL_TEMPLATES.email_verification },
       }
 
       // guest_register 模板必须包含 {{email}} 和 {{password}}，否则使用默认模板
@@ -155,7 +157,11 @@ export default async function orderPlacedHandler({
 
     const templates = getEmailTemplates(setting)
     const storeUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || process.env.STORE_URL || ""
+      process.env.STORE_FRONTEND_URL ||
+      process.env.STOREFRONT_URL ||
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      process.env.STORE_URL ||
+      ""
     const emailService =
       container.resolve<EmailProxyService>(EMAIL_PROXY_MODULE)
 
@@ -238,7 +244,15 @@ export default async function orderPlacedHandler({
     // 5. 构建订单商品 HTML
     const orderItemsHtml = buildOrderItemsHtml(order.items ?? [])
     const rawTotal = order.total ?? order.item_total
-    const orderTotal = formatAmount(typeof rawTotal === "string" ? parseFloat(rawTotal) : (rawTotal as number | null | undefined))
+    // Fallback: compute total from items when order.total is not populated
+    const computedTotal =
+      rawTotal != null
+        ? (typeof rawTotal === "string" ? parseFloat(rawTotal) : (rawTotal as number))
+        : (order.items ?? []).reduce((acc, item) => {
+            const subtotal = item.subtotal ?? (item.unit_price ?? 0) * (item.quantity ?? 1)
+            return acc + (typeof subtotal === "string" ? parseFloat(subtotal) : (subtotal as number))
+          }, 0)
+    const orderTotal = formatAmount(computedTotal)
     const currency = (order.currency_code ?? "").toUpperCase()
     const orderIdDisplay = order.display_id
       ? String(order.display_id)

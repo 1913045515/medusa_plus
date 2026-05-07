@@ -21,6 +21,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
   const page = sp.page ? parseInt(sp.page, 10) : 1
   const [locale, authHeaders] = await Promise.all([getLocale(), getAuthHeaders()])
   const dict = getBlogDictionary(locale)
+  const headers = authHeaders as Record<string, string>
 
   const [result, categories, tags] = await Promise.all([
     listBlogPosts({
@@ -29,9 +30,10 @@ export default async function BlogPage({ params, searchParams }: Props) {
       category_id: sp.category_id,
       tag_id: sp.tag_id,
       q: sp.q,
+      customHeaders: headers,
     }),
-    listBlogCategories(authHeaders as Record<string, string>),
-    listBlogTags(),
+    listBlogCategories(headers),
+    listBlogTags(headers),
   ])
 
   return (

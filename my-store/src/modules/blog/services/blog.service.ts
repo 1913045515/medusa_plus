@@ -96,16 +96,18 @@ export class BlogService {
         query = query.where(function () {
           this.where("p.visibility", "all")
             .orWhere(function () {
+              // Check if customer_id exists as an element in the visibility_user_ids JSONB array
               this.where("p.visibility", "user").whereRaw(
-                `p.visibility_user_ids @> ?::jsonb`,
-                [JSON.stringify([visibility_customer_id])]
+                `? = ANY(SELECT jsonb_array_elements_text(COALESCE(p.visibility_user_ids, '[]'::jsonb)))`,
+                [visibility_customer_id]
               )
             })
           if (groupIds.length > 0) {
             this.orWhere(function () {
+              // Check if any customer group intersects the visibility_group_ids JSONB array
               this.where("p.visibility", "group").whereRaw(
-                `p.visibility_group_ids && ?::jsonb`,
-                [JSON.stringify(groupIds)]
+                `EXISTS (SELECT 1 FROM jsonb_array_elements_text(COALESCE(p.visibility_group_ids, '[]'::jsonb)) AS gelem WHERE gelem = ANY(?))`,
+                [groupIds]
               )
             })
           }
@@ -120,8 +122,28 @@ export class BlogService {
     query = query.orderByRaw("p.is_pinned DESC, p.sort DESC, p.published_at DESC NULLS LAST")
 
     const offset = (page - 1) * limit
+
+    // For the count query, we need to avoid duplicates when a tag JOIN is present.
+    // Build a fresh count subquery instead of cloning the select query.
+    const countQuery = tag_id
+      ? this.knex("blog_post as p")
+          .countDistinct("p.id as total")
+          .join("blog_post_tag as pt", "pt.post_id", "p.id")
+          .where("pt.tag_id", tag_id)
+          .modify((qb) => {
+            if (!include_deleted) qb.whereNull("p.deleted_at")
+            if (status) {
+              if (Array.isArray(status)) qb.whereIn("p.status", status)
+              else qb.where("p.status", status)
+            }
+            if (category_id) qb.where("p.category_id", category_id)
+            // For tag pages, only show public posts in the count
+            qb.where("p.visibility", "all")
+          })
+      : query.clone().clearSelect().clearOrder().count("p.id as total")
+
     const [countResult, rows] = await Promise.all([
-      query.clone().clearSelect().clearOrder().count("p.id as total").first(),
+      countQuery.first(),
       query.limit(limit).offset(offset),
     ])
 
@@ -409,14 +431,43 @@ export class BlogService {
 
   // ─── CATEGORIES ────────────────────────────────────────────────────────────
 
-  async listCategories() {
+  async listCategories(opts: { visibility_customer_id?: string; visibility_group_ids?: string[] } = {}) {
     const categories = await this.knex("blog_category").orderBy("name", "asc")
-    const counts = await this.knex("blog_post")
+
+    // Build a base published-post count query that respects visibility
+    let countQuery = this.knex("blog_post")
       .where("status", "published")
       .whereNull("deleted_at")
+      .whereNotNull("category_id")
+
+    const { visibility_customer_id, visibility_group_ids = [] } = opts
+    if (visibility_customer_id) {
+      countQuery = countQuery.where(function () {
+        this.where("visibility", "all")
+          .orWhere(function () {
+            this.where("visibility", "user").whereRaw(
+              `? = ANY(SELECT jsonb_array_elements_text(COALESCE(visibility_user_ids, '[]'::jsonb)))`,
+              [visibility_customer_id]
+            )
+          })
+        if (visibility_group_ids.length > 0) {
+          this.orWhere(function () {
+            this.where("visibility", "group").whereRaw(
+              `EXISTS (SELECT 1 FROM jsonb_array_elements_text(COALESCE(visibility_group_ids, '[]'::jsonb)) AS gelem WHERE gelem = ANY(?))`,
+              [visibility_group_ids]
+            )
+          })
+        }
+      })
+    } else {
+      countQuery = countQuery.where("visibility", "all")
+    }
+
+    const counts = await countQuery
       .groupBy("category_id")
       .select("category_id")
       .count("id as count")
+
     const countMap: Record<string, number> = {}
     for (const c of counts) {
       if (c.category_id) countMap[c.category_id] = parseInt(String(c.count), 10)
@@ -462,8 +513,48 @@ export class BlogService {
 
   // ─── TAGS ──────────────────────────────────────────────────────────────────
 
-  async listTags() {
-    return this.knex("blog_tag").orderBy("name", "asc")
+  async listTags(opts: { visibility_customer_id?: string; visibility_group_ids?: string[] } = {}) {
+    const tags = await this.knex("blog_tag").orderBy("name", "asc")
+
+    // Count published posts per tag that the current viewer can see
+    const { visibility_customer_id, visibility_group_ids = [] } = opts
+    let countQuery = this.knex("blog_post_tag as pt")
+      .join("blog_post as p", "p.id", "pt.post_id")
+      .where("p.status", "published")
+      .whereNull("p.deleted_at")
+
+    if (visibility_customer_id) {
+      countQuery = countQuery.where(function () {
+        this.where("p.visibility", "all")
+          .orWhere(function () {
+            this.where("p.visibility", "user").whereRaw(
+              `? = ANY(SELECT jsonb_array_elements_text(COALESCE(p.visibility_user_ids, '[]'::jsonb)))`,
+              [visibility_customer_id]
+            )
+          })
+        if (visibility_group_ids.length > 0) {
+          this.orWhere(function () {
+            this.where("p.visibility", "group").whereRaw(
+              `EXISTS (SELECT 1 FROM jsonb_array_elements_text(COALESCE(p.visibility_group_ids, '[]'::jsonb)) AS gelem WHERE gelem = ANY(?))`,
+              [visibility_group_ids]
+            )
+          })
+        }
+      })
+    } else {
+      countQuery = countQuery.where("p.visibility", "all")
+    }
+
+    const counts = await countQuery
+      .groupBy("pt.tag_id")
+      .select("pt.tag_id")
+      .count("pt.post_id as count")
+
+    const countMap: Record<string, number> = {}
+    for (const c of counts) {
+      countMap[c.tag_id] = parseInt(String(c.count), 10)
+    }
+    return tags.map((tag: any) => ({ ...tag, post_count: countMap[tag.id] || 0 }))
   }
 
   async getTagBySlug(slug: string) {

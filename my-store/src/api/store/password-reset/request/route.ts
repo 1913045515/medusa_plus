@@ -26,7 +26,10 @@ async function getSmtpConfig(settingsService: StoreSettingsModuleService) {
   const setting = list[0]
   if (!setting || !(setting as any).email_proxy_config) return null
   try {
-    return JSON.parse((setting as any).email_proxy_config)
+    const config = JSON.parse((setting as any).email_proxy_config)
+    // 优先使用环境变量中的授权码（与其他 SMTP 调用点保持一致）
+    if (process.env.QQ_SMTP_PASS) config.pass = process.env.QQ_SMTP_PASS
+    return config
   } catch {
     return null
   }

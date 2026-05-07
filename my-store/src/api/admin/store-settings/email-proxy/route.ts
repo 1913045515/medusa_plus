@@ -17,7 +17,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
   let config: Partial<SmtpConfig> = {
     host: "smtp.qq.com",
-    port: 465,
+    port: 587,
     user: "",
     pass: "",
     fromName: "商店通知",

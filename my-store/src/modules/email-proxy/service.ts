@@ -8,15 +8,33 @@ class EmailProxyService {
       return
     }
 
-    const transporter = nodemailer.createTransport({
+    const port = config.port || 465
+    // Port 465 → implicit SSL (secure: true)
+    // Port 587 / others → STARTTLS (secure: false + requireTLS: true)
+    const isSecurePort = port === 465
+
+    const transportOptions: nodemailer.TransportOptions = {
       host: config.host,
-      port: config.port || 465,
-      secure: (config.port || 465) === 465,
+      port,
+      secure: isSecurePort,
+      requireTLS: !isSecurePort,
       auth: {
         user: config.user,
         pass: config.pass,
       },
-    })
+      // Relax TLS certificate verification & force IPv4 to avoid TLS socket drops on IPv6
+      tls: {
+        rejectUnauthorized: false,
+      },
+      // Force IPv4 — IPv6 stack on many VPS/Docker hosts causes TLS handshake failures
+      family: 4,
+      // Generous timeouts to survive high-latency networks
+      connectionTimeout: 30000,
+      greetingTimeout: 20000,
+      socketTimeout: 45000,
+    } as any
+
+    const transporter = nodemailer.createTransport(transportOptions)
 
     await transporter.sendMail({
       from: `"${config.fromName || "商店通知"}" <${config.user}>`,

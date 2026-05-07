@@ -74,11 +74,11 @@ const Login = ({ setCurrentView }: Props) => {
       </span>
       <div className="flex gap-3 mt-4 text-small-regular text-ui-fg-muted">
         <LocalizedClientLink href="/content/privacy-policy" className="underline hover:text-ui-fg-subtle">
-          隐私协议
+          {dict.privacyPolicy}
         </LocalizedClientLink>
         <span>·</span>
         <LocalizedClientLink href="/content/terms-of-use" className="underline hover:text-ui-fg-subtle">
-          用户协议
+          {dict.termsOfUse}
         </LocalizedClientLink>
       </div>
     </div>

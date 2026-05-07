@@ -79,6 +79,29 @@ export default function TicketListClient({ customerEmail, countryCode, locale }:
   const [error, setError] = useState("")
   const [, forceUpdate] = useState(0)
 
+  // Not logged in → show login prompt, hide all ticket UI
+  if (!customerEmail) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        </svg>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          {isZh(locale) ? "请先登录" : "Please log in"}
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          {isZh(locale) ? "登录后才能查看和提交工单。" : "You need to be logged in to view and submit tickets."}
+        </p>
+        <a
+          href={`/${countryCode}/account`}
+          className="inline-block bg-gray-900 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
+        >
+          {isZh(locale) ? "立即登录" : "Sign in"}
+        </a>
+      </div>
+    )
+  }
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -143,19 +166,6 @@ export default function TicketListClient({ customerEmail, countryCode, locale }:
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* Guest banner */}
-      {!customerEmail && (
-        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-center justify-between">
-          <p className="text-sm text-amber-800">{dict.guestBanner}</p>
-          <a
-            href={`/${countryCode}/account`}
-            className="ml-4 text-sm font-medium text-amber-900 underline whitespace-nowrap"
-          >
-            {dict.guestRegister}
-          </a>
-        </div>
-      )}
-
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold flex items-center gap-2">
           {dict.pageTitle}

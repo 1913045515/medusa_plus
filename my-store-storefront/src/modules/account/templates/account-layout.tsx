@@ -17,10 +17,14 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   return (
     <div className="flex-1 py-8 sm:py-12" data-testid="account-page">
       <div className="content-container flex h-full w-full flex-col gap-10">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_minmax(0,1fr)] xl:gap-12">
-          <div>{customer && <AccountNav customer={customer} />}</div>
-          <div className="min-w-0 flex-1">{children}</div>
-        </div>
+        {customer ? (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_minmax(0,1fr)] xl:gap-12">
+            <div><AccountNav customer={customer} /></div>
+            <div className="min-w-0 flex-1">{children}</div>
+          </div>
+        ) : (
+          <div className="flex justify-center">{children}</div>
+        )}
         <div className="flex flex-col gap-6 rounded-[24px] border border-[#e3d5c1] bg-white/92 px-5 py-6 shadow-[0_18px_50px_rgba(74,53,24,0.06)] sm:flex-row sm:items-end sm:justify-between sm:px-7 sm:py-8">
           <div>
             <h3 className="text-xl-semi mb-4">Got questions?</h3>

@@ -41,6 +41,9 @@ export type CoursesDictionary = {
   errorVideoUnavailable: string
   errorLessonNotFound: string
   errorCannotPlay: string
+  // Login hint for already-purchased users
+  loginHintPurchased: string
+  loginLink: string
 }
 
 const zh: CoursesDictionary = {
@@ -78,6 +81,8 @@ const zh: CoursesDictionary = {
   errorVideoUnavailable: "视频授权暂不可用，请稍后重试",
   errorLessonNotFound: "课时不存在",
   errorCannotPlay: "无法播放当前课时",
+  loginHintPurchased: "如果您已购买本课程，请登录后观看。",
+  loginLink: "立即登录",
 }
 
 const en: CoursesDictionary = {
@@ -115,6 +120,8 @@ const en: CoursesDictionary = {
   errorVideoUnavailable: "Video is temporarily unavailable. Please try again later.",
   errorLessonNotFound: "Episode not found",
   errorCannotPlay: "Unable to play this episode",
+  loginHintPurchased: "If you have already purchased this course, please log in to watch.",
+  loginLink: "Sign in",
 }
 
 const dictionaries: Record<string, CoursesDictionary> = {
@@ -355,6 +362,9 @@ export type PasswordResetDictionary = {
   signInButton: string
   notAMember: string
   joinUs: string
+  // Privacy & terms links on login page
+  privacyPolicy: string
+  termsOfUse: string
 }
 
 const prZh: PasswordResetDictionary = {
@@ -396,6 +406,8 @@ const prZh: PasswordResetDictionary = {
   signInButton: "立即登录",
   notAMember: "还没有账号？",
   joinUs: "立即注册",
+  privacyPolicy: "隐私协议",
+  termsOfUse: "用户协议",
 }
 
 const prEn: PasswordResetDictionary = {
@@ -437,6 +449,8 @@ const prEn: PasswordResetDictionary = {
   signInButton: "Sign in",
   notAMember: "Not a member?",
   joinUs: "Join us",
+  privacyPolicy: "Privacy Policy",
+  termsOfUse: "Terms of Use",
 }
 
 const prDictionaries: Record<string, PasswordResetDictionary> = {

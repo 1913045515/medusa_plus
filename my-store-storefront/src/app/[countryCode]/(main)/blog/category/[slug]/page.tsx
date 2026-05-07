@@ -14,8 +14,9 @@ export default async function BlogCategoryPage({ params, searchParams }: Props) 
   const sp = await searchParams
   const page = sp.page ? parseInt(sp.page, 10) : 1
 
-  const [authHeaders, tags, locale] = await Promise.all([getAuthHeaders(), listBlogTags(), getLocale().catch(() => null)])
-  const categories = await listBlogCategories(authHeaders as Record<string, string>)
+  const [authHeaders, locale] = await Promise.all([getAuthHeaders(), getLocale().catch(() => null)])
+  const headers = authHeaders as Record<string, string>
+  const [tags, categories] = await Promise.all([listBlogTags(headers), listBlogCategories(headers)])
   const category = categories.find((c) => c.slug === slug)
   const dict = getBlogDictionary(locale)
 
@@ -23,6 +24,7 @@ export default async function BlogCategoryPage({ params, searchParams }: Props) 
     page,
     limit: 12,
     category_id: category?.id,
+    customHeaders: headers,
   })
 
   return (

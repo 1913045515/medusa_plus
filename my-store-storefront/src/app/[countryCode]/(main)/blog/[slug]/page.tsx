@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { getBlogPost, getRelatedPosts, getAdjacentPosts, getBlogComments } from "@lib/data/blog"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getLocale } from "@lib/data/locale-actions"
+import { getAuthHeaders } from "@lib/data/cookies"
 import { getBlogDictionary } from "@lib/i18n/dictionaries"
 import BlogDetailTemplate from "@modules/blog/templates/blog-detail"
 
@@ -15,7 +16,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { slug } = await params
   const sp = await searchParams
   try {
-    const post = await getBlogPost(slug, { preview: sp.preview })
+    const authHeaders = await getAuthHeaders()
+    const post = await getBlogPost(slug, { preview: sp.preview, customHeaders: authHeaders as Record<string, string> })
     return {
       title: post.seo_title || post.title,
       description: post.seo_description || post.excerpt || undefined,
@@ -41,10 +43,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 export default async function BlogPostPage({ params, searchParams }: Props) {
   const { slug } = await params
   const sp = await searchParams
+  const authHeaders = await getAuthHeaders()
+  const headers = authHeaders as Record<string, string>
 
   let post
   try {
-    post = await getBlogPost(slug, { preview: sp.preview, password: sp.password })
+    post = await getBlogPost(slug, { preview: sp.preview, password: sp.password, customHeaders: headers })
   } catch (err: any) {
     if (err.message?.includes("403") || err.message?.includes("password")) {
       return <BlogDetailTemplate post={null} passwordProtected slug={slug} />

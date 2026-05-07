@@ -104,7 +104,8 @@ export default function TicketWidget({
     }
   }, [customerEmail])
 
-  if (!visible || isOnSupportPage) return null
+  // Hide widget entirely when user is not logged in
+  if (!visible || isOnSupportPage || !customerEmail) return null
 
   return (
     <button

@@ -16,17 +16,34 @@ function getBaseHeaders(): Record<string, string> {
   return { "x-publishable-api-key": getPublishableKey() }
 }
 
-async function backendFetch<T>(path: string, options?: RequestInit): Promise<T> {
+async function backendFetch<T>(path: string, options?: RequestInit, retries = 2): Promise<T> {
   if (!BACKEND_URL) throw new Error("Missing MEDUSA_BACKEND_URL")
-  const res = await fetch(`${BACKEND_URL}${path}`, {
-    ...options,
-    headers: { ...getBaseHeaders(), ...(options?.headers ?? {}) },
-  })
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "")
-    throw new Error(`Blog API error ${res.status}: ${txt.slice(0, 200)}`)
+  let lastErr: unknown
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(`${BACKEND_URL}${path}`, {
+        ...options,
+        headers: { ...getBaseHeaders(), ...(options?.headers ?? {}) },
+        // Use a reasonable signal timeout to avoid hanging SSR
+        signal: AbortSignal.timeout(15000),
+      })
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "")
+        throw new Error(`Blog API error ${res.status}: ${txt.slice(0, 200)}`)
+      }
+      return res.json()
+    } catch (err: unknown) {
+      lastErr = err
+      // Don't retry on 4xx errors — they are definitive
+      if (err instanceof Error && err.message.startsWith("Blog API error 4")) throw err
+      if (attempt < retries) {
+        // Brief back-off before retry
+        await new Promise((r) => setTimeout(r, 300 * (attempt + 1)))
+        continue
+      }
+    }
   }
-  return res.json()
+  throw lastErr
 }
 
 export type BlogPost = {
@@ -68,6 +85,7 @@ export type BlogTag = {
   id: string
   name: string
   slug: string
+  post_count?: number
 }
 
 export type BlogListResult = {
@@ -98,24 +116,30 @@ export async function listBlogPosts(params: {
   })
 }
 
-export async function getBlogPost(slug: string, options?: { password?: string; preview?: string }): Promise<BlogPost> {
+export async function getBlogPost(slug: string, options?: { password?: string; preview?: string; customHeaders?: Record<string, string> }): Promise<BlogPost> {
   const query = new URLSearchParams()
   if (options?.password) query.set("password", options.password)
   if (options?.preview) query.set("preview", options.preview)
   const qs = query.toString() ? `?${query}` : ""
-  return backendFetch<{ post: BlogPost }>(`/store/blogs/${slug}${qs}`, { cache: "no-store" }).then((d) => d.post)
+  return backendFetch<{ post: BlogPost }>(`/store/blogs/${slug}${qs}`, {
+    headers: options?.customHeaders,
+    cache: "no-store",
+  }).then((d) => d.post)
 }
 
 export async function listBlogCategories(customHeaders?: Record<string, string>): Promise<BlogCategory[]> {
   const data = await backendFetch<{ categories: BlogCategory[] }>("/store/blog-categories", {
     headers: customHeaders,
-    next: { revalidate: 300 },
+    cache: "no-store",
   })
   return data.categories
 }
 
-export async function listBlogTags(): Promise<BlogTag[]> {
-  const data = await backendFetch<{ tags: BlogTag[] }>("/store/blog-tags", { next: { revalidate: 300 } })
+export async function listBlogTags(customHeaders?: Record<string, string>): Promise<BlogTag[]> {
+  const data = await backendFetch<{ tags: BlogTag[] }>("/store/blog-tags", {
+    headers: customHeaders,
+    cache: "no-store",
+  })
   return data.tags
 }
 

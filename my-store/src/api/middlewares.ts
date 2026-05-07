@@ -19,6 +19,22 @@ export default defineMiddlewares({
       ],
     },
     {
+      matcher: "/store/blog-categories*",
+      middlewares: [
+        authenticate("customer", ["bearer", "session"], {
+          allowUnauthenticated: true,
+        }),
+      ],
+    },
+    {
+      matcher: "/store/blog-tags*",
+      middlewares: [
+        authenticate("customer", ["bearer", "session"], {
+          allowUnauthenticated: true,
+        }),
+      ],
+    },
+    {
       matcher: "/admin/content-pages*",
       middlewares: [
         authenticate("user", ["bearer", "session"]),

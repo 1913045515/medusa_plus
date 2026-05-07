@@ -175,7 +175,7 @@ export default function BlogListTemplate({
                         : "border-neutral-200 text-neutral-600 hover:border-blue-300 hover:text-blue-600"
                     }`}
                   >
-                    #{tag.name}
+                    #{tag.name}{typeof tag.post_count === "number" && tag.post_count > 0 ? ` (${tag.post_count})` : ""}
                   </a>
                 ))}
               </div>

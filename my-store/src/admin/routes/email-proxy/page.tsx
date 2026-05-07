@@ -38,7 +38,7 @@ type ConfigResponse = { email_proxy: SmtpConfig }
 
 const DEFAULT_CONFIG: SmtpConfig = {
   host: "smtp.qq.com",
-  port: 465,
+  port: 587,
   user: "",
   pass: "",
   fromName: "商店通知",
@@ -46,6 +46,8 @@ const DEFAULT_CONFIG: SmtpConfig = {
 
 export default function EmailProxyPage() {
   const [config, setConfig] = useState<SmtpConfig>(DEFAULT_CONFIG)
+  // 是否已有保存的授权码（API 返回 *** 代表已设置）
+  const [hasSavedPass, setHasSavedPass] = useState(false)
   const [originalConfig, setOriginalConfig] = useState<string>(JSON.stringify(DEFAULT_CONFIG))
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -54,7 +56,11 @@ export default function EmailProxyPage() {
   useEffect(() => {
     apiFetch<ConfigResponse>("/store-settings/email-proxy")
       .then((data) => {
-        const cfg = { ...DEFAULT_CONFIG, ...data.email_proxy }
+        const raw = { ...DEFAULT_CONFIG, ...data.email_proxy }
+        const passIsMasked = raw.pass === "***"
+        setHasSavedPass(passIsMasked)
+        // 展示时清空 pass，避免显示 *** 混淤用户
+        const cfg = { ...raw, pass: passIsMasked ? "" : raw.pass }
         setConfig(cfg)
         setOriginalConfig(JSON.stringify(cfg))
       })
@@ -69,11 +75,19 @@ export default function EmailProxyPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
+      // 如果用户没有输入新授权码但原先已有，发送 *** 让后端保留原存就的
+      const sendConfig = {
+        ...config,
+        pass: !config.pass && hasSavedPass ? "***" : config.pass,
+      }
       const data = await apiFetch<ConfigResponse>("/store-settings/email-proxy", {
         method: "PUT",
-        body: JSON.stringify({ email_proxy: config }),
+        body: JSON.stringify({ email_proxy: sendConfig }),
       })
-      const updated = { ...DEFAULT_CONFIG, ...data.email_proxy }
+      const raw = { ...DEFAULT_CONFIG, ...data.email_proxy }
+      const passIsMasked = raw.pass === "***"
+      setHasSavedPass(passIsMasked)
+      const updated = { ...raw, pass: passIsMasked ? "" : raw.pass }
       setConfig(updated)
       setOriginalConfig(JSON.stringify(updated))
       toast.success("邮件代理配置已保存")
@@ -87,9 +101,16 @@ export default function EmailProxyPage() {
   const handleTest = async () => {
     setTesting(true)
     try {
+      const sendConfig = {
+        ...config,
+        pass: !config.pass && hasSavedPass ? "***" : config.pass,
+      }
       const data = await apiFetch<{ success: boolean; message: string }>(
         "/store-settings/email-proxy/test",
-        { method: "POST" }
+        {
+          method: "POST",
+          body: JSON.stringify({ email_proxy: sendConfig }),
+        }
       )
       if (data.success) {
         toast.success("测试成功", { description: data.message })
@@ -103,6 +124,7 @@ export default function EmailProxyPage() {
     }
   }
 
+  // 有未保存的更改
   const isDirty = JSON.stringify(config) !== originalConfig
 
   if (loading) {
@@ -146,6 +168,9 @@ export default function EmailProxyPage() {
               onChange={(e) => handleChange("port", parseInt(e.target.value) || 465)}
               placeholder="465"
             />
+            <Text className="text-xs text-ui-fg-muted mt-1">
+              QQ 邮箱支持 465（SSL）或 587（TLS）。若 465 连接失败请改用 587。
+            </Text>
           </div>
         </div>
 
@@ -169,11 +194,16 @@ export default function EmailProxyPage() {
             type="password"
             value={config.pass}
             onChange={(e) => handleChange("pass", e.target.value)}
-            placeholder="在 QQ 邮箱 → 设置 → 账户 → 生成授权码"
+            placeholder={hasSavedPass ? "──── 授权码已设置，留空保持不变，输入新值可更换 ────" : "在 QQ 邮箱 → 设置 → 账户 → 生成授权码"}
           />
-          <Text className="text-xs text-ui-fg-muted mt-1">
-            注意：使用授权码而非 QQ 密码。可在 QQ 邮箱 → 设置 → 账户 → POP3/SMTP 服务 → 生成授权码获取。
-          </Text>
+          {hasSavedPass && !config.pass && (
+            <Text className="text-xs text-ui-fg-success mt-1">✓ 授权码已保存（出于安全不显示明文，如需更换请输入新授权码）</Text>
+          )}
+          {!hasSavedPass && (
+            <Text className="text-xs text-ui-fg-muted mt-1">
+              注意：使用授权码而非 QQ 密码。可在 QQ 邮箱 → 设置 → 账户 → POP3/SMTP 服务 → 生成授权码获取。
+            </Text>
+          )}
         </div>
 
         <div>
@@ -199,7 +229,7 @@ export default function EmailProxyPage() {
           variant="secondary"
           onClick={handleTest}
           isLoading={testing}
-          disabled={!config.host || !config.user || !config.pass}
+          disabled={!config.host || !config.user || (!config.pass && !hasSavedPass)}
         >
           发送测试邮件
         </Button>

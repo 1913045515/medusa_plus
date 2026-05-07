@@ -24,8 +24,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
   }, [order])
 
   return (
-    <div className="bg-white flex flex-col" data-testid="order-card">
-      <div className="uppercase text-large-semi mb-1">
+    <div className="flex flex-col gap-y-4 p-4" data-testid="order-card">
+      <div className="uppercase text-large-semi">
         #<span data-testid="order-display-id">{order.display_id}</span>
       </div>
       <div className="flex items-center divide-x divide-gray-200 text-small-regular text-ui-fg-base">
@@ -42,7 +42,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
           numberOfLines > 1 ? "items" : "item"
         }`}</span>
       </div>
-      <div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
+      <div className="grid grid-cols-2 small:grid-cols-4 gap-3">
         {order.items?.slice(0, 3).map((i) => {
           return (
             <div
@@ -50,16 +50,18 @@ const OrderCard = ({ order }: OrderCardProps) => {
               className="flex flex-col gap-y-2"
               data-testid="order-item"
             >
-              <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
-              <div className="flex items-center text-small-regular text-ui-fg-base">
+              <div className="rounded overflow-hidden border border-gray-100">
+                <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
+              </div>
+              <div className="flex items-center text-small-regular text-ui-fg-base flex-wrap gap-x-1">
                 <span
-                  className="text-ui-fg-base font-semibold"
+                  className="text-ui-fg-base font-semibold text-xs"
                   data-testid="item-title"
                 >
                   {i.title}
                 </span>
-                <span className="ml-2">x</span>
-                <span data-testid="item-quantity">{i.quantity}</span>
+                <span className="text-xs text-ui-fg-muted">x</span>
+                <span className="text-xs" data-testid="item-quantity">{i.quantity}</span>
               </div>
             </div>
           )
@@ -73,7 +75,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
           </div>
         )}
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-2 border-t border-gray-100">
         <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
           <Button data-testid="order-details-link" variant="secondary">
             See details
