@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top 100 Open-Source AI Projects</title>
+  <link rel="stylesheet" href="./ai-top100.css" />
+</head>
+<body class="ai-nav-page">
+
+<nav class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">AI</div>
+    <div>
+      <div>Top 100 Open-Source AI Projects</div>
+      <div class="topbar-subtitle">Future Tools style layout for global storefronts</div>
+    </div>
+  </div>
+  <div class="topbar-count">Showing <span id="totalCount">100</span> projects</div>
+</nav>
+
+<div class="main">
+  <section class="hero">
+    <h1>Top 100 Open-Source AI Projects</h1>
+    <p>A curated list of the most starred open-source AI frameworks and developer tools across LLMs, agent systems, image generation, speech, vector search, and AI infrastructure.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">100</div><div class="label">Projects</div></div>
+      <div class="hero-stat"><div class="num">8</div><div class="label">Categories</div></div>
+      <div class="hero-stat"><div class="num">2.5M+</div><div class="label">Combined Stars</div></div>
+      <div class="hero-stat"><div class="num">2026</div><div class="label">Snapshot</div></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search projects, descriptions, or categories..." oninput="filterCards()" />
+    </div>
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" onclick="filterByTag('all', this)">All</button>
+      <button class="filter-tab" onclick="filterByTag('LLM', this)">LLM</button>
+      <button class="filter-tab" onclick="filterByTag('Deep Learning', this)">Deep Learning</button>
+      <button class="filter-tab" onclick="filterByTag('Agent Systems', this)">Agent Systems</button>
+      <button class="filter-tab" onclick="filterByTag('Image Generation', this)">Image Generation</button>
+      <button class="filter-tab" onclick="filterByTag('Vector Databases', this)">Vector Databases</button>
+      <button class="filter-tab" onclick="filterByTag('Speech AI', this)">Speech AI</button>
+      <button class="filter-tab" onclick="filterByTag('RAG & Knowledge', this)">RAG & Knowledge</button>
+      <button class="filter-tab" onclick="filterByTag('AI Tooling', this)">AI Tooling</button>
+    </div>
+    <select class="sort-select" onchange="sortCards(this.value)">
+      <option value="stars">Sort by Stars</option>
+      <option value="name">Sort by Name</option>
+    </select>
+  </div>
+
+  <div class="result-bar">Showing <span id="shownCount">100</span> / 100 projects</div>
+
+  <div class="grid" id="cardGrid">
+    <div class="no-results" id="noResults">
+      <svg viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      <div>No matching projects found. Try a different keyword.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Source: <a href="https://github.com" target="_blank">GitHub</a> | Ranked by approximate star counts from the 2025-2026 snapshot</p>
+  <p style="margin-top:8px;">Star counts are estimates and should be verified against the live repositories.</p>
+</footer>
+
+<script>
+const RAW_DATA = [
+  { rank:1,  name:"TensorFlow",        org:"google",         stars:"188K", cat:"深度学习", lang:"Python", tags:["深度学习","神经网络","Google"], color:"#FF6F00", url:"https://github.com/tensorflow/tensorflow" },
+  { rank:2,  name:"PyTorch",           org:"pytorch",        stars:"83K",  cat:"深度学习", lang:"Python", tags:["深度学习","神经网络","Meta"], color:"#EE4C2C", url:"https://github.com/pytorch/pytorch" },
+  { rank:3,  name:"Keras",             org:"keras-team",     stars:"61K",  cat:"深度学习", lang:"Python", tags:["深度学习","高层API"], color:"#D00000", url:"https://github.com/keras-team/keras" },
+  { rank:4,  name:"scikit-learn",      org:"scikit-learn",   stars:"59K",  cat:"深度学习", lang:"Python", tags:["机器学习","传统ML"], color:"#F89939", url:"https://github.com/scikit-learn/scikit-learn" },
+  { rank:5,  name:"opencv",            org:"opencv",         stars:"78K",  cat:"深度学习", lang:"C++",    tags:["计算机视觉","图像处理"], color:"#5C9BD6", url:"https://github.com/opencv/opencv" },
+  { rank:6,  name:"JAX",               org:"google",         stars:"31K",  cat:"深度学习", lang:"Python", tags:["深度学习","自动微分","XLA"], color:"#4285F4", url:"https://github.com/google/jax" },
+  { rank:7,  name:"PaddlePaddle",      org:"PaddlePaddle",   stars:"22K",  cat:"深度学习", lang:"Python", tags:["深度学习","百度"], color:"#0052D9", url:"https://github.com/PaddlePaddle/Paddle" },
+  { rank:8,  name:"MXNet",             org:"apache",         stars:"20K",  cat:"深度学习", lang:"Python", tags:["深度学习","分布式"], color:"#2E75B6", url:"https://github.com/apache/mxnet" },
+  { rank:9,  name:"fastai",            org:"fastai",         stars:"25K",  cat:"深度学习", lang:"Python", tags:["深度学习","快速原型"], color:"#009688", url:"https://github.com/fastai/fastai" },
+  { rank:10, name:"DeepSpeed",         org:"microsoft",      stars:"36K",  cat:"深度学习", lang:"Python", tags:["训练优化","分布式","LLM"], color:"#0078D4", url:"https://github.com/microsoft/DeepSpeed" },
+  { rank:11, name:"transformers",      org:"huggingface",    stars:"136K", cat:"LLM", lang:"Python", tags:["LLM","NLP","预训练模型"], color:"#FFD21E", url:"https://github.com/huggingface/transformers" },
+  { rank:12, name:"llama.cpp",         org:"ggerganov",      stars:"72K",  cat:"LLM", lang:"C++",    tags:["LLM","推理","端侧"], color:"#6B48FF", url:"https://github.com/ggerganov/llama.cpp" },
+  { rank:13, name:"ollama",            org:"ollama",         stars:"96K",  cat:"LLM", lang:"Go",     tags:["LLM","本地部署","端侧"], color:"#00C896", url:"https://github.com/ollama/ollama" },
+  { rank:14, name:"whisper",           org:"openai",         stars:"68K",  cat:"语音", lang:"Python", tags:["语音识别","OpenAI","ASR"], color:"#10A37F", url:"https://github.com/openai/whisper" },
+  { rank:15, name:"vllm",              org:"vllm-project",   stars:"42K",  cat:"LLM", lang:"Python", tags:["LLM","推理","高吞吐"], color:"#7C3AED", url:"https://github.com/vllm-project/vllm" },
+  { rank:16, name:"text-generation-webui", org:"oobabooga", stars:"40K",  cat:"LLM", lang:"Python", tags:["LLM","WebUI","本地"], color:"#8B5CF6", url:"https://github.com/oobabooga/text-generation-webui" },
+  { rank:17, name:"gpt4all",           org:"nomic-ai",       stars:"70K",  cat:"LLM", lang:"C++",    tags:["LLM","本地","端侧"], color:"#059669", url:"https://github.com/nomic-ai/gpt4all" },
+  { rank:18, name:"ChatGLM",           org:"THUDM",          stars:"14K",  cat:"LLM", lang:"Python", tags:["LLM","中文","清华"], color:"#1D4ED8", url:"https://github.com/THUDM/ChatGLM-6B" },
+  { rank:19, name:"RWKV-LM",           org:"BlinkDL",        stars:"12K",  cat:"LLM", lang:"Python", tags:["LLM","RNN","高效"], color:"#DC2626", url:"https://github.com/BlinkDL/RWKV-LM" },
+  { rank:20, name:"LMDeploy",          org:"InternLM",       stars:"5K",   cat:"LLM", lang:"Python", tags:["LLM","部署","量化"], color:"#0EA5E9", url:"https://github.com/InternLM/lmdeploy" },
+  { rank:21, name:"AutoGPT",           org:"Significant-Gravitas", stars:"172K", cat:"Agent", lang:"Python", tags:["Agent","自主AI","AutoGPT"], color:"#00A67E", url:"https://github.com/Significant-Gravitas/AutoGPT" },
+  { rank:22, name:"langchain",         org:"langchain-ai",   stars:"96K",  cat:"RAG", lang:"Python", tags:["LLM","RAG","工具链","Agent"], color:"#1C7E5F", url:"https://github.com/langchain-ai/langchain" },
+  { rank:23, name:"CrewAI",            org:"crewAIInc",      stars:"26K",  cat:"Agent", lang:"Python", tags:["Agent","多Agent","协作"], color:"#F59E0B", url:"https://github.com/crewAIInc/crewAI" },
+  { rank:24, name:"autogen",           org:"microsoft",      stars:"35K",  cat:"Agent", lang:"Python", tags:["Agent","多Agent","微软"], color:"#0078D4", url:"https://github.com/microsoft/autogen" },
+  { rank:25, name:"BabyAGI",           org:"yoheinakajima",  stars:"20K",  cat:"Agent", lang:"Python", tags:["Agent","任务规划","AGI"], color:"#7C3AED", url:"https://github.com/yoheinakajima/babyagi" },
+  { rank:26, name:"agentgpt",          org:"reworkd",        stars:"31K",  cat:"Agent", lang:"TypeScript", tags:["Agent","WebUI","自主AI"], color:"#8B5CF6", url:"https://github.com/reworkd/AgentGPT" },
+  { rank:27, name:"open-interpreter",  org:"OpenInterpreter", stars:"56K", cat:"Agent", lang:"Python", tags:["Agent","代码执行","终端"], color:"#374151", url:"https://github.com/OpenInterpreter/open-interpreter" },
+  { rank:28, name:"semantic-kernel",   org:"microsoft",      stars:"23K",  cat:"Agent", lang:"C#",     tags:["Agent","SDK","微软"], color:"#0078D4", url:"https://github.com/microsoft/semantic-kernel" },
+  { rank:29, name:"smolagents",        org:"huggingface",    stars:"13K",  cat:"Agent", lang:"Python", tags:["Agent","轻量","HuggingFace"], color:"#FFD21E", url:"https://github.com/huggingface/smolagents" },
+  { rank:30, name:"phidata",           org:"phidatahq",      stars:"16K",  cat:"Agent", lang:"Python", tags:["Agent","工作流","RAG"], color:"#059669", url:"https://github.com/phidatahq/phidata" },
+  { rank:31, name:"stable-diffusion-webui", org:"AUTOMATIC1111", stars:"143K", cat:"图像生成", lang:"Python", tags:["图像生成","Stable Diffusion","WebUI"], color:"#9333EA", url:"https://github.com/AUTOMATIC1111/stable-diffusion-webui" },
+  { rank:32, name:"ComfyUI",           org:"comfyanonymous",  stars:"57K",  cat:"图像生成", lang:"Python", tags:["图像生成","节点式","工作流"], color:"#7C3AED", url:"https://github.com/comfyanonymous/ComfyUI" },
+  { rank:33, name:"ControlNet",        org:"lllyasviel",      stars:"29K",  cat:"图像生成", lang:"Python", tags:["图像生成","条件控制","扩散模型"], color:"#EC4899", url:"https://github.com/lllyasviel/ControlNet" },
+  { rank:34, name:"Real-ESRGAN",       org:"xinntao",         stars:"27K",  cat:"图像生成", lang:"Python", tags:["图像超分","图像修复","GAN"], color:"#0EA5E9", url:"https://github.com/xinntao/Real-ESRGAN" },
+  { rank:35, name:"diffusers",         org:"huggingface",     stars:"27K",  cat:"图像生成", lang:"Python", tags:["图像生成","扩散模型","HuggingFace"], color:"#FFD21E", url:"https://github.com/huggingface/diffusers" },
+  { rank:36, name:"CLIP",              org:"openai",          stars:"25K",  cat:"图像生成", lang:"Python", tags:["多模态","图文匹配","OpenAI"], color:"#10A37F", url:"https://github.com/openai/CLIP" },
+  { rank:37, name:"segment-anything",  org:"facebookresearch", stars:"48K", cat:"图像生成", lang:"Python", tags:["图像分割","SAM","Meta"], color:"#1877F2", url:"https://github.com/facebookresearch/segment-anything" },
+  { rank:38, name:"CodeFormer",        org:"sczhou",          stars:"24K",  cat:"图像生成", lang:"Python", tags:["人脸修复","图像增强","GAN"], color:"#F97316", url:"https://github.com/sczhou/CodeFormer" },
+  { rank:39, name:"Midjourney-Styles", org:"willwulfken",     stars:"11K",  cat:"图像生成", lang:"Markdown", tags:["图像生成","提示词","风格"], color:"#A855F7", url:"https://github.com/willwulfken/MidJourney-Styles-and-Keywords-Reference" },
+  { rank:40, name:"InvokeAI",          org:"invoke-ai",       stars:"24K",  cat:"图像生成", lang:"Python", tags:["图像生成","Stable Diffusion","UI"], color:"#6366F1", url:"https://github.com/invoke-ai/InvokeAI" },
+  { rank:41, name:"LlamaIndex",        org:"run-llama",       stars:"38K",  cat:"RAG", lang:"Python", tags:["RAG","数据索引","LLM"], color:"#3B82F6", url:"https://github.com/run-llama/llama_index" },
+  { rank:42, name:"Dify",              org:"langgenius",      stars:"52K",  cat:"RAG", lang:"Python", tags:["RAG","工作流","低代码","Agent"], color:"#4F46E5", url:"https://github.com/langgenius/dify" },
+  { rank:43, name:"privateGPT",        org:"zylon-ai",        stars:"53K",  cat:"RAG", lang:"Python", tags:["RAG","私有化","本地LLM"], color:"#1F2937", url:"https://github.com/zylon-ai/private-gpt" },
+  { rank:44, name:"AnythingLLM",       org:"Mintplex-Labs",   stars:"29K",  cat:"RAG", lang:"JavaScript", tags:["RAG","全能","本地"], color:"#6366F1", url:"https://github.com/Mintplex-Labs/anything-llm" },
+  { rank:45, name:"haystack",          org:"deepset-ai",      stars:"18K",  cat:"RAG", lang:"Python", tags:["RAG","NLP管道","搜索"], color:"#00B4D8", url:"https://github.com/deepset-ai/haystack" },
+  { rank:46, name:"Flowise",           org:"FlowiseAI",       stars:"32K",  cat:"RAG", lang:"JavaScript", tags:["RAG","低代码","可视化"], color:"#F59E0B", url:"https://github.com/FlowiseAI/Flowise" },
+  { rank:47, name:"txtai",             org:"neuml",           stars:"9K",   cat:"RAG", lang:"Python", tags:["RAG","语义搜索","嵌入"], color:"#10B981", url:"https://github.com/neuml/txtai" },
+  { rank:48, name:"LiteLLM",           org:"BerriAI",         stars:"17K",  cat:"工具链", lang:"Python", tags:["LLM","统一API","代理"], color:"#8B5CF6", url:"https://github.com/BerriAI/litellm" },
+  { rank:49, name:"guidance",          org:"guidance-ai",     stars:"19K",  cat:"工具链", lang:"Python", tags:["Prompt工程","结构化输出","LLM"], color:"#374151", url:"https://github.com/guidance-ai/guidance" },
+  { rank:50, name:"embedchain",        org:"mem0ai",          stars:"9K",   cat:"RAG", lang:"Python", tags:["RAG","数据接入","简易"], color:"#F97316", url:"https://github.com/mem0ai/mem0" },
+  { rank:51, name:"faiss",             org:"facebookresearch", stars:"31K", cat:"向量数据库", lang:"C++",    tags:["向量搜索","相似度","Meta"], color:"#1877F2", url:"https://github.com/facebookresearch/faiss" },
+  { rank:52, name:"chroma",            org:"chroma-core",     stars:"16K",  cat:"向量数据库", lang:"Python", tags:["向量数据库","嵌入","开源"], color:"#EC4899", url:"https://github.com/chroma-core/chroma" },
+  { rank:53, name:"qdrant",            org:"qdrant",          stars:"21K",  cat:"向量数据库", lang:"Rust",   tags:["向量数据库","高性能","Rust"], color:"#DC2626", url:"https://github.com/qdrant/qdrant" },
+  { rank:54, name:"milvus",            org:"milvus-io",       stars:"31K",  cat:"向量数据库", lang:"Go",     tags:["向量数据库","分布式","云原生"], color:"#00B5F5", url:"https://github.com/milvus-io/milvus" },
+  { rank:55, name:"weaviate",          org:"weaviate",        stars:"11K",  cat:"向量数据库", lang:"Go",     tags:["向量数据库","多模态","GraphQL"], color:"#4CAF50", url:"https://github.com/weaviate/weaviate" },
+  { rank:56, name:"pgvector",          org:"pgvector",        stars:"13K",  cat:"向量数据库", lang:"C",      tags:["向量搜索","PostgreSQL","扩展"], color:"#336791", url:"https://github.com/pgvector/pgvector" },
+  { rank:57, name:"sentence-transformers", org:"UKPLab",      stars:"16K",  cat:"向量数据库", lang:"Python", tags:["嵌入模型","语义相似度","BERT"], color:"#FFD21E", url:"https://github.com/UKPLab/sentence-transformers" },
+  { rank:58, name:"annoy",             org:"spotify",         stars:"13K",  cat:"向量数据库", lang:"C++",    tags:["向量搜索","近似近邻","Spotify"], color:"#1DB954", url:"https://github.com/spotify/annoy" },
+  { rank:59, name:"Bark",              org:"suno-ai",         stars:"36K",  cat:"语音", lang:"Python", tags:["语音合成","TTS","生成式"], color:"#7C3AED", url:"https://github.com/suno-ai/bark" },
+  { rank:60, name:"coqui-ai TTS",      org:"coqui-ai",        stars:"35K",  cat:"语音", lang:"Python", tags:["语音合成","TTS","开源"], color:"#059669", url:"https://github.com/coqui-ai/TTS" },
+  { rank:61, name:"tortoise-tts",      org:"neonbjb",         stars:"13K",  cat:"语音", lang:"Python", tags:["语音合成","声音克隆","高质量"], color:"#F97316", url:"https://github.com/neonbjb/tortoise-tts" },
+  { rank:62, name:"faster-whisper",    org:"SYSTRAN",         stars:"12K",  cat:"语音", lang:"Python", tags:["语音识别","ASR","高效"], color:"#0EA5E9", url:"https://github.com/SYSTRAN/faster-whisper" },
+  { rank:63, name:"OpenVoice",         org:"myshell-ai",      stars:"29K",  cat:"语音", lang:"Python", tags:["声音克隆","TTS","即时"], color:"#6366F1", url:"https://github.com/myshell-ai/OpenVoice" },
+  { rank:64, name:"YOLOv8",            org:"ultralytics",     stars:"34K",  cat:"深度学习", lang:"Python", tags:["目标检测","YOLO","实时"], color:"#00B4D8", url:"https://github.com/ultralytics/ultralytics" },
+  { rank:65, name:"mmdetection",       org:"open-mmlab",      stars:"29K",  cat:"深度学习", lang:"Python", tags:["目标检测","OpenMMLab","检测"], color:"#005BBB", url:"https://github.com/open-mmlab/mmdetection" },
+  { rank:66, name:"Detectron2",        org:"facebookresearch", stars:"29K", cat:"深度学习", lang:"Python", tags:["目标检测","分割","Meta"], color:"#1877F2", url:"https://github.com/facebookresearch/detectron2" },
+  { rank:67, name:"PaddleOCR",         org:"PaddlePaddle",    stars:"43K",  cat:"深度学习", lang:"Python", tags:["OCR","文字识别","多语言"], color:"#0052D9", url:"https://github.com/PaddlePaddle/PaddleOCR" },
+  { rank:68, name:"EasyOCR",           org:"JaidedAI",        stars:"22K",  cat:"深度学习", lang:"Python", tags:["OCR","文字识别","简易"], color:"#16A34A", url:"https://github.com/JaidedAI/EasyOCR" },
+  { rank:69, name:"lobe-chat",         org:"lobehub",         stars:"53K",  cat:"工具链", lang:"TypeScript", tags:["ChatUI","插件","多模态"], color:"#6C63FF", url:"https://github.com/lobehub/lobe-chat" },
+  { rank:70, name:"open-webui",        org:"open-webui",      stars:"54K",  cat:"工具链", lang:"Python", tags:["WebUI","Ollama","ChatGPT"], color:"#374151", url:"https://github.com/open-webui/open-webui" },
+  { rank:71, name:"chatbot-ui",        org:"mckaywrigley",    stars:"28K",  cat:"工具链", lang:"TypeScript", tags:["ChatUI","Next.js","克隆"], color:"#0EA5E9", url:"https://github.com/mckaywrigley/chatbot-ui" },
+  { rank:72, name:"jan",               org:"janhq",           stars:"26K",  cat:"工具链", lang:"TypeScript", tags:["本地LLM","客户端","隐私"], color:"#6366F1", url:"https://github.com/janhq/jan" },
+  { rank:73, name:"ChatGPT-Next-Web",  org:"ChatGPTNextWeb",  stars:"75K",  cat:"工具链", lang:"TypeScript", tags:["ChatUI","部署","多端"], color:"#09B37B", url:"https://github.com/ChatGPTNextWeb/NextChat" },
+  { rank:74, name:"ChuanhuChatGPT",    org:"GaiZhenbiao",     stars:"15K",  cat:"工具链", lang:"Python", tags:["ChatUI","Gradio","中文"], color:"#F59E0B", url:"https://github.com/GaiZhenbiao/ChuanhuChatGPT" },
+  { rank:75, name:"peft",              org:"huggingface",     stars:"17K",  cat:"工具链", lang:"Python", tags:["微调","LoRA","高效"], color:"#FFD21E", url:"https://github.com/huggingface/peft" },
+  { rank:76, name:"unsloth",           org:"unslothai",       stars:"20K",  cat:"工具链", lang:"Python", tags:["微调","加速","LoRA"], color:"#F97316", url:"https://github.com/unslothai/unsloth" },
+  { rank:77, name:"trl",               org:"huggingface",     stars:"10K",  cat:"工具链", lang:"Python", tags:["RLHF","强化学习","对齐"], color:"#FFD21E", url:"https://github.com/huggingface/trl" },
+  { rank:78, name:"ColossalAI",        org:"hpcaitech",       stars:"38K",  cat:"工具链", lang:"Python", tags:["分布式训练","大模型","并行"], color:"#A855F7", url:"https://github.com/hpcaitech/ColossalAI" },
+  { rank:79, name:"axolotl",           org:"OpenAccess-AI-Collective", stars:"8K", cat:"工具链", lang:"Python", tags:["微调","多模型","配置驱动"], color:"#059669", url:"https://github.com/OpenAccess-AI-Collective/axolotl" },
+  { rank:80, name:"llamafile",         org:"Mozilla-Ocho",    stars:"21K",  cat:"LLM", lang:"C",      tags:["LLM","单文件","跨平台"], color:"#FF7139", url:"https://github.com/Mozilla-Ocho/llamafile" },
+  { rank:81, name:"n8n",               org:"n8n-io",          stars:"48K",  cat:"工具链", lang:"TypeScript", tags:["工作流","自动化","低代码"], color:"#FF6D5A", url:"https://github.com/n8n-io/n8n" },
+  { rank:82, name:"aider",             org:"paul-gauthier",   stars:"19K",  cat:"工具链", lang:"Python", tags:["编程助手","代码","终端"], color:"#06B6D4", url:"https://github.com/Aider-AI/aider" },
+  { rank:83, name:"tabbyML",           org:"TabbyML",         stars:"22K",  cat:"工具链", lang:"Rust",   tags:["代码补全","自托管","AI编程"], color:"#F97316", url:"https://github.com/TabbyML/tabby" },
+  { rank:84, name:"CopilotKit",        org:"CopilotKit",      stars:"15K",  cat:"工具链", lang:"TypeScript", tags:["AI编程","React","SDK"], color:"#6366F1", url:"https://github.com/CopilotKit/CopilotKit" },
+  { rank:85, name:"minGPT",            org:"karpathy",        stars:"20K",  cat:"深度学习", lang:"Python", tags:["GPT","教学","最简实现"], color:"#374151", url:"https://github.com/karpathy/minGPT" },
+  { rank:86, name:"nanoGPT",           org:"karpathy",        stars:"36K",  cat:"深度学习", lang:"Python", tags:["GPT","训练","最简"], color:"#1F2937", url:"https://github.com/karpathy/nanoGPT" },
+  { rank:87, name:"TaskMatrix",        org:"microsoft",       stars:"34K",  cat:"Agent", lang:"Python", tags:["Agent","工具调用","API"], color:"#0078D4", url:"https://github.com/microsoft/TaskMatrix" },
+  { rank:88, name:"openai-cookbook",   org:"openai",          stars:"60K",  cat:"工具链", lang:"Jupyter", tags:["示例代码","教程","OpenAI"], color:"#10A37F", url:"https://github.com/openai/openai-cookbook" },
+  { rank:89, name:"llm-course",        org:"mlabonne",        stars:"38K",  cat:"工具链", lang:"Jupyter", tags:["课程","教程","LLM"], color:"#8B5CF6", url:"https://github.com/mlabonne/llm-course" },
+  { rank:90, name:"awesome-chatgpt-prompts", org:"f/awesome-chatgpt-prompts", stars:"119K", cat:"工具链", lang:"Markdown", tags:["提示词","ChatGPT","资源"], color:"#10A37F", url:"https://github.com/f/awesome-chatgpt-prompts" },
+  { rank:91, name:"LangGraph",         org:"langchain-ai",    stars:"9K",   cat:"Agent", lang:"Python", tags:["Agent","图工作流","状态机"], color:"#1C7E5F", url:"https://github.com/langchain-ai/langgraph" },
+  { rank:92, name:"DSPy",              org:"stanfordnlp",     stars:"19K",  cat:"工具链", lang:"Python", tags:["Prompt优化","LLM","自动化"], color:"#8B1A1A", url:"https://github.com/stanfordnlp/dspy" },
+  { rank:93, name:"LocalAI",           org:"mudler",          stars:"26K",  cat:"LLM", lang:"Go",     tags:["本地LLM","OpenAI兼容","多模态"], color:"#06B6D4", url:"https://github.com/mudler/LocalAI" },
+  { rank:94, name:"spaCy",             org:"explosion",       stars:"29K",  cat:"深度学习", lang:"Python", tags:["NLP","文本处理","工业级"], color:"#09A3D5", url:"https://github.com/explosion/spaCy" },
+  { rank:95, name:"Hugging Face Hub",  org:"huggingface",     stars:"9K",   cat:"工具链", lang:"Python", tags:["模型仓库","数据集","HuggingFace"], color:"#FFD21E", url:"https://github.com/huggingface/huggingface_hub" },
+  { rank:96, name:"instructor",        org:"jxnl",            stars:"9K",   cat:"工具链", lang:"Python", tags:["结构化输出","LLM","Pydantic"], color:"#6366F1", url:"https://github.com/jxnl/instructor" },
+  { rank:97, name:"gorilla",           org:"ShishirPatil",    stars:"11K",  cat:"Agent", lang:"Python", tags:["工具调用","API","微调"], color:"#DC2626", url:"https://github.com/ShishirPatil/gorilla" },
+  { rank:98, name:"accelerate",        org:"huggingface",     stars:"8K",   cat:"工具链", lang:"Python", tags:["分布式训练","PyTorch","多GPU"], color:"#FFD21E", url:"https://github.com/huggingface/accelerate" },
+  { rank:99, name:"OpenHands",         org:"All-Hands-AI",    stars:"45K",  cat:"Agent", lang:"Python", tags:["Agent","软件工程","代码"], color:"#374151", url:"https://github.com/All-Hands-AI/OpenHands" },
+  { rank:100, name:"Pydantic AI",      org:"pydantic",        stars:"8K",   cat:"Agent", lang:"Python", tags:["Agent","类型安全","Python"], color:"#E92063", url:"https://github.com/pydantic/pydantic-ai" }
+];
+
+const CATEGORY_MAP = {
+  "深度学习": "Deep Learning",
+  "LLM": "LLM",
+  "Agent": "Agent Systems",
+  "图像生成": "Image Generation",
+  "RAG": "RAG & Knowledge",
+  "向量数据库": "Vector Databases",
+  "语音": "Speech AI",
+  "工具链": "AI Tooling"
+};
+
+const TAG_MAP = {
+  "深度学习": "deep learning",
+  "神经网络": "neural networks",
+  "机器学习": "machine learning",
+  "传统ML": "classical ML",
+  "计算机视觉": "computer vision",
+  "图像处理": "image processing",
+  "自动微分": "automatic differentiation",
+  "分布式": "distributed training",
+  "快速原型": "rapid prototyping",
+  "训练优化": "training optimization",
+  "预训练模型": "pretrained models",
+  "推理": "inference",
+  "端侧": "edge deployment",
+  "本地部署": "local deployment",
+  "语音识别": "speech recognition",
+  "高吞吐": "high throughput",
+  "本地": "local use",
+  "中文": "Chinese support",
+  "高效": "efficiency",
+  "部署": "deployment",
+  "量化": "quantization",
+  "自主AI": "autonomous AI",
+  "多Agent": "multi-agent orchestration",
+  "协作": "collaboration",
+  "任务规划": "task planning",
+  "代码执行": "code execution",
+  "终端": "terminal workflows",
+  "轻量": "lightweight design",
+  "工作流": "workflows",
+  "图像生成": "image generation",
+  "节点式": "node-based workflows",
+  "条件控制": "conditioning",
+  "扩散模型": "diffusion models",
+  "图像超分": "super resolution",
+  "图像修复": "restoration",
+  "多模态": "multimodal",
+  "图文匹配": "vision-language",
+  "图像分割": "segmentation",
+  "人脸修复": "face restoration",
+  "提示词": "prompts",
+  "风格": "styles",
+  "数据索引": "data indexing",
+  "低代码": "low-code",
+  "私有化": "private deployment",
+  "本地LLM": "local LLMs",
+  "全能": "all-in-one",
+  "NLP管道": "NLP pipelines",
+  "搜索": "search",
+  "可视化": "visual builders",
+  "语义搜索": "semantic search",
+  "嵌入": "embeddings",
+  "统一API": "unified APIs",
+  "代理": "proxying",
+  "Prompt工程": "prompt engineering",
+  "结构化输出": "structured outputs",
+  "数据接入": "data ingestion",
+  "向量搜索": "vector search",
+  "相似度": "similarity search",
+  "高性能": "high performance",
+  "云原生": "cloud native",
+  "扩展": "extension",
+  "嵌入模型": "embedding models",
+  "语义相似度": "semantic similarity",
+  "近似近邻": "ANN",
+  "语音合成": "speech synthesis",
+  "生成式": "generative audio",
+  "声音克隆": "voice cloning",
+  "高质量": "high quality",
+  "即时": "instant cloning",
+  "目标检测": "object detection",
+  "实时": "real-time",
+  "检测": "detection",
+  "文字识别": "text recognition",
+  "多语言": "multilingual",
+  "简易": "easy setup",
+  "插件": "plugins",
+  "克隆": "clone starter",
+  "隐私": "privacy",
+  "多端": "cross-platform",
+  "微调": "fine-tuning",
+  "强化学习": "reinforcement learning",
+  "对齐": "alignment",
+  "大模型": "large models",
+  "并行": "parallelism",
+  "单文件": "single file",
+  "跨平台": "cross-platform",
+  "自动化": "automation",
+  "编程助手": "coding assistant",
+  "代码": "code",
+  "代码补全": "code completion",
+  "自托管": "self-hosted",
+  "AI编程": "AI coding",
+  "教学": "education",
+  "最简实现": "minimal implementation",
+  "教程": "tutorials",
+  "课程": "courses",
+  "图工作流": "graph workflows",
+  "状态机": "state machines",
+  "Prompt优化": "prompt optimization",
+  "模型仓库": "model hub",
+  "数据集": "datasets",
+  "工具调用": "tool use"
+};
+
+function buildEnglishDescription(project) {
+  const category = CATEGORY_MAP[project.cat] || project.cat;
+  const tags = (project.tags || []).slice(0, 2).map((tag) => TAG_MAP[tag] || tag).join(", ");
+  return `${category} project by ${project.org}${tags ? ` focused on ${tags}` : ""}.`;
+}
+
+const DATA = RAW_DATA.map((project) => ({
+  ...project,
+  displayCategory: CATEGORY_MAP[project.cat] || project.cat,
+  displayTags: (project.tags || []).map((tag) => TAG_MAP[tag] || tag),
+  displayDesc: buildEnglishDescription(project)
+}));
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+const starSVG = `<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>`;
+const ghSVG = `<svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>`;
+
+function renderCards(arr) {
+  const grid = document.getElementById('cardGrid');
+  const noRes = document.getElementById('noResults');
+  Array.from(grid.children).forEach((child) => {
+    if (child.id !== 'noResults') {
+      child.remove();
+    }
+  });
+
+  if (arr.length === 0) {
+    noRes.style.display = 'flex';
+    noRes.style.flexDirection = 'column';
+    noRes.style.alignItems = 'center';
+    document.getElementById('shownCount').textContent = 0;
+    return;
+  }
+
+  noRes.style.display = 'none';
+  document.getElementById('shownCount').textContent = arr.length;
+
+  arr.forEach((project) => {
+    const isTop3 = project.rank <= 3;
+    const rgb = hexToRgb(project.color);
+    const initials = project.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase();
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = project.url;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
+    card.innerHTML = `
+      <div class="rank-badge ${isTop3 ? 'top3' : ''}">
+        ${isTop3 ? `Top ${project.rank}` : `#${project.rank}`}
+      </div>
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,rgba(${rgb},1),rgba(${rgb},0.7))">
+          ${initials}
+        </div>
+        <div class="card-meta">
+          <div class="card-name">${project.name}</div>
+          <div class="card-org">${project.org}</div>
+        </div>
+      </div>
+      <div class="card-desc">${project.displayDesc}</div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="tag">${project.displayCategory}</span>
+          <span class="tag lang">${project.lang}</span>
+        </div>
+        <div class="card-stars">${starSVG}${project.stars}</div>
+      </div>
+      <div class="card-github-link">${ghSVG} View on GitHub</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+let activeTag = 'all';
+let currentSort = 'stars';
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let arr = DATA.slice();
+
+  if (activeTag !== 'all') {
+    arr = arr.filter((project) => project.displayCategory === activeTag || project.displayTags.includes(activeTag));
+  }
+
+  if (q) {
+    arr = arr.filter((project) =>
+      project.name.toLowerCase().includes(q) ||
+      project.org.toLowerCase().includes(q) ||
+      project.displayDesc.toLowerCase().includes(q) ||
+      project.displayCategory.toLowerCase().includes(q) ||
+      project.displayTags.join(' ').toLowerCase().includes(q)
+    );
+  }
+
+  if (currentSort === 'name') {
+    arr.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return arr;
+}
+
+function filterCards() {
+  renderCards(getFiltered());
+}
+
+function filterByTag(tag, el) {
+  activeTag = tag;
+  document.querySelectorAll('.filter-tab').forEach((button) => button.classList.remove('active'));
+  el.classList.add('active');
+  filterCards();
+}
+
+function sortCards(val) {
+  currentSort = val;
+  filterCards();
+}
+
+renderCards(DATA);
+</script>
+</body>
+</html>

@@ -92,7 +92,16 @@ const JS_URL_ATTR_REGEX = /\s(href|src|xlink:href|formaction)\s*=\s*(["'])\s*jav
 function sanitizeTemplateHtml(html?: string | null): string {
   return (html ?? "")
     .replace(SCRIPT_TAG_REGEX, "")
-    .replace(STYLE_TAG_REGEX, "")
+    .replace(STYLE_TAG_REGEX, (match) => {
+      const openTagEnd = match.indexOf(">") + 1
+      const closeTagStart = match.lastIndexOf("</style>")
+      const innerCss = match.slice(openTagEnd, closeTagStart)
+      const sanitizedInner = innerCss
+        .replace(/@import\s+[^;]+;?/gi, "")
+        .replace(/expression\s*\(/gi, "(")
+        .replace(/javascript\s*:/gi, "")
+      return `<style>${sanitizedInner}</style>`
+    })
     .replace(EVENT_HANDLER_ATTR_REGEX, "")
     .replace(JS_URL_ATTR_REGEX, ' $1="#"')
     .trim()

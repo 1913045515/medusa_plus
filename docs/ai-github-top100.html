@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Top 100 AI Open Source Projects on GitHub</title>
+<style>
+:root{
+  --bg:#07090f;
+  --surf:#0f1420;
+  --surf2:#161d2e;
+  --bdr:#1e2840;
+  --bdr2:#2a3a58;
+  --accent:#4f8ef7;
+  --violet:#8b5cf6;
+  --cyan:#06b6d4;
+  --green:#10b981;
+  --orange:#f97316;
+  --pink:#ec4899;
+  --gold:#f59e0b;
+  --red:#ef4444;
+  --text:#dde4f0;
+  --text2:#7a8aaa;
+  --text3:#3d4f6e;
+  --r:10px;
+  --trans:.15s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body.gh100{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;line-height:1.5;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ── TOP BAR ── */
+.gh-bar{position:sticky;top:0;z-index:100;background:rgba(7,9,15,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);height:52px;padding:0 28px;display:flex;align-items:center;justify-content:space-between}
+.gh-brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700}
+.gh-logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--violet));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff}
+.gh-counts{display:flex;gap:16px;font-size:12px;color:var(--text2)}
+.gh-badge{padding:2px 9px;border-radius:12px;font-weight:600;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.22);color:var(--accent)}
+
+/* ── HERO ── */
+.gh-hero{text-align:center;padding:52px 28px 40px;background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(79,142,247,.1) 0%,transparent 65%);border-bottom:1px solid var(--bdr)}
+.gh-hero h1{font-size:clamp(24px,4.5vw,46px);font-weight:800;letter-spacing:-.5px;line-height:1.15;margin-bottom:10px;background:linear-gradient(140deg,#e8edf8 35%,var(--violet) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gh-hero p{font-size:15px;color:var(--text2);max-width:660px;margin:0 auto 28px}
+.gh-kpi{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.gh-kpi-item .kn{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gh-kpi-item .kl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* ── NAV PILLS ── */
+.gh-nav{display:flex;overflow-x:auto;gap:8px;padding:18px 28px 0;border-bottom:1px solid var(--bdr);scrollbar-width:none}
+.gh-nav::-webkit-scrollbar{display:none}
+.gh-nav a{white-space:nowrap;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--bdr);color:var(--text2);transition:all var(--trans)}
+.gh-nav a:hover{border-color:var(--accent);color:var(--text)}
+
+/* ── MAIN ── */
+.gh-main{max-width:1640px;margin:0 auto;padding:40px 24px 80px;display:flex;flex-direction:column;gap:48px}
+
+/* ── SECTION ── */
+.gh-sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.gh-sec-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.gh-sec-title{font-size:17px;font-weight:700;color:var(--text)}
+.gh-sec-sub{font-size:12px;color:var(--text3);margin-left:4px}
+.gh-sec-count{margin-left:auto;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;background:var(--surf);border:1px solid var(--bdr);color:var(--text2)}
+
+/* ── GRID ── */
+.gh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+
+/* ── CARD ── */
+.gh-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;transition:border-color var(--trans),background var(--trans),transform var(--trans),box-shadow var(--trans)}
+.gh-card:hover{background:var(--surf2);border-color:var(--bdr2);transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,0,0,.4)}
+.gh-card-bar{position:absolute;top:0;left:0;right:0;height:1.5px;opacity:0;transition:opacity var(--trans)}
+.gh-card:hover .gh-card-bar{opacity:1}
+
+/* ── CARD HEAD ── */
+.gh-ch{display:flex;align-items:center;gap:9px}
+.gh-icon{width:36px;height:36px;min-width:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:rgba(255,255,255,.92);letter-spacing:-.3px}
+.gh-meta{flex:1;min-width:0}
+.gh-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-org{font-size:11px;color:var(--text3);margin-top:1px}
+.gh-rank{font-size:10px;font-weight:700;color:var(--text3);flex-shrink:0}
+.gh-rank.gold{color:var(--gold)}
+.gh-rank.silver{color:#94a3b8}
+
+/* ── CARD BODY ── */
+.gh-desc{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ── CARD FOOT ── */
+.gh-cf{display:flex;align-items:center;justify-content:space-between;padding-top:7px;border-top:1px solid var(--bdr);margin-top:auto;gap:6px;flex-wrap:wrap}
+.gh-tags{display:flex;gap:4px;flex-wrap:wrap}
+.gh-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px}
+.tlang{background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.18)}
+.gh-stars{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--gold);flex-shrink:0}
+.gh-repo{font-size:10px;color:var(--text3);transition:color var(--trans);display:flex;align-items:center;gap:3px}
+.gh-repo:hover{color:var(--accent)}
+
+/* ══════════════ PER-CATEGORY COLORS ══════════════ */
+/* ML Framework — amber */
+.cat-ml .gh-card-bar{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.cat-ml .gh-icon{background:linear-gradient(135deg,#92400e,#b45309)}
+.cat-ml .gh-sec-icon{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);color:#fbbf24}
+/* LLM — violet */
+.cat-llm .gh-card-bar{background:linear-gradient(90deg,#6d28d9,#a78bfa)}
+.cat-llm .gh-icon{background:linear-gradient(135deg,#4c1d95,#7c3aed)}
+.cat-llm .gh-sec-icon{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa}
+/* Agents — cyan */
+.cat-agent .gh-card-bar{background:linear-gradient(90deg,#0891b2,#06b6d4)}
+.cat-agent .gh-icon{background:linear-gradient(135deg,#155e75,#0891b2)}
+.cat-agent .gh-sec-icon{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.2);color:#22d3ee}
+/* Image — pink-orange */
+.cat-img .gh-card-bar{background:linear-gradient(90deg,#be185d,#f97316)}
+.cat-img .gh-icon{background:linear-gradient(135deg,#9d174d,#c2410c)}
+.cat-img .gh-sec-icon{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.2);color:#fb923c}
+/* Voice — sky */
+.cat-voice .gh-card-bar{background:linear-gradient(90deg,#0369a1,#38bdf8)}
+.cat-voice .gh-icon{background:linear-gradient(135deg,#075985,#0284c7)}
+.cat-voice .gh-sec-icon{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);color:#38bdf8}
+/* Code — green */
+.cat-code .gh-card-bar{background:linear-gradient(90deg,#15803d,#4ade80)}
+.cat-code .gh-icon{background:linear-gradient(135deg,#14532d,#15803d)}
+.cat-code .gh-sec-icon{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);color:#34d399}
+/* RAG — purple-pink */
+.cat-rag .gh-card-bar{background:linear-gradient(90deg,#7c3aed,#ec4899)}
+.cat-rag .gh-icon{background:linear-gradient(135deg,#581c87,#be185d)}
+.cat-rag .gh-sec-icon{background:rgba(236,72,153,.12);border:1px solid rgba(236,72,153,.2);color:#f472b6}
+/* AI Tools — red-orange */
+.cat-tool .gh-card-bar{background:linear-gradient(90deg,#b91c1c,#f97316)}
+.cat-tool .gh-icon{background:linear-gradient(135deg,#7f1d1d,#b91c1c)}
+.cat-tool .gh-sec-icon{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);color:#f87171}
+
+/* ── FOOTER ── */
+.gh-footer{text-align:center;padding:32px 20px;color:var(--text3);font-size:12px;border-top:1px solid var(--bdr);margin-top:20px}
+.gh-footer a{color:var(--accent)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.gh-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
+@media(max-width:720px){.gh-main{padding:24px 14px 60px;gap:36px}.gh-bar{padding:0 16px}.gh-nav{padding:14px 16px 0}.gh-hero{padding:36px 16px 28px}.gh-grid{grid-template-columns:1fr 1fr;gap:9px}}
+@media(max-width:420px){.gh-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="gh100">
+
+<header class="gh-bar">
+  <div class="gh-brand">
+    <div class="gh-logo">AI</div>
+    Top 100 AI Open Source
+  </div>
+  <div class="gh-counts">
+    <span class="gh-badge">100 Projects · 8 Categories</span>
+    <span>Updated 2025</span>
+  </div>
+</header>
+
+<section class="gh-hero">
+  <h1>100 Most-Starred AI &amp;<br>ML Open Source Repos</h1>
+  <p>Curated by GitHub star count — frameworks, agents, LLMs, image generation, voice, code assistants, RAG, and developer tooling, organized by category.</p>
+  <div class="gh-kpi">
+    <div class="gh-kpi-item"><div class="kn">100</div><div class="kl">Projects</div></div>
+    <div class="gh-kpi-item"><div class="kn">8</div><div class="kl">Categories</div></div>
+    <div class="gh-kpi-item"><div class="kn">5M+</div><div class="kl">Total Stars</div></div>
+    <div class="gh-kpi-item"><div class="kn">2025</div><div class="kl">Updated</div></div>
+  </div>
+</section>
+
+<nav class="gh-nav" aria-label="Jump to category">
+  <a href="#sec-tool">AI Tooling</a>
+  <a href="#sec-agent">AI Agents</a>
+  <a href="#sec-llm">LLM &amp; Models</a>
+  <a href="#sec-img">Image Gen</a>
+  <a href="#sec-voice">Voice &amp; Audio</a>
+  <a href="#sec-ml">ML Frameworks</a>
+  <a href="#sec-rag">RAG &amp; Search</a>
+  <a href="#sec-code">Code AI</a>
+</nav>
+
+<main class="gh-main">
+
+<!-- ══════════════════════════════════════════
+     AI TOOLING  (sorted by ★ desc)
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-tool" id="sec-tool">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🛠</div>
+    <span class="gh-sec-title">AI Tooling</span>
+    <span class="gh-sec-sub">Platforms, SDKs &amp; productivity tools</span>
+    <span class="gh-sec-count">13 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">AP</div>
+        <div class="gh-meta"><div class="gh-name">awesome-chatgpt-prompts</div><div class="gh-org">f · Community</div></div>
+        <span class="gh-rank gold">★ 108k</span>
+      </div>
+      <div class="gh-desc">Curated collection of the best ChatGPT prompt examples and personas for developers and power users.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Markdown</span></div>
+        <a href="https://github.com/f/awesome-chatgpt-prompts" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">GA</div>
+        <div class="gh-meta"><div class="gh-name">GPT Academic</div><div class="gh-org">binary-husky</div></div>
+        <span class="gh-rank gold">★ 65k</span>
+      </div>
+      <div class="gh-desc">LLM-enhanced academic research interface with paper reading, code editing, and LaTeX support.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/binary-husky/gpt_academic" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">DF</div>
+        <div class="gh-meta"><div class="gh-name">Dify</div><div class="gh-org">Dify AI</div></div>
+        <span class="gh-rank gold">★ 61k</span>
+      </div>
+      <div class="gh-desc">Open-source LLM app development platform with visual orchestration, RAG pipeline, and model hub.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">TypeScript</span></div>
+        <a href="https://github.com/langgenius/dify" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">N8</div>
+        <div class="gh-meta"><div class="gh-name">n8n</div><div class="gh-org">n8n-io</div></div>
+        <span class="gh-rank">★ 47k</span>
+      </div>
+      <div class="gh-desc">Extendable workflow automation with 200+ integrations, AI nodes, and self-hosting support.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">TypeScript</span></div>
+        <a href="https://github.com/n8n-io/n8n" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">LB</div>
+        <div class="gh-meta"><div class="gh-name">LobeChat</div><div class="gh-org">LobeHub</div></div>
+        <span class="gh-rank">★ 47k</span>
+      </div>
+      <div class="gh-desc">Modern AI chat framework with plugin marketplace, vision, TTS, and multi-model support.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">TypeScript</span></div>
+        <a href="https://github.com/lobehub/lobe-chat" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">CC</div>
+        <div class="gh-meta"><div class="gh-name">Langchain-Chatchat</div><div class="gh-org">ChatChat Space</div></div>
+        <span class="gh-rank">★ 33k</span>
+      </div>
+      <div class="gh-desc">Local private knowledge Q&amp;A system combining LangChain with local LLMs for enterprise use.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/chatchat-space/Langchain-Chatchat" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">OP</div>
+        <div class="gh-meta"><div class="gh-name">OpenAI Python SDK</div><div class="gh-org">OpenAI</div></div>
+        <span class="gh-rank">★ 22k</span>
+      </div>
+      <div class="gh-desc">Official Python library for the OpenAI API with async support, streaming, and typed responses.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/openai/openai-python" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">HY</div>
+        <div class="gh-meta"><div class="gh-name">Haystack</div><div class="gh-org">deepset</div></div>
+        <span class="gh-rank">★ 17k</span>
+      </div>
+      <div class="gh-desc">End-to-end NLP framework for building custom Q&amp;A, document search, and RAG pipelines.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/deepset-ai/haystack" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">LL</div>
+        <div class="gh-meta"><div class="gh-name">LiteLLM</div><div class="gh-org">BerriAI</div></div>
+        <span class="gh-rank">★ 16k</span>
+      </div>
+      <div class="gh-desc">Call 100+ LLM APIs using the OpenAI input/output format with one unified Python SDK.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/BerriAI/litellm" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">EV</div>
+        <div class="gh-meta"><div class="gh-name">OpenAI Evals</div><div class="gh-org">OpenAI</div></div>
+        <span class="gh-rank">★ 14k</span>
+      </div>
+      <div class="gh-desc">Framework for evaluating LLMs and LLM systems with built-in and custom evaluation metrics.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/openai/evals" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">GD</div>
+        <div class="gh-meta"><div class="gh-name">Guidance</div><div class="gh-org">Microsoft</div></div>
+        <span class="gh-rank">★ 18k</span>
+      </div>
+      <div class="gh-desc">Constrained LLM generation with templates, output validation, and structured response control.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/guidance-ai/guidance" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">PF</div>
+        <div class="gh-meta"><div class="gh-name">PromptFlow</div><div class="gh-org">Microsoft</div></div>
+        <span class="gh-rank">★ 9.4k</span>
+      </div>
+      <div class="gh-desc">Build, evaluate, and deploy high-quality LLM flows from prototype to production with monitoring.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/microsoft/promptflow" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch">
+        <div class="gh-icon">PE</div>
+        <div class="gh-meta"><div class="gh-name">PEFT</div><div class="gh-org">Hugging Face</div></div>
+        <span class="gh-rank">★ 16k</span>
+      </div>
+      <div class="gh-desc">Parameter-efficient fine-tuning: LoRA, Prefix Tuning, P-Tuning for large pretrained models.</div>
+      <div class="gh-cf">
+        <div class="gh-tags"><span class="gh-tag tlang">Python</span></div>
+        <a href="https://github.com/huggingface/peft" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     AI AGENTS
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-agent" id="sec-agent">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🤖</div>
+    <span class="gh-sec-title">AI Agents</span>
+    <span class="gh-sec-sub">Autonomous agents, multi-agent frameworks &amp; orchestration</span>
+    <span class="gh-sec-count">15 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">AG</div><div class="gh-meta"><div class="gh-name">AutoGPT</div><div class="gh-org">Significant Gravitas</div></div><span class="gh-rank gold">★ 167k</span></div>
+      <div class="gh-desc">Experimental autonomous AI agent that chains GPT calls to accomplish complex long-horizon tasks without human input.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/Significant-Gravitas/AutoGPT" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">LC</div><div class="gh-meta"><div class="gh-name">LangChain</div><div class="gh-org">LangChain AI</div></div><span class="gh-rank gold">★ 92k</span></div>
+      <div class="gh-desc">Build context-aware reasoning applications with LLMs using chains, agents, tools, and memory modules.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/langchain-ai/langchain" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">OI</div><div class="gh-meta"><div class="gh-name">Open Interpreter</div><div class="gh-org">Open Interpreter</div></div><span class="gh-rank gold">★ 55k</span></div>
+      <div class="gh-desc">LLM-powered terminal that writes and runs code locally — a natural-language interface to your computer.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/OpenInterpreter/open-interpreter" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">MG</div><div class="gh-meta"><div class="gh-name">MetaGPT</div><div class="gh-org">geekan</div></div><span class="gh-rank">★ 44k</span></div>
+      <div class="gh-desc">Multi-agent LLM framework assigning PM, architect, and engineer roles to build complete software projects.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/geekan/MetaGPT" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">AU</div><div class="gh-meta"><div class="gh-name">AutoGen</div><div class="gh-org">Microsoft</div></div><span class="gh-rank">★ 34k</span></div>
+      <div class="gh-desc">Enable next-generation LLM applications via multi-agent conversations with human-in-the-loop support.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/microsoft/autogen" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">OH</div><div class="gh-meta"><div class="gh-name">OpenHands</div><div class="gh-org">All Hands AI</div></div><span class="gh-rank">★ 34k</span></div>
+      <div class="gh-desc">Platform for autonomous AI software agents that can write, edit, run, debug, and browse the web.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/All-Hands-AI/OpenHands" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">HG</div><div class="gh-meta"><div class="gh-name">HuggingGPT (JARVIS)</div><div class="gh-org">Microsoft</div></div><span class="gh-rank">★ 24k</span></div>
+      <div class="gh-desc">Connect ChatGPT with hundreds of Hugging Face expert models to solve complex AI tasks step-by-step.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/microsoft/JARVIS" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">CD</div><div class="gh-meta"><div class="gh-name">ChatDev</div><div class="gh-org">OpenBMB</div></div><span class="gh-rank">★ 26k</span></div>
+      <div class="gh-desc">Communicative agents for software development — LLM-powered team of PM, developer, and QA tester.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/OpenBMB/ChatDev" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">SK</div><div class="gh-meta"><div class="gh-name">Semantic Kernel</div><div class="gh-org">Microsoft</div></div><span class="gh-rank">★ 22k</span></div>
+      <div class="gh-desc">SDK integrating LLMs into .NET, Python, and Java apps with plugins, planners, and memory.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">C#</span></div><a href="https://github.com/microsoft/semantic-kernel" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">CA</div><div class="gh-meta"><div class="gh-name">CrewAI</div><div class="gh-org">CrewAI Inc</div></div><span class="gh-rank">★ 22k</span></div>
+      <div class="gh-desc">Framework for orchestrating role-based autonomous AI agent teams for complex collaborative tasks.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/crewAIInc/crewAI" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">SW</div><div class="gh-meta"><div class="gh-name">Swarm</div><div class="gh-org">OpenAI</div></div><span class="gh-rank">★ 17k</span></div>
+      <div class="gh-desc">Lightweight, experimental multi-agent orchestration framework for educational purposes from OpenAI.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/openai/swarm" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">PH</div><div class="gh-meta"><div class="gh-name">Phidata</div><div class="gh-org">Phidata HQ</div></div><span class="gh-rank">★ 15k</span></div>
+      <div class="gh-desc">Build AI assistants with memory, knowledge, tools, and reasoning from a unified agent framework.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/phidatahq/phidata" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">SV</div><div class="gh-meta"><div class="gh-name">Skyvern</div><div class="gh-org">Skyvern AI</div></div><span class="gh-rank">★ 9k</span></div>
+      <div class="gh-desc">Automate browser workflows using LLMs and computer vision — no brittle CSS selectors needed.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/Skyvern-AI/skyvern" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">CM</div><div class="gh-meta"><div class="gh-name">CAMEL</div><div class="gh-org">CAMEL AI</div></div><span class="gh-rank">★ 6k</span></div>
+      <div class="gh-desc">Communicative Agents for Mind Exploration — role-playing multi-agent framework for LLM cooperation.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/camel-ai/camel" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+    <div class="gh-card">
+      <div class="gh-card-bar"></div>
+      <div class="gh-ch"><div class="gh-icon">LK</div><div class="gh-meta"><div class="gh-name">LiveKit Agents</div><div class="gh-org">LiveKit</div></div><span class="gh-rank">★ 5k</span></div>
+      <div class="gh-desc">Build real-time multimodal voice and video AI agents with production-ready WebRTC infrastructure.</div>
+      <div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/livekit/agents" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     LLM & MODELS
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-llm" id="sec-llm">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🧠</div>
+    <span class="gh-sec-title">LLM &amp; Models</span>
+    <span class="gh-sec-sub">Large language model repos, serving engines &amp; fine-tuning</span>
+    <span class="gh-sec-count">30 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">HF</div><div class="gh-meta"><div class="gh-name">Transformers</div><div class="gh-org">Hugging Face</div></div><span class="gh-rank gold">★ 131k</span></div><div class="gh-desc">State-of-the-art pretrained models for NLP, vision, and audio on PyTorch, TensorFlow, and JAX.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/huggingface/transformers" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">OL</div><div class="gh-meta"><div class="gh-name">Ollama</div><div class="gh-org">Ollama</div></div><span class="gh-rank gold">★ 95k</span></div><div class="gh-desc">Run Llama 3, Mistral, Gemma, and 80+ large language models locally with a single command.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Go</span></div><a href="https://github.com/ollama/ollama" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">G4</div><div class="gh-meta"><div class="gh-name">GPT4All</div><div class="gh-org">Nomic AI</div></div><span class="gh-rank gold">★ 70k</span></div><div class="gh-desc">Run private, no-internet LLMs locally on CPU and GPU — privacy-first AI assistant for everyone.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">C++</span></div><a href="https://github.com/nomic-ai/gpt4all" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LC</div><div class="gh-meta"><div class="gh-name">llama.cpp</div><div class="gh-org">ggerganov</div></div><span class="gh-rank gold">★ 66k</span></div><div class="gh-desc">LLM inference in pure C/C++ with quantization — runs Llama, Mistral, and Gemma on CPU with no GPU.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">C++</span></div><a href="https://github.com/ggerganov/llama.cpp" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LL</div><div class="gh-meta"><div class="gh-name">LLaMA</div><div class="gh-org">Meta AI</div></div><span class="gh-rank">★ 57k</span></div><div class="gh-desc">Open foundation language model from Meta — 7B to 65B parameters for research and production use.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/facebookresearch/llama" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CG</div><div class="gh-meta"><div class="gh-name">ChatGLM-6B</div><div class="gh-org">THUDM</div></div><span class="gh-rank">★ 40k</span></div><div class="gh-desc">Bilingual Chinese-English dialogue language model based on the General Language Model architecture.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/THUDM/ChatGLM-6B" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">NG</div><div class="gh-meta"><div class="gh-name">nanoGPT</div><div class="gh-org">karpathy</div></div><span class="gh-rank">★ 37k</span></div><div class="gh-desc">Minimal, fast GPT-2 training and inference codebase — the simplest, fastest repo for training medium-size GPTs.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/karpathy/nanoGPT" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">FC</div><div class="gh-meta"><div class="gh-name">FastChat</div><div class="gh-org">LMSYS Org</div></div><span class="gh-rank">★ 36k</span></div><div class="gh-desc">Open platform for training, serving, and evaluating LLMs — home of Vicuna and Chatbot Arena.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/lm-sys/FastChat" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LF</div><div class="gh-meta"><div class="gh-name">LLaMA-Factory</div><div class="gh-org">hiyouga</div></div><span class="gh-rank">★ 35k</span></div><div class="gh-desc">Unified fine-tuning framework for 100+ LLMs with LoRA, QLoRA, full-parameter, and RLHF support.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/hiyouga/LLaMA-Factory" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">VL</div><div class="gh-meta"><div class="gh-name">vLLM</div><div class="gh-org">vLLM Project</div></div><span class="gh-rank">★ 35k</span></div><div class="gh-desc">High-throughput, memory-efficient LLM inference and serving engine powered by PagedAttention.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/vllm-project/vllm" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LC</div><div class="gh-meta"><div class="gh-name">llm.c</div><div class="gh-org">karpathy</div></div><span class="gh-rank">★ 28k</span></div><div class="gh-desc">LLM training in pure C and CUDA with no PyTorch dependency — fast, educational GPT-2 implementation.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">C</span></div><a href="https://github.com/karpathy/llm.c" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">L3</div><div class="gh-meta"><div class="gh-name">LLaMA 3</div><div class="gh-org">Meta AI</div></div><span class="gh-rank">★ 26k</span></div><div class="gh-desc">Next-generation open foundation models from Meta with 8B, 70B, and 405B parameter variants.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/meta-llama/llama3" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LA</div><div class="gh-meta"><div class="gh-name">LocalAI</div><div class="gh-org">mudler</div></div><span class="gh-rank">★ 24k</span></div><div class="gh-desc">Free, open-source OpenAI-compatible local inference server for LLMs, image, and audio generation.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Go</span></div><a href="https://github.com/mudler/LocalAI" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">US</div><div class="gh-meta"><div class="gh-name">Unsloth</div><div class="gh-org">unslothai</div></div><span class="gh-rank">★ 22k</span></div><div class="gh-desc">Finetune LLMs 2× faster with 50% less VRAM — Llama 3, Mistral, Gemma with no accuracy loss.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/unslothai/unsloth" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MG</div><div class="gh-meta"><div class="gh-name">minGPT</div><div class="gh-org">karpathy</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">Clean, minimal PyTorch re-implementation of GPT training — ~300 lines, pure education-first codebase.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/karpathy/minGPT" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LV</div><div class="gh-meta"><div class="gh-name">LLaVA</div><div class="gh-org">haotian-liu</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">Visual instruction tuning for large multimodal models — connects CLIP vision encoder with language models.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/haotian-liu/LLaVA" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">Q2</div><div class="gh-meta"><div class="gh-name">Qwen 2</div><div class="gh-org">Alibaba QwenLM</div></div><span class="gh-rank">★ 14k</span></div><div class="gh-desc">Series of open language models from Alibaba with strong multilingual and coding capabilities.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/QwenLM/Qwen2" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MB</div><div class="gh-meta"><div class="gh-name">Mamba</div><div class="gh-org">State Spaces</div></div><span class="gh-rank">★ 12k</span></div><div class="gh-desc">Linear-time sequence model with selective state spaces — a compelling alternative to Transformers at scale.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/state-spaces/mamba" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">OL</div><div class="gh-meta"><div class="gh-name">OpenLLM</div><div class="gh-org">BentoML</div></div><span class="gh-rank">★ 10k</span></div><div class="gh-desc">Run any open-source LLM as an OpenAI-compatible REST API server with easy local and cloud deployment.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/bentoml/OpenLLM" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LP</div><div class="gh-meta"><div class="gh-name">llama-cpp-python</div><div class="gh-org">abetlen</div></div><span class="gh-rank">★ 9k</span></div><div class="gh-desc">Python bindings for llama.cpp — run local LLMs with an OpenAI-compatible Python API.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/abetlen/llama-cpp-python" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MI</div><div class="gh-meta"><div class="gh-name">Mistral</div><div class="gh-org">Mistral AI</div></div><span class="gh-rank">★ 9k</span></div><div class="gh-desc">Reference implementation of Mistral 7B — an efficient, high-performance open-weights language model.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/mistralai/mistral-src" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MN</div><div class="gh-meta"><div class="gh-name">MiniCPM</div><div class="gh-org">OpenBMB</div></div><span class="gh-rank">★ 8k</span></div><div class="gh-desc">Edge-capable language models with strong performance for mobile and IoT — small but mighty LLMs.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/OpenBMB/MiniCPM" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TI</div><div class="gh-meta"><div class="gh-name">TGI</div><div class="gh-org">Hugging Face</div></div><span class="gh-rank">★ 8k</span></div><div class="gh-desc">Production-grade toolkit for deploying and serving Large Language Models at scale with low latency.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Rust</span></div><a href="https://github.com/huggingface/text-generation-inference" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">DV</div><div class="gh-meta"><div class="gh-name">DeepSeek-V2</div><div class="gh-org">DeepSeek AI</div></div><span class="gh-rank">★ 8k</span></div><div class="gh-desc">Mixture-of-Experts language model — 236B total parameters, 21B active, strong and economical inference.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/deepseek-ai/DeepSeek-V2" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">GN</div><div class="gh-meta"><div class="gh-name">GPT-NeoX</div><div class="gh-org">EleutherAI</div></div><span class="gh-rank">★ 7k</span></div><div class="gh-desc">20B parameter autoregressive language model trained on the Pile dataset — open and fully replicable.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/EleutherAI/gpt-neox" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">IV</div><div class="gh-meta"><div class="gh-name">InternVL</div><div class="gh-org">OpenGVLab</div></div><span class="gh-rank">★ 6k</span></div><div class="gh-desc">Vision-language foundation models matching closed-source GPT-4V performance on major visual benchmarks.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/OpenGVLab/InternVL" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">P3</div><div class="gh-meta"><div class="gh-name">Phi-3 CookBook</div><div class="gh-org">Microsoft</div></div><span class="gh-rank">★ 5k</span></div><div class="gh-desc">Samples and guides for Microsoft's Phi-3 small language models — fine-tuning, inference, and deployment.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/microsoft/Phi-3CookBook" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">GM</div><div class="gh-meta"><div class="gh-name">Gemma PyTorch</div><div class="gh-org">Google</div></div><span class="gh-rank">★ 5k</span></div><div class="gh-desc">Lightweight open models built with Gemini research — capable yet compact LLMs for diverse use cases.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/google/gemma_pytorch" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">QV</div><div class="gh-meta"><div class="gh-name">Qwen-VL</div><div class="gh-org">Alibaba QwenLM</div></div><span class="gh-rank">★ 4k</span></div><div class="gh-desc">Large vision-language model supporting image, text, and multi-region visual understanding and generation.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/QwenLM/Qwen-VL" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TT</div><div class="gh-meta"><div class="gh-name">TorchTune</div><div class="gh-org">PyTorch</div></div><span class="gh-rank">★ 4k</span></div><div class="gh-desc">PyTorch-native library for fine-tuning and experimenting with LLMs using simple, modular APIs.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/pytorch/torchtune" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">G4</div><div class="gh-meta"><div class="gh-name">GLM-4</div><div class="gh-org">THUDM</div></div><span class="gh-rank">★ 4k</span></div><div class="gh-desc">General language model with all-tools capability — function calling, code, browsing, and image understanding.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/THUDM/GLM-4" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     IMAGE GENERATION
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-img" id="sec-img">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🎨</div>
+    <span class="gh-sec-title">Image Generation</span>
+    <span class="gh-sec-sub">Diffusion models, visual AI &amp; creative tools</span>
+    <span class="gh-sec-count">8 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">SD</div><div class="gh-meta"><div class="gh-name">SD WebUI</div><div class="gh-org">AUTOMATIC1111</div></div><span class="gh-rank gold">★ 141k</span></div><div class="gh-desc">Feature-rich browser interface for Stable Diffusion with extensions, scripts, and advanced controls.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CU</div><div class="gh-meta"><div class="gh-name">ComfyUI</div><div class="gh-org">comfyanonymous</div></div><span class="gh-rank gold">★ 59k</span></div><div class="gh-desc">Powerful modular node-based UI for Stable Diffusion workflows with custom extension support.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/comfyanonymous/ComfyUI" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">SB</div><div class="gh-meta"><div class="gh-name">Stable Diffusion</div><div class="gh-org">Stability AI</div></div><span class="gh-rank gold">★ 37k</span></div><div class="gh-desc">Latent text-to-image diffusion model for high-resolution photorealistic image synthesis from text prompts.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/Stability-AI/stablediffusion" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CN</div><div class="gh-meta"><div class="gh-name">ControlNet</div><div class="gh-org">lllyasviel</div></div><span class="gh-rank">★ 29k</span></div><div class="gh-desc">Neural network for adding spatial conditioning controls to Stable Diffusion via auxiliary encoders.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/lllyasviel/ControlNet" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">RE</div><div class="gh-meta"><div class="gh-name">Real-ESRGAN</div><div class="gh-org">xinntao</div></div><span class="gh-rank">★ 28k</span></div><div class="gh-desc">Practical algorithms for general real-world image and video super-resolution using enhanced ESRGAN.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/xinntao/Real-ESRGAN" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">DI</div><div class="gh-meta"><div class="gh-name">Diffusers</div><div class="gh-org">Hugging Face</div></div><span class="gh-rank">★ 25k</span></div><div class="gh-desc">State-of-the-art diffusion model library for image, audio, and 3D generation — training and inference.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/huggingface/diffusers" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">IV</div><div class="gh-meta"><div class="gh-name">InvokeAI</div><div class="gh-org">InvokeAI</div></div><span class="gh-rank">★ 23k</span></div><div class="gh-desc">Professional Stable Diffusion toolkit for creatives with a node editor, canvas, and custom workflows.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/invoke-ai/InvokeAI" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CV</div><div class="gh-meta"><div class="gh-name">CogVideo</div><div class="gh-org">THUDM</div></div><span class="gh-rank">★ 7k</span></div><div class="gh-desc">Large-scale text-to-video generation model pre-trained on billions of text-video aligned pairs.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/THUDM/CogVideo" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     VOICE & AUDIO
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-voice" id="sec-voice">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🎙</div>
+    <span class="gh-sec-title">Voice &amp; Audio</span>
+    <span class="gh-sec-sub">Speech recognition, TTS, and voice cloning</span>
+    <span class="gh-sec-count">8 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">WH</div><div class="gh-meta"><div class="gh-name">Whisper</div><div class="gh-org">OpenAI</div></div><span class="gh-rank gold">★ 72k</span></div><div class="gh-desc">Robust general-purpose speech recognition trained on 680,000 hours of multilingual web audio data.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/openai/whisper" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">GS</div><div class="gh-meta"><div class="gh-name">GPT-SoVITS</div><div class="gh-org">RVC-Boss</div></div><span class="gh-rank gold">★ 37k</span></div><div class="gh-desc">1-minute voice cloning with few-shot zero-shot TTS — fine-tune your own voice model quickly and easily.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/RVC-Boss/GPT-SoVITS" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">WC</div><div class="gh-meta"><div class="gh-name">whisper.cpp</div><div class="gh-org">ggerganov</div></div><span class="gh-rank">★ 35k</span></div><div class="gh-desc">High-performance C/C++ port of OpenAI Whisper enabling real-time, on-device speech transcription.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">C++</span></div><a href="https://github.com/ggerganov/whisper.cpp" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CT</div><div class="gh-meta"><div class="gh-name">Coqui TTS</div><div class="gh-org">Coqui AI</div></div><span class="gh-rank">★ 35k</span></div><div class="gh-desc">Deep learning text-to-speech toolkit with 1,100+ pretrained models and dozens of supported languages.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/coqui-ai/TTS" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">BK</div><div class="gh-meta"><div class="gh-name">Bark</div><div class="gh-org">Suno AI</div></div><span class="gh-rank">★ 34k</span></div><div class="gh-desc">Text-prompted generative audio model producing voice, music, sound effects, and multilingual speech.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/suno-ai/bark" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">OV</div><div class="gh-meta"><div class="gh-name">OpenVoice</div><div class="gh-org">MyShell AI</div></div><span class="gh-rank">★ 29k</span></div><div class="gh-desc">Instant, flexible voice cloning with precise tone, style, and language control for diverse speakers.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/myshell-ai/OpenVoice" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TT</div><div class="gh-meta"><div class="gh-name">Tortoise TTS</div><div class="gh-org">neonbjb</div></div><span class="gh-rank">★ 12k</span></div><div class="gh-desc">Multi-voice TTS system producing remarkably realistic speech — slow but exceptional audio quality output.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/neonbjb/tortoise-tts" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">AM</div><div class="gh-meta"><div class="gh-name">Amphion</div><div class="gh-org">OpenMMLab</div></div><span class="gh-rank">★ 7k</span></div><div class="gh-desc">Open-source audio, music, and speech generation toolkit providing a unified research platform.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/open-mmlab/Amphion" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ML FRAMEWORKS
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-ml" id="sec-ml">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">⚙️</div>
+    <span class="gh-sec-title">ML Frameworks</span>
+    <span class="gh-sec-sub">Core training, distributed computing &amp; scientific ML</span>
+    <span class="gh-sec-count">11 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TF</div><div class="gh-meta"><div class="gh-name">TensorFlow</div><div class="gh-org">Google</div></div><span class="gh-rank gold">★ 185k</span></div><div class="gh-desc">End-to-end open source ML platform for training and deploying models across every environment and device.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/tensorflow/tensorflow" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">PT</div><div class="gh-meta"><div class="gh-name">PyTorch</div><div class="gh-org">Meta AI</div></div><span class="gh-rank gold">★ 82k</span></div><div class="gh-desc">Tensors and dynamic neural networks with strong GPU acceleration — the go-to deep learning framework.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/pytorch/pytorch" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">DS</div><div class="gh-meta"><div class="gh-name">DeepSpeed</div><div class="gh-org">Microsoft</div></div><span class="gh-rank">★ 34k</span></div><div class="gh-desc">Deep learning optimization library enabling training of 100B+ parameter models with extreme efficiency.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/microsoft/DeepSpeed" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">RY</div><div class="gh-meta"><div class="gh-name">Ray</div><div class="gh-org">Anyscale</div></div><span class="gh-rank">★ 32k</span></div><div class="gh-desc">Unified framework for scaling AI and Python applications from a laptop to a large distributed cluster.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/ray-project/ray" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">JX</div><div class="gh-meta"><div class="gh-name">JAX</div><div class="gh-org">Google</div></div><span class="gh-rank">★ 29k</span></div><div class="gh-desc">Composable NumPy transformations — autograd, JIT compilation, VMAP, and PMAP on CPUs, GPUs, and TPUs.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/google/jax" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TG</div><div class="gh-meta"><div class="gh-name">tinygrad</div><div class="gh-org">tinygrad</div></div><span class="gh-rank">★ 26k</span></div><div class="gh-desc">Simple deep learning framework with a ~1000-line Python core — for learning and fast inference on edge.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/tinygrad/tinygrad" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MF</div><div class="gh-meta"><div class="gh-name">MLflow</div><div class="gh-org">MLflow</div></div><span class="gh-rank">★ 18k</span></div><div class="gh-desc">Open-source platform for the full ML lifecycle — experiment tracking, model registry, and deployment.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/mlflow/mlflow" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">AF</div><div class="gh-meta"><div class="gh-name">AlphaFold</div><div class="gh-org">Google DeepMind</div></div><span class="gh-rank">★ 12k</span></div><div class="gh-desc">AI system predicting protein 3D structures with near-atomic accuracy — a landmark biology breakthrough.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/google-deepmind/alphafold" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TR</div><div class="gh-meta"><div class="gh-name">Triton</div><div class="gh-org">OpenAI</div></div><span class="gh-rank">★ 12k</span></div><div class="gh-desc">A language and compiler for writing highly efficient custom GPU kernels without requiring CUDA expertise.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/openai/triton" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">AC</div><div class="gh-meta"><div class="gh-name">Accelerate</div><div class="gh-org">Hugging Face</div></div><span class="gh-rank">★ 8k</span></div><div class="gh-desc">Run PyTorch training on any distributed configuration with minimal code change and maximum performance.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/huggingface/accelerate" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">FX</div><div class="gh-meta"><div class="gh-name">Flax</div><div class="gh-org">Google</div></div><span class="gh-rank">★ 6k</span></div><div class="gh-desc">Neural network library built on JAX — focused on flexibility and performance for deep learning research.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/google/flax" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     RAG & SEARCH
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-rag" id="sec-rag">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">🔍</div>
+    <span class="gh-sec-title">RAG &amp; Vector Search</span>
+    <span class="gh-sec-sub">Retrieval-augmented generation, vector databases &amp; document Q&amp;A</span>
+    <span class="gh-sec-count">9 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">PG</div><div class="gh-meta"><div class="gh-name">PrivateGPT</div><div class="gh-org">imartinez</div></div><span class="gh-rank gold">★ 53k</span></div><div class="gh-desc">Ask questions to your documents using LLMs locally — full privacy, no data ever leaves your machine.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/zylon-ai/private-gpt" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LI</div><div class="gh-meta"><div class="gh-name">LlamaIndex</div><div class="gh-org">LlamaIndex</div></div><span class="gh-rank gold">★ 36k</span></div><div class="gh-desc">Data framework for connecting LLMs to external knowledge, databases, and structured data sources.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/run-llama/llama_index" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">MV</div><div class="gh-meta"><div class="gh-name">Milvus</div><div class="gh-org">Milvus</div></div><span class="gh-rank">★ 31k</span></div><div class="gh-desc">Cloud-native vector database built for scalable similarity search and AI-powered application backends.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Go</span></div><a href="https://github.com/milvus-io/milvus" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">LG</div><div class="gh-meta"><div class="gh-name">LocalGPT</div><div class="gh-org">PromtEngineer</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">Chat privately with your local documents using LLMs — zero data leaves your device at any time.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/PromtEngineer/localGPT" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">KT</div><div class="gh-meta"><div class="gh-name">Kotaemon</div><div class="gh-org">Cinnamon</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">Clean, customizable RAG-based UI for chatting with your documents — easy to self-host and extend.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/Cinnamon/kotaemon" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">RP</div><div class="gh-meta"><div class="gh-name">ChatGPT Retrieval Plugin</div><div class="gh-org">OpenAI</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">ChatGPT plugin enabling semantic document search using various vector database backends.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/openai/chatgpt-retrieval-plugin" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">QD</div><div class="gh-meta"><div class="gh-name">Qdrant</div><div class="gh-org">Qdrant</div></div><span class="gh-rank">★ 20k</span></div><div class="gh-desc">Vector database and search engine built in Rust — designed for high performance AI application backends.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Rust</span></div><a href="https://github.com/qdrant/qdrant" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CH</div><div class="gh-meta"><div class="gh-name">Chroma</div><div class="gh-org">Chroma</div></div><span class="gh-rank">★ 16k</span></div><div class="gh-desc">Open-source AI-native embedding database for building LLM apps with blazing-fast semantic retrieval.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/chroma-core/chroma" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">WV</div><div class="gh-meta"><div class="gh-name">Weaviate</div><div class="gh-org">Weaviate</div></div><span class="gh-rank">★ 11k</span></div><div class="gh-desc">Open-source ML-native vector database — store objects and vectors for semantic search and RAG pipelines.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Go</span></div><a href="https://github.com/weaviate/weaviate" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CODE AI
+══════════════════════════════════════════ -->
+<section class="gh-sec cat-code" id="sec-code">
+  <div class="gh-sec-head">
+    <div class="gh-sec-icon">💻</div>
+    <span class="gh-sec-title">Code AI</span>
+    <span class="gh-sec-sub">AI coding assistants, code search &amp; completion</span>
+    <span class="gh-sec-count">4 repos</span>
+  </div>
+  <div class="gh-grid">
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">TB</div><div class="gh-meta"><div class="gh-name">Tabby</div><div class="gh-org">TabbyML</div></div><span class="gh-rank gold">★ 22k</span></div><div class="gh-desc">Self-hosted, open-source AI coding assistant — a privacy-friendly GitHub Copilot alternative you own.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Rust</span></div><a href="https://github.com/TabbyML/tabby" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">CO</div><div class="gh-meta"><div class="gh-name">Continue</div><div class="gh-org">Continue Dev</div></div><span class="gh-rank">★ 18k</span></div><div class="gh-desc">Open-source AI code assistant integrating deeply into VS Code and JetBrains with any LLM backend.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">TypeScript</span></div><a href="https://github.com/continuedev/continue" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">DS</div><div class="gh-meta"><div class="gh-name">DeepSeek-Coder</div><div class="gh-org">DeepSeek AI</div></div><span class="gh-rank">★ 12k</span></div><div class="gh-desc">Code-focused LLM trained on 2T tokens of code and natural language — strong fill-in-the-middle performance.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Python</span></div><a href="https://github.com/deepseek-ai/DeepSeek-Coder" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+    <div class="gh-card"><div class="gh-card-bar"></div><div class="gh-ch"><div class="gh-icon">BP</div><div class="gh-meta"><div class="gh-name">Bloop</div><div class="gh-org">Bloop AI</div></div><span class="gh-rank">★ 10k</span></div><div class="gh-desc">AI-powered code search and navigation — search your entire codebase using natural language queries.</div><div class="gh-cf"><div class="gh-tags"><span class="gh-tag tlang">Rust</span></div><a href="https://github.com/BloopAI/bloop" class="gh-repo" target="_blank" rel="noopener">↗ GitHub</a></div></div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="gh-footer">
+  <p>Star counts are approximate as of 2025 · Data sourced from public GitHub repositories</p>
+  <p style="margin-top:5px">Built for the open source AI community · <a href="https://github.com" target="_blank" rel="noopener">GitHub</a></p>
+</footer>
+
+</body>
+</html>

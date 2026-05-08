@@ -89,17 +89,18 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 function sanitizeTemplateHtml(html?: string | null): string {
   return (html ?? "")
     .replace(SCRIPT_TAG_REGEX, "")
-    .replace(STYLE_TAG_REGEX, "")
+    .replace(STYLE_TAG_REGEX, (match) => {
+      const openTagEnd = match.indexOf(">") + 1
+      const closeTagStart = match.lastIndexOf("</style>")
+      const innerCss = match.slice(openTagEnd, closeTagStart)
+      const sanitizedInner = innerCss
+        .replace(/@import\s+[^;]+;?/gi, "")
+        .replace(/expression\s*\(/gi, "(")
+        .replace(/javascript\s*:/gi, "")
+      return `<style>${sanitizedInner}</style>`
+    })
     .replace(EVENT_HANDLER_ATTR_REGEX, "")
     .replace(JS_URL_ATTR_REGEX, ' $1="#"')
-    .trim()
-}
-
-function sanitizeTemplateCss(css?: string | null): string {
-  return (css ?? "")
-    .replace(/@import\s+[^;]+;?/gi, "")
-    .replace(/expression\s*\(/gi, "(")
-    .replace(/javascript\s*:/gi, "")
     .trim()
 }
 
@@ -143,12 +144,7 @@ const HomepageEditorPage = () => {
     () => sanitizeTemplateHtml(template.template.html),
     [template.template.html]
   )
-  const sanitizedCss = useMemo(
-    () => sanitizeTemplateCss(template.template.css),
-    [template.template.css]
-  )
   const htmlAdjusted = sanitizedHtml !== template.template.html.trim()
-  const cssAdjusted = sanitizedCss !== template.template.css.trim()
   const isLegacyRecord = Boolean(selectedRecord && selectedRecord.content?.render_mode !== "static_html")
 
   const syncEditor = useCallback((record: HomepageRecord | null) => {
@@ -563,7 +559,7 @@ const HomepageEditorPage = () => {
           <Container className="p-6">
             <Heading level="h2">{t("homepageEditor.htmlTemplate")}</Heading>
             <Text className="txt-small text-ui-fg-subtle mt-2">
-              {t("homepageEditor.htmlDescription")}
+              {t("homepageEditor.htmlDescription")} CSS 样式可以直接通过 <code>&lt;style&gt;</code> 标签内嵌在 HTML 中，无需单独配置。
             </Text>
             <div className="mt-4 flex flex-col gap-2">
               <Label htmlFor="template-html">HTML</Label>
@@ -582,27 +578,7 @@ const HomepageEditorPage = () => {
             </div>
           </Container>
 
-          <Container className="p-6">
-            <Heading level="h2">{t("homepageEditor.templateStyles")}</Heading>
-            <Text className="txt-small text-ui-fg-subtle mt-2">
-              {t("homepageEditor.cssDescription")}
-            </Text>
-            <div className="mt-4 flex flex-col gap-2">
-              <Label htmlFor="template-css">CSS</Label>
-              <Textarea
-                id="template-css"
-                rows={12}
-                value={template.template.css}
-                onChange={(e) =>
-                  setTemplate((prev) => ({
-                    ...prev,
-                    template: { ...prev.template, css: e.target.value },
-                  }))
-                }
-                disabled={!selectedRecord}
-              />
-            </div>
-          </Container>
+
         </div>
 
         <Container className="p-6 h-fit sticky top-6">
@@ -618,12 +594,10 @@ const HomepageEditorPage = () => {
 
           <div className="mt-4 grid gap-3">
             {htmlAdjusted ? <Badge color="orange">{t("homepageEditor.htmlSanitized")}</Badge> : null}
-            {cssAdjusted ? <Badge color="orange">{t("homepageEditor.cssSanitized")}</Badge> : null}
             {!sanitizedHtml ? <Badge color="red">{t("homepageEditor.noHtml")}</Badge> : null}
           </div>
 
           <div className="mt-4 rounded-2xl overflow-hidden border border-ui-border-base bg-ui-bg-base">
-            {sanitizedCss ? <style dangerouslySetInnerHTML={{ __html: sanitizedCss }} /> : null}
             <div className="min-h-[480px] bg-ui-bg-subtle p-4">
               {sanitizedHtml ? (
                 <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
