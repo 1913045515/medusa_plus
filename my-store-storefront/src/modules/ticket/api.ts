@@ -36,8 +36,13 @@ export function setGuestToken(token: string): void {
   localStorage.setItem(GUEST_TOKEN_KEY, token)
 }
 
-function getBackendUrl(): string {
-  return process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+// All ticket API calls go through /api/tickets/* proxy so that the
+// Next.js route handler can forward the _medusa_jwt cookie as an
+// Authorization: Bearer header to the Medusa backend.
+// This is necessary because the _medusa_jwt cookie is scoped to the
+// storefront domain and is not sent to the backend (different origin).
+function getApiBase(): string {
+  return "/api/tickets"
 }
 
 function getPublishableKey(): string {
@@ -49,12 +54,11 @@ function getPublishableKey(): string {
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${getBackendUrl()}${path}`, {
+  const res = await fetch(`${getApiBase()}${path}`, {
     ...options,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "x-publishable-api-key": getPublishableKey(),
       ...(options?.headers ?? {}),
     },
   })
@@ -76,13 +80,13 @@ export async function listTickets(params: {
   if (params.guest_token) query.set("guest_token", params.guest_token)
   if (params.status) query.set("status", params.status)
   if (params.page) query.set("page", String(params.page))
-  return apiFetch(`/store/tickets?${query}`)
+  return apiFetch(`?${query}`)
 }
 
 export async function createTicket(
   input: CreateTicketInput
 ): Promise<{ ticket: Ticket; guest_token?: string }> {
-  return apiFetch("/store/tickets", {
+  return apiFetch("", {
     method: "POST",
     body: JSON.stringify(input),
   })
@@ -92,7 +96,7 @@ export async function getTicket(
   id: string,
   guestToken?: string | null
 ): Promise<{ ticket: Ticket; messages: TicketMessage[] }> {
-  return apiFetch(`/store/tickets/${id}`)
+  return apiFetch(`/${id}`)
 }
 
 export async function sendMessage(
@@ -100,14 +104,14 @@ export async function sendMessage(
   content: string,
   guestToken?: string | null
 ): Promise<{ message: TicketMessage }> {
-  return apiFetch(`/store/tickets/${ticketId}/messages`, {
+  return apiFetch(`/${ticketId}/messages`, {
     method: "POST",
     body: JSON.stringify({ content, guest_token: guestToken }),
   })
 }
 
 export async function closeTicket(id: string): Promise<{ ticket: Ticket }> {
-  return apiFetch(`/store/tickets/${id}`, {
+  return apiFetch(`/${id}`, {
     method: "PATCH",
     body: JSON.stringify({ status: "closed" }),
   })
@@ -117,7 +121,7 @@ export async function migrateGuestTickets(
   guestToken: string,
   customerEmail: string
 ): Promise<{ migrated: number }> {
-  return apiFetch("/store/tickets/migrate", {
+  return apiFetch("/migrate", {
     method: "POST",
     body: JSON.stringify({ guest_token: guestToken, customer_email: customerEmail }),
   })

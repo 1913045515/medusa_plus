@@ -1,0 +1,118 @@
+<!-- AI 导航首页（海外风格，模块化，适配 Tailwind 设计系统） -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Tools Navigation</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* 额外自定义样式（如需） */
+    .ai-card {
+      @apply rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow duration-200;
+    }
+    .ai-section {
+      @apply mb-12;
+    }
+    .ai-section-title {
+      @apply text-2xl font-bold mb-6 text-gray-800;
+    }
+    .ai-link {
+      @apply text-blue-600 hover:underline;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="content-container max-w-6xl mx-auto px-4 py-10">
+    <!-- Hero Banner -->
+    <section class="ai-section flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-8 mb-12">
+      <div class="mb-6 md:mb-0 md:w-2/3">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Discover the Best AI Tools</h1>
+        <p class="text-lg text-gray-700 mb-6">Curated collection of the most powerful and innovative AI tools for productivity, creativity, and business. Explore, compare, and find the right AI solution for your needs.</p>
+        <a href="#featured" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition">Explore Featured Tools</a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="AI Illustration" class="w-64 h-48 object-cover rounded-xl shadow-md" />
+    </section>
+
+    <!-- Categories Grid -->
+    <section class="ai-section">
+      <h2 class="ai-section-title">Categories</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <a href="#chatbots" class="ai-card flex flex-col items-center p-6">
+          <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Chatbots" class="w-12 h-12 mb-3" />
+          <span class="font-medium text-gray-800">Chatbots</span>
+        </a>
+        <a href="#image" class="ai-card flex flex-col items-center p-6">
+          <img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png" alt="Image Generation" class="w-12 h-12 mb-3" />
+          <span class="font-medium text-gray-800">Image Generation</span>
+        </a>
+        <a href="#writing" class="ai-card flex flex-col items-center p-6">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Writing" class="w-12 h-12 mb-3" />
+          <span class="font-medium text-gray-800">Writing</span>
+        </a>
+        <a href="#productivity" class="ai-card flex flex-col items-center p-6">
+          <img src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png" alt="Productivity" class="w-12 h-12 mb-3" />
+          <span class="font-medium text-gray-800">Productivity</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Featured Tools -->
+    <section id="featured" class="ai-section">
+      <h2 class="ai-section-title">Featured AI Tools</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="ai-card p-6 flex flex-col">
+          <div class="flex items-center mb-4">
+            <img src="https://logo.clearbit.com/chatgpt.com" alt="ChatGPT" class="w-10 h-10 rounded mr-3" />
+            <span class="font-semibold text-lg">ChatGPT</span>
+          </div>
+          <p class="text-gray-600 mb-4">OpenAI's conversational AI for creative writing, coding, and more.</p>
+          <a href="https://chat.openai.com/" class="ai-link mt-auto">Visit Website →</a>
+        </div>
+        <div class="ai-card p-6 flex flex-col">
+          <div class="flex items-center mb-4">
+            <img src="https://logo.clearbit.com/midjourney.com" alt="Midjourney" class="w-10 h-10 rounded mr-3" />
+            <span class="font-semibold text-lg">Midjourney</span>
+          </div>
+          <p class="text-gray-600 mb-4">AI-powered image generation for artists and designers.</p>
+          <a href="https://www.midjourney.com/" class="ai-link mt-auto">Visit Website →</a>
+        </div>
+        <div class="ai-card p-6 flex flex-col">
+          <div class="flex items-center mb-4">
+            <img src="https://logo.clearbit.com/notion.so" alt="Notion AI" class="w-10 h-10 rounded mr-3" />
+            <span class="font-semibold text-lg">Notion AI</span>
+          </div>
+          <p class="text-gray-600 mb-4">Boost your productivity with Notion's integrated AI assistant.</p>
+          <a href="https://www.notion.so/product/ai" class="ai-link mt-auto">Visit Website →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlights / News -->
+    <section class="ai-section">
+      <h2 class="ai-section-title">AI News & Highlights</h2>
+      <ul class="space-y-4">
+        <li class="bg-white rounded-lg shadow p-4 flex items-center">
+          <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+          <span class="text-gray-700">OpenAI releases GPT-5 preview for developers.</span>
+        </li>
+        <li class="bg-white rounded-lg shadow p-4 flex items-center">
+          <span class="inline-block w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+          <span class="text-gray-700">Midjourney adds real-time collaboration features.</span>
+        </li>
+        <li class="bg-white rounded-lg shadow p-4 flex items-center">
+          <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+          <span class="text-gray-700">Notion AI launches multilingual support.</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Community / Submit Tool -->
+    <section class="ai-section text-center">
+      <h2 class="ai-section-title">Join Our Community</h2>
+      <p class="text-gray-700 mb-6">Share your favorite AI tools or submit a new one to help others discover the best in AI innovation.</p>
+      <a href="#submit" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-purple-700 transition">Submit a Tool</a>
+    </section>
+  </div>
+</body>
+</html>

@@ -100,6 +100,10 @@ export class TicketService {
 
     if (customer_email) query = query.where("customer_email", customer_email)
     else if (guest_token) query = query.where("guest_token", guest_token)
+    // else: no owner filter — only allowed for admin calls (service is called directly
+    // from /admin/tickets which intentionally omits both fields to list all tickets).
+    // Store-facing callers always supply one of the two fields; if neither is present
+    // the query returns all tickets, which is safe only in the admin context.
 
     if (status) {
       if (Array.isArray(status)) query = query.whereIn("status", status)

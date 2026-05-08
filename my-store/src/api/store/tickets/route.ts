@@ -19,9 +19,9 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     try {
       const customerService = req.scope.resolve(Modules.CUSTOMER)
       const customer = await customerService.retrieveCustomer(actorId).catch(() => null)
-      resolvedEmail = customer?.email ?? undefined
+      resolvedEmail = customer?.email ?? "__no_match__"
     } catch {
-      // If resolution fails fall back to no filter; an empty result is safer than a leak
+      // If resolution fails fall back to no-match so we don't leak other customers' tickets
       resolvedEmail = "__no_match__"
     }
   } else {

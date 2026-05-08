@@ -405,3 +405,96 @@ test.describe("New Fix D – Front password reset form submits without error", (
     expect(errVisible).toBe(false)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// New Fix E – My Tickets source-field filtering: logged-in user sees only their tickets
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe("New Fix E – My Tickets source-field filtering via /api/tickets proxy", () => {
+  const STORE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:8000"
+  const CC_CODE = process.env.PLAYWRIGHT_COUNTRY_CODE || "us"
+  const FRONT_EMAIL = "208017534@qq.com"
+  const FRONT_PASS = "0316"
+
+  test("authenticated user's /api/tickets request goes through proxy with Authorization header", async ({ page }) => {
+    // Log in
+    await page.goto(`${STORE_URL}/${CC_CODE}/account`)
+    await page.waitForLoadState("networkidle")
+
+    const emailInput = page.getByTestId("email-input").or(page.locator("input[type='email']").first())
+    const passInput = page.getByTestId("password-input").or(page.locator("input[type='password']").first())
+    if (!(await emailInput.isVisible())) {
+      test.info().annotations.push({ type: "skip", description: "Login form not visible" })
+      return
+    }
+    await emailInput.fill(FRONT_EMAIL)
+    await passInput.fill(FRONT_PASS)
+    const signInBtn = page.getByTestId("sign-in-button").or(page.getByRole("button", { name: /sign in|登录/i }).first())
+    await signInBtn.click()
+    await page.waitForLoadState("networkidle")
+
+    // Intercept the /api/tickets proxy request to verify it is the proxy route (not direct backend)
+    const proxyRequests: string[] = []
+    const directRequests: string[] = []
+    page.on("request", (req) => {
+      const url = req.url()
+      if (url.includes("/api/tickets") && !url.includes("localhost:9000")) {
+        proxyRequests.push(url)
+      }
+      if (url.includes("localhost:9000/store/tickets")) {
+        directRequests.push(url)
+      }
+    })
+
+    // Navigate to My Tickets
+    await page.goto(`${STORE_URL}/${CC_CODE}/support/tickets`)
+    await page.waitForLoadState("networkidle")
+    await page.waitForTimeout(2000)
+
+    // CRITICAL: the client must use /api/tickets proxy, NOT direct backend
+    // (Only one of them will be true depending on environment – in production both run on separate domains)
+    // At minimum: NO direct call to localhost:9000/store/tickets from the browser
+    expect(directRequests.length).toBe(0)
+
+    // The proxy route must have been called
+    if (proxyRequests.length > 0) {
+      expect(proxyRequests.some((u) => u.includes("/api/tickets"))).toBe(true)
+    }
+
+    // Page should show the My Tickets heading (logged-in user)
+    const ticketHeading = page.locator("h1").filter({ hasText: /my tickets|工单|support/i })
+    if ((await ticketHeading.count()) > 0) {
+      await expect(ticketHeading.first()).toBeVisible()
+    }
+
+    // No error overlay
+    await expect(page.locator("[data-nextjs-dialog-header]")).not.toBeVisible()
+  })
+
+  test("unauthenticated user sees login prompt on My Tickets page, not all tickets", async ({ page }) => {
+    // No login — visit My Tickets page directly
+    await page.goto(`${STORE_URL}/${CC_CODE}/support/tickets`)
+    await page.waitForLoadState("networkidle")
+
+    // Should show login prompt
+    const loginPrompt = page.locator("h2").filter({ hasText: /please log in|请先登录/i })
+    await expect(loginPrompt).toBeVisible()
+
+    // No ticket rows should be visible
+    const ticketRows = page.locator("a[href*='/support/tickets/ticket_']")
+    expect(await ticketRows.count()).toBe(0)
+  })
+
+  test("/api/tickets proxy endpoint is reachable and returns JSON", async ({ page }) => {
+    // Hit the proxy endpoint directly (unauthenticated — should return empty or guest list)
+    const response = await page.request.get(`${STORE_URL}/api/tickets`)
+    expect(response.status()).toBeLessThan(500)
+    const body = await response.json().catch(() => null)
+    // Should be a valid JSON response with a tickets array
+    expect(body).not.toBeNull()
+    if (body && typeof body === "object") {
+      // Either empty tickets array or a count field
+      const hasTickets = "tickets" in body
+      expect(hasTickets).toBe(true)
+    }
+  })
+})

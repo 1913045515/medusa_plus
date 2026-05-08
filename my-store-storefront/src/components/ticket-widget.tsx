@@ -36,13 +36,6 @@ export default function TicketWidget({
 
   // ── Unread polling ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const BACKEND =
-      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000"
-    const PUB_KEY =
-      process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ??
-      process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY ??
-      ""
-
     const check = async () => {
       if (typeof window === "undefined") return
       const guestToken = localStorage.getItem("ticket_guest_token")
@@ -53,12 +46,12 @@ export default function TicketWidget({
 
       try {
         const params = new URLSearchParams()
-        if (customerEmail) params.set("customer_email", customerEmail)
-        else if (guestToken) params.set("guest_token", guestToken)
+        // guest_token is still passed for unauthenticated guests (proxy will forward it)
+        if (!customerEmail && guestToken) params.set("guest_token", guestToken)
 
-        const res = await fetch(`${BACKEND}/store/tickets?${params}`, {
+        // Use the Next.js proxy so the _medusa_jwt cookie is forwarded as Authorization
+        const res = await fetch(`/api/tickets${params.toString() ? `?${params}` : ""}`, {
           credentials: "include",
-          headers: { "x-publishable-api-key": PUB_KEY },
         })
         if (!res.ok) return
 
