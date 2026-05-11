@@ -36,6 +36,7 @@ export default async function ProductPreview({
           images={product.images}
           size="full"
           isFeatured={isFeatured}
+          forceSquare={true}
         />
         <div className="flex txt-compact-medium mt-4 justify-between">
           <Text className="text-ui-fg-subtle" data-testid="product-title">
