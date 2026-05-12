@@ -1,419 +1,404 @@
-<!-- 
-  AI Cross Stand — 独立站开发文档
-  富文本 HTML 版本，可直接粘贴到支持 HTML 的博客编辑器
--->
+<!-- AI Cross Stand Platform Guide - HTML version for blog publishing -->
 
-<h1>AI Cross Stand — 独立站开发文档</h1>
-<p>本文档覆盖平台功能介绍、技术栈说明、本地开发流程与线上部署流程，适合开发者快速上手与团队协作参考。</p>
-<hr />
+<h1>AI Cross Stand Platform Guide</h1>
+<p><em>A practical overview of what the platform does, how the admin and storefront work together, and how to develop and deploy the system with confidence.</em></p>
 
-<h2>一、功能介绍</h2>
-<p>本平台是一套基于 MedusaJS + Next.js 构建的<strong>数字商品独立站</strong>，既支持虚拟产品（软件源码、视频课程），也支持实体产品销售。平台由两大部分组成：<strong>Admin 后台</strong>（内容与业务管理）和 <strong>Storefront 前台</strong>（面向买家的购物体验）。</p>
+<p>AI Cross Stand is a headless commerce platform built for selling digital-first products, including source code packages, learning resources, and structured video courses. It combines a Medusa-based admin system with a Next.js storefront, giving operators a flexible back office while keeping the customer-facing experience fast, modern, and SEO-friendly.</p>
 
-<h3>1.1 产品与商城</h3>
+<p>At a high level, the platform is split into two major applications:</p>
+
 <ul>
-  <li><strong>商品管理</strong>：支持在 Admin 后台创建、编辑、上架商品，配置价格、变体、库存、图片、分类与标签。</li>
-  <li><strong>虚拟商品扩展</strong>：每件商品可标记为「虚拟产品」，类型分为：
-    <ul>
-      <li><code>resource</code>：数字资料 / 软件源码包，关联文件资产，购买后可下载。</li>
-      <li><code>course</code>：视频课程，关联站内课程模块，购买后解锁全部视频。</li>
-    </ul>
-  </li>
-  <li><strong>产品详情富文本</strong>：支持长描述 HTML 编辑，详情页分上下两段展示。</li>
-  <li><strong>产品图片管理</strong>：支持多图上传、排序、设置主图。</li>
-  <li><strong>产品分类</strong>：多级分类树，前台店铺页支持按分类筛选。</li>
-  <li><strong>排序与筛选</strong>：按最新上架、价格升序/降序排序，商品列表展示正方形缩略图及商品数量统计。</li>
+  <li><strong>The admin app</strong> handles content operations, product setup, course management, file delivery, store settings, and internal workflows.</li>
+  <li><strong>The storefront</strong> handles discovery, product presentation, checkout, gated digital delivery, customer accounts, and post-purchase access.</li>
 </ul>
 
-<h3>1.2 课程模块</h3>
-<ul>
-  <li><strong>课程管理</strong>：在 Admin 后台创建课程，维护课程标题、封面、描述、handle。</li>
-  <li><strong>视频课时</strong>：每门课程包含多集视频，支持设置标题、集数、时长、视频 URL、封面、是否免费。</li>
-  <li><strong>免费预览</strong>：前 N 集可设置为免费播放，购买后解锁完整内容。</li>
-  <li><strong>购买解锁</strong>：通过标准结账流程购买绑定课程的商品，订单确认后自动记录课程购买记录并解锁视频。</li>
-  <li><strong>学习进度</strong>：视频播放详情页展示课时列表（左视频 + 右集数导航），支持会员专属内容保护。</li>
-</ul>
-
-<h3>1.3 博客系统</h3>
-<ul>
-  <li><strong>文章管理</strong>：在 Admin 后台使用富文本编辑器创建/发布博客文章（TipTap 编辑器，支持标题、图片、链接、列表、表格等）。</li>
-  <li><strong>分类与标签</strong>：文章支持多级分类和多标签，前台支持按分类/标签筛选。</li>
-  <li><strong>用户组可见性</strong>：文章可设置对特定用户组可见（如付费会员专属内容）。</li>
-  <li><strong>内容图片管理</strong>：博客图片统一上传至文件资产库，支持插入文章。</li>
-  <li><strong>前台博客页面</strong>：列表页、详情页、分类页、标签页，侧边栏展示分类与标签导航。</li>
-</ul>
-
-<h3>1.4 内容页面</h3>
-<ul>
-  <li><strong>自定义内容页</strong>：在 Admin 后台创建任意静态/富文本页面（如关于我们、隐私政策），通过 URL handle 访问。</li>
-  <li><strong>首页内容管理</strong>：首页 Banner、模块内容可在 Admin 后台可视化配置，无需修改代码发布。</li>
-</ul>
-
-<h3>1.5 文件资产管理</h3>
-<ul>
-  <li><strong>文件库</strong>：统一管理站内所有上传文件（软件包、文档、图片等），支持名称、MIME 类型、文件大小查看。</li>
-  <li><strong>安全下载</strong>：虚拟资料商品关联文件资产后，购买用户可获得限时签名下载链接，无法盗链。</li>
-  <li><strong>分页搜索</strong>：文件列表支持关键词搜索与分页。</li>
-</ul>
-
-<h3>1.6 用户与账户</h3>
-<ul>
-  <li><strong>注册与登录</strong>：邮箱 + 密码注册/登录，支持 JWT 认证 + Cookie 会话。</li>
-  <li><strong>密码重置</strong>：忘记密码通过邮件发送重置链接（OTP 验证码流程）。</li>
-  <li><strong>个人中心</strong>：前台账户中心支持查看个人信息、地址管理、历史订单。</li>
-  <li><strong>多地区支持</strong>：URL 前缀 <code>/{countryCode}/</code> 路由，自动匹配地区货币与税率。</li>
-</ul>
-
-<h3>1.7 购物与结账</h3>
-<ul>
-  <li><strong>购物车</strong>：标准购物车操作（增删改数量），支持展示商品变体、价格、折扣。</li>
-  <li><strong>结账流程</strong>：地址填写 → 配送方式 → 支付确认，全流程 Medusa 标准工作流。</li>
-  <li><strong>PayPal 支付</strong>：集成 PayPal REST API，支持生产与沙箱环境切换，Admin 可配置。</li>
-  <li><strong>结账字段配置</strong>：Admin 后台可控制结账页面展示/隐藏哪些字段（如公司名、电话等），适配不同商品类型。</li>
-  <li><strong>订单管理</strong>：Admin 后台查看所有订单详情；前台用户可在账户中心查看历史订单；虚拟商品订单支持自动发货确认。</li>
-</ul>
-
-<h3>1.8 客服工单</h3>
-<ul>
-  <li><strong>工单系统</strong>：登录用户可在前台提交客服工单，填写主题、内容、分类。</li>
-  <li><strong>工单管理</strong>：Admin 后台查看所有工单，支持回复与状态管理。</li>
-  <li><strong>鉴权保护</strong>：未登录用户访问工单页面显示登录提示，不可查看他人工单。</li>
-</ul>
-
-<h3>1.9 站点配置与分析</h3>
-<ul>
-  <li><strong>菜单管理</strong>：Admin 后台可视化配置导航菜单，支持多级菜单项、链接与排序，前台实时渲染。</li>
-  <li><strong>站点设置</strong>：商店名称、介绍文字等全局配置在 Admin 后台统一管理。</li>
-  <li><strong>站点分析</strong>：内置 PV/UV 事件采集，记录页面浏览行为，Admin 后台可查看访问统计。</li>
-  <li><strong>邮件代理</strong>：Admin 后台配置 SMTP 服务（主机、端口、用户名、密码、发件人），支持发送测试邮件验证可达性。</li>
-</ul>
-
-<h3>1.10 Admin 后台国际化</h3>
-<ul>
-  <li>后台管理界面支持多语言（已内置中文简体）。</li>
-  <li>通过 <code>src/admin/i18n/</code> 维护翻译文本，覆盖后台所有自定义页面与组件。</li>
-</ul>
+<p>Instead of behaving like a generic template storefront, the platform is built for businesses that need to sell both physical goods and digital products in the same system while also publishing educational and marketing content around those products.</p>
 
 <hr />
 
-<h2>二、技术栈介绍</h2>
+<h2>1. Feature Breakdown</h2>
 
-<h3>后端 — my-store/</h3>
-<table>
-  <thead>
-    <tr><th>技术</th><th>版本 / 说明</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><strong>MedusaJS</strong></td><td>v2.13 — Headless 商业框架，提供商品、订单、用户、支付等核心模块</td></tr>
-    <tr><td><strong>Node.js</strong></td><td>&gt;= 20 LTS</td></tr>
-    <tr><td><strong>TypeScript</strong></td><td>严格模式，全项目类型安全</td></tr>
-    <tr><td><strong>PostgreSQL</strong></td><td>16 — 主数据库</td></tr>
-    <tr><td><strong>Redis</strong></td><td>7 — 队列、会话与缓存</td></tr>
-    <tr><td><strong>MikroORM</strong></td><td>Medusa 内置 ORM，代码优先数据模型与迁移</td></tr>
-    <tr><td><strong>TipTap</strong></td><td>富文本编辑器（博客、产品详情编辑）</td></tr>
-    <tr><td><strong>AWS S3 SDK</strong></td><td>课程视频/图片存储，支持签名 URL</td></tr>
-    <tr><td><strong>Redocly</strong></td><td>OpenAPI 文档生成与预览</td></tr>
-    <tr><td><strong>Jest</strong></td><td>单元测试 + 集成测试框架</td></tr>
-  </tbody>
-</table>
+<h3>1.1 Commerce and Product Management</h3>
+<p>The core commerce layer supports standard catalog operations such as product creation, pricing, variants, media, collections, and category organization. On top of that baseline, the platform adds a digital-product model that is especially useful for software businesses, education brands, and creator-led commerce.</p>
 
-<p><strong>核心架构特点：</strong></p>
+<p>Key capabilities include:</p>
 <ul>
-  <li><strong>文件路由 API</strong>：<code>src/api/</code> 下按目录结构自动注册 REST 路由。</li>
-  <li><strong>自定义模块</strong>：<code>src/modules/</code> 独立封装业务逻辑（博客、课程、工单、文件资产、虚拟商品等）。</li>
-  <li><strong>工作流引擎</strong>：<code>src/workflows/</code> 编排多步骤业务，支持回滚事务。</li>
-  <li><strong>事件订阅</strong>：<code>src/subscribers/</code> 响应系统事件，解耦副作用（如订单完成后发邮件/解锁课程）。</li>
-  <li><strong>模块关联</strong>：<code>src/links/</code> 建立跨模块松耦合关系。</li>
+  <li>Full product management from the admin side, including pricing, images, variants, and publishing state.</li>
+  <li>Support for both physical and virtual products in the same catalog.</li>
+  <li>Dedicated virtual-product settings that allow a product to be treated as either a downloadable resource or a course-linked product.</li>
+  <li>Product detail pages with rich content blocks, custom media ordering, and tailored messaging depending on product type.</li>
+  <li>Category-based browsing and storefront sorting, making product discovery feel more complete and easier to navigate.</li>
 </ul>
 
-<h3>前台 — my-store-storefront/</h3>
-<table>
-  <thead>
-    <tr><th>技术</th><th>版本 / 说明</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><strong>Next.js</strong></td><td>15（App Router + Server Components）</td></tr>
-    <tr><td><strong>React</strong></td><td>19</td></tr>
-    <tr><td><strong>TypeScript</strong></td><td>严格模式</td></tr>
-    <tr><td><strong>Tailwind CSS</strong></td><td>3.x — 原子化样式</td></tr>
-    <tr><td><strong>Medusa UI</strong></td><td>Medusa 官方组件库（按钮、表单、图标等）</td></tr>
-    <tr><td><strong>Medusa JS SDK</strong></td><td>官方 API 客户端，封装所有 Store API 调用</td></tr>
-    <tr><td><strong>Turbopack</strong></td><td>开发服务器（替代 Webpack 加速热更新）</td></tr>
-    <tr><td><strong>TipTap</strong></td><td>富文本内容渲染</td></tr>
-    <tr><td><strong>PayPal React SDK</strong></td><td>PayPal 支付按钮集成</td></tr>
-    <tr><td><strong>Playwright</strong></td><td>E2E 端到端测试</td></tr>
-  </tbody>
-</table>
+<p>For virtual products, the storefront experience is intentionally different. Instead of showing physical-shipping language, the product page can present instant digital delivery messaging, access expectations, and post-purchase guidance that better matches how U.S. customers evaluate software and learning products.</p>
 
-<p><strong>核心架构特点：</strong></p>
+<h3>1.2 Course Sales and Video Learning</h3>
+<p>The platform includes a built-in course model that turns products into structured learning experiences. This is useful when a product is more than a file download and needs ongoing instructional value.</p>
+
+<p>Core course features include:</p>
 <ul>
-  <li><strong>App Router</strong>：全站 Server Components + Client Components 混合，最大化性能与 SEO。</li>
-  <li><strong>国家/地区路由</strong>：<code>/{countryCode}/</code> 前缀，中间件自动重定向，支持多地区多货币。</li>
-  <li><strong>数据层</strong>：<code>src/lib/data/</code> 封装所有 Server Actions 和数据获取，Server/Client 组件均可复用。</li>
-  <li><strong>模块化 UI</strong>：<code>src/modules/</code> 将页面拆分为功能模块（home、store、products、account 等）。</li>
+  <li>Course creation and management from the admin panel.</li>
+  <li>Episode-based lesson organization with titles, sequence numbers, durations, and media references.</li>
+  <li>Free-preview support for selected lessons before purchase.</li>
+  <li>Purchase-based access control that unlocks protected course content after checkout.</li>
+  <li>Course-aware product linking, so a storefront product can serve as the commercial entry point for a learning experience.</li>
 </ul>
 
-<h3>Admin 后台 — 内嵌于 my-store/</h3>
-<table>
-  <thead>
-    <tr><th>技术</th><th>说明</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><strong>Medusa Admin SDK</strong></td><td>官方 Admin UI 扩展框架（Vite + React）</td></tr>
-    <tr><td><strong>React i18next</strong></td><td>Admin 界面多语言</td></tr>
-    <tr><td><strong>Medusa UI</strong></td><td>Admin 组件库</td></tr>
-    <tr><td><strong>TipTap</strong></td><td>博客/内容编辑器</td></tr>
-    <tr><td><strong>dnd-kit</strong></td><td>拖拽排序（图片、菜单等）</td></tr>
-  </tbody>
-</table>
+<p>This setup works especially well for source code products that also include guided education, implementation walkthroughs, or premium onboarding material.</p>
+
+<h3>1.3 Blog and Content Publishing</h3>
+<p>The platform is not limited to transactions. It also includes a structured content system so teams can publish educational, promotional, and SEO-focused content without relying on a separate CMS.</p>
+
+<p>Blog and content features include:</p>
+<ul>
+  <li>Rich-text blog editing for long-form publishing.</li>
+  <li>Category and tag management for content organization.</li>
+  <li>Access control support for audience-based visibility.</li>
+  <li>Shared media handling for blog images and embedded assets.</li>
+  <li>Blog listing, article detail, category pages, and tag pages on the storefront.</li>
+</ul>
+
+<p>This matters because the storefront can support the full funnel, not just the purchase step. Visitors can discover a product through blog content, learn from supporting articles, and then move naturally into a purchase flow.</p>
+
+<h3>1.4 Custom Pages and Homepage Content</h3>
+<p>The admin side also supports general content management beyond the blog. Teams can create static or rich-text pages for standard site sections such as About, Contact, Privacy, Terms, and campaign landing pages.</p>
+
+<p>Homepage content is configurable as well, which makes it possible to update banners, featured sections, or promotional messaging without shipping code changes for every small revision.</p>
+
+<h3>1.5 Secure File Delivery and Asset Management</h3>
+<p>Digital fulfillment depends on reliable file handling. The platform includes a dedicated file-asset system so teams can manage downloadable content from the admin interface instead of pushing files around manually.</p>
+
+<p>Notable capabilities include:</p>
+<ul>
+  <li>Centralized asset management for uploaded files.</li>
+  <li>File metadata visibility, including format and size.</li>
+  <li>Search and pagination for larger asset libraries.</li>
+  <li>Secure download workflows for digital products.</li>
+  <li>Signed or time-limited delivery patterns for protected assets.</li>
+</ul>
+
+<p>This makes the platform especially useful for distributing source code bundles, documentation packs, templates, or premium downloads.</p>
+
+<h3>1.6 Customer Accounts and Access Control</h3>
+<p>The storefront includes the account features customers expect from a modern commerce site, but with extra attention to digital ownership and gated access.</p>
+
+<ul>
+  <li>Email-based sign-up and sign-in.</li>
+  <li>Password reset flows.</li>
+  <li>Order history and account management.</li>
+  <li>Region-aware storefront routing.</li>
+  <li>Auth-aware access control for protected resources such as tickets, course content, or post-purchase downloads.</li>
+</ul>
+
+<p>Because the platform mixes commerce with content and education, authentication is not just about checkout. It also governs what customers can read, watch, and download after purchase.</p>
+
+<h3>1.7 Cart, Checkout, and Payments</h3>
+<p>On the commerce side, the platform supports the expected storefront purchasing journey from browsing through payment confirmation.</p>
+
+<ul>
+  <li>Standard cart management.</li>
+  <li>Medusa-based checkout workflows.</li>
+  <li>Payment integration support, including PayPal.</li>
+  <li>Configurable checkout fields from the admin side.</li>
+  <li>Order views for both administrators and customers.</li>
+  <li>Virtual-order handling for digital fulfillment scenarios.</li>
+</ul>
+
+<p>That flexibility matters when the business model includes both traditional product sales and instant digital access.</p>
+
+<h3>1.8 Support Tickets and Customer Service Workflows</h3>
+<p>The system includes a customer support ticket flow that lets authenticated users submit requests from the storefront while giving internal teams a structured way to review and respond in the admin area.</p>
+
+<p>This is especially useful for software and course businesses, where pre-sales questions, access issues, and implementation support often continue after checkout.</p>
+
+<h3>1.9 Navigation, Store Settings, and Analytics</h3>
+<p>The admin application also includes tools that support day-to-day operation of the site itself:</p>
+
+<ul>
+  <li>Navigation menu management.</li>
+  <li>Store-wide settings management.</li>
+  <li>Analytics event collection for site activity.</li>
+  <li>Email-proxy and SMTP management for outbound communications.</li>
+</ul>
+
+<p>Together, these features reduce the number of external systems required to operate the site.</p>
+
+<h3>1.10 Admin Localization Support</h3>
+<p>The admin interface supports localization for custom pages and UI extensions. That makes it easier for internal teams to work in their preferred language while keeping the storefront experience aligned with the brand’s target market.</p>
 
 <hr />
 
-<h2>三、开发流程介绍</h2>
+<h2>2. Tech Stack</h2>
 
-<h3>3.1 环境准备</h3>
-<p><strong>系统依赖：</strong></p>
+<h3>2.1 Backend Application</h3>
+<p>The backend lives in the Medusa application and acts as the operational core of the platform.</p>
+
+<table>
+  <thead>
+    <tr><th>Layer</th><th>Technology</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Commerce backend</td><td>Medusa v2</td></tr>
+    <tr><td>Language</td><td>TypeScript</td></tr>
+    <tr><td>Runtime</td><td>Node.js</td></tr>
+    <tr><td>Database</td><td>PostgreSQL</td></tr>
+    <tr><td>Cache and queue support</td><td>Redis</td></tr>
+    <tr><td>API documentation</td><td>OpenAPI with Redocly</td></tr>
+    <tr><td>Testing</td><td>Jest</td></tr>
+    <tr><td>File and media integration</td><td>S3-compatible workflows and file services</td></tr>
+  </tbody>
+</table>
+
+<p>The backend architecture is intentionally modular. Custom business logic is implemented in isolated modules, while API extensions are organized by route. This makes the codebase easier to maintain as the platform grows.</p>
+
+<p>Important backend patterns include:</p>
 <ul>
-  <li>Node.js &gt;= 20 LTS</li>
-  <li>Docker &amp; Docker Compose（用于本地数据库）</li>
-  <li>Git</li>
+  <li>File-based API routing for admin and store endpoints.</li>
+  <li>Custom modules for blog, course, tickets, file assets, product detail extensions, analytics, and virtual-product behavior.</li>
+  <li>Workflow orchestration for multi-step operations.</li>
+  <li>Event subscribers for asynchronous business actions.</li>
+  <li>Admin UI extensions that live inside the same backend repository.</li>
 </ul>
 
-<p><strong>克隆项目：</strong></p>
-<pre><code>git clone &lt;repository-url&gt;
-cd ai-cross-stand</code></pre>
+<h3>2.2 Storefront Application</h3>
+<p>The storefront is built with Next.js and is optimized for server-rendered commerce, localized routing, and modular UI composition.</p>
 
-<h3>3.2 启动本地基础设施</h3>
-<p>使用 Docker Compose 启动 PostgreSQL 和 Redis：</p>
+<table>
+  <thead>
+    <tr><th>Layer</th><th>Technology</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Frontend framework</td><td>Next.js 15</td></tr>
+    <tr><td>UI library</td><td>React 19</td></tr>
+    <tr><td>Language</td><td>TypeScript</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS</td></tr>
+    <tr><td>Component system</td><td>Medusa UI</td></tr>
+    <tr><td>API client</td><td>Medusa JS SDK</td></tr>
+    <tr><td>End-to-end testing</td><td>Playwright</td></tr>
+  </tbody>
+</table>
+
+<p>Architecturally, the storefront leans on:</p>
+<ul>
+  <li>App Router with server components where appropriate.</li>
+  <li>Region-based routing.</li>
+  <li>A dedicated data layer for server-side fetching and shared business logic.</li>
+  <li>Modular page construction for products, store listing pages, account flows, blog pages, and checkout.</li>
+</ul>
+
+<h3>2.3 Admin Experience</h3>
+<p>The admin layer is not a separate product stitched on later. It is part of the operational model of the platform.</p>
+
+<table>
+  <thead>
+    <tr><th>Area</th><th>Technology</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Admin extension framework</td><td>Medusa Admin SDK</td></tr>
+    <tr><td>UI components</td><td>Medusa UI</td></tr>
+    <tr><td>Localization</td><td>react-i18next</td></tr>
+    <tr><td>Rich-text editing</td><td>TipTap</td></tr>
+    <tr><td>Interactive ordering</td><td>dnd-kit</td></tr>
+  </tbody>
+</table>
+
+<p>This allows the team to build business-specific interfaces for content operations, store settings, course management, and digital-product workflows without leaving the admin environment.</p>
+
+<hr />
+
+<h2>3. Development Workflow</h2>
+
+<h3>3.1 Local Development Setup</h3>
+<p>The local setup is designed to keep infrastructure simple. The recommended workflow is to run the supporting services in containers and run the applications directly in development mode.</p>
+
+<p>Typical local prerequisites:</p>
+<ul>
+  <li>Node.js</li>
+  <li>Docker and Docker Compose</li>
+  <li>PostgreSQL and Redis access through the local container setup</li>
+  <li>A working package manager environment for both apps</li>
+</ul>
+
+<p>The usual development flow looks like this:</p>
+<ol>
+  <li>Start local infrastructure services.</li>
+  <li>Install backend dependencies and run database migrations.</li>
+  <li>Start the Medusa backend in development mode.</li>
+  <li>Install storefront dependencies and start the Next.js app.</li>
+  <li>Sign in to the admin area and configure content, products, or settings as needed.</li>
+</ol>
+
+<h3>3.2 Suggested Local Startup Sequence</h3>
+<p>Use the infrastructure compose file to start PostgreSQL and Redis locally:</p>
+
 <pre><code>docker compose -f docker-compose.dev.yml up -d</code></pre>
-<p>默认会启动：</p>
-<ul>
-  <li>PostgreSQL（端口 5432）</li>
-  <li>Redis（端口 6379）</li>
-</ul>
 
-<h3>3.3 启动后端（my-store）</h3>
+<p>Start the backend:</p>
 <pre><code>cd my-store
-
-# 安装依赖
 npm install
-
-# 配置环境变量（复制模板后按实际填写）
-cp .env.example .env
-
-# 数据库迁移
 npx medusa db:migrate
-
-# （可选）初始化演示数据
-npm run seed
-
-# 启动开发服务器
 npm run dev</code></pre>
 
-<p>关键环境变量说明：</p>
-<table>
-  <thead>
-    <tr><th>变量名</th><th>示例值</th><th>说明</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>DATABASE_URL</code></td><td><code>postgres://medusa:pass@localhost:5432/medusa_db</code></td><td>PostgreSQL 连接串</td></tr>
-    <tr><td><code>REDIS_URL</code></td><td><code>redis://:pass@localhost:6379</code></td><td>Redis 连接串</td></tr>
-    <tr><td><code>JWT_SECRET</code></td><td>随机字符串</td><td>JWT 签名密钥</td></tr>
-    <tr><td><code>COOKIE_SECRET</code></td><td>随机字符串</td><td>Cookie 签名密钥</td></tr>
-    <tr><td><code>STORE_CORS</code></td><td><code>http://localhost:8000</code></td><td>前台跨域白名单</td></tr>
-    <tr><td><code>ADMIN_CORS</code></td><td><code>http://localhost:9000</code></td><td>Admin 跨域白名单</td></tr>
-    <tr><td><code>AUTH_CORS</code></td><td><code>http://localhost:8000,http://localhost:9000</code></td><td>认证服务跨域白名单</td></tr>
-  </tbody>
-</table>
+<p>If the project needs initial data, seed it after migrations:</p>
+<pre><code>npm run seed</code></pre>
 
-<p>后端运行于 <code>http://localhost:9000</code>，Admin 后台访问 <code>http://localhost:9000/app</code>。</p>
-
-<h3>3.4 启动前台（my-store-storefront）</h3>
+<p>Start the storefront in a separate terminal:</p>
 <pre><code>cd my-store-storefront
-
-# 安装依赖
 npm install
-
-# 配置环境变量
-cp .env.example .env.local
-
-# 启动开发服务器（Turbopack）
 npm run dev</code></pre>
 
-<p>关键环境变量说明：</p>
-<table>
-  <thead>
-    <tr><th>变量名</th><th>说明</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>NEXT_PUBLIC_MEDUSA_BACKEND_URL</code></td><td>前端可访问的后端地址</td></tr>
-    <tr><td><code>NEXT_PUBLIC_BASE_URL</code></td><td>前台自身地址（用于 SEO 等）</td></tr>
-    <tr><td><code>NEXT_PUBLIC_DEFAULT_REGION</code></td><td>默认地区代码，如 <code>us</code></td></tr>
-    <tr><td><code>MEDUSA_BACKEND_URL</code></td><td>服务端请求后端地址（可与公网地址不同）</td></tr>
-    <tr><td><code>REVALIDATE_SECRET</code></td><td>增量静态再生密钥</td></tr>
-  </tbody>
-</table>
+<p>The admin UI is served from the backend application, so it becomes available when the backend is running.</p>
 
-<p>前台运行于 <code>http://localhost:8000</code>。</p>
+<h3>3.3 Admin and Storefront Development Practices</h3>
+<p>The codebase supports a clean separation of concerns:</p>
 
-<h3>3.5 Admin 后台使用</h3>
-<p>Admin 后台无需单独启动，随后端服务一起运行。首次使用需创建管理员账户：</p>
-<pre><code>cd my-store
-npx medusa user -e admin@example.com -p your_password</code></pre>
-
-<h3>3.6 运行测试</h3>
-<p><strong>后端单元测试：</strong></p>
-<pre><code>cd my-store
-npm run test:unit</code></pre>
-
-<p><strong>后端集成测试：</strong></p>
-<pre><code>npm run test:integration:http</code></pre>
-
-<p><strong>前台 E2E 测试（Playwright）：</strong></p>
-<pre><code>cd my-store-storefront
-# 确保前后端均已运行后执行
-npm run test:e2e
-
-# 可视化调试模式
-npm run test:e2e:ui</code></pre>
-
-<h3>3.7 Admin 扩展开发规范</h3>
 <ul>
-  <li><strong>新增路由页面</strong>：在 <code>src/admin/routes/</code> 下按目录创建，使用 <code>defineRouteConfig</code> 注册菜单项。</li>
-  <li><strong>新增 Widget</strong>：在 <code>src/admin/widgets/</code> 下创建，使用 <code>defineWidgetConfig</code> 注入到产品/订单详情页。</li>
-  <li><strong>国际化翻译</strong>：新增文本在 <code>src/admin/i18n/</code> 对应语言文件中添加 key-value。</li>
-  <li><strong>新增自定义 API</strong>：在 <code>src/api/admin/</code> 或 <code>src/api/store/</code> 下按功能目录创建 <code>route.ts</code>，文件路径即为 URL 路径。</li>
-  <li><strong>新增模块</strong>：在 <code>src/modules/</code> 创建模块目录（含 models/、service.ts、index.ts），并在 <code>medusa-config.ts</code> 注册。</li>
-  <li><strong>数据库变更</strong>：修改数据模型后执行 <code>npx medusa db:migrate</code>。</li>
+  <li>Admin routes and widgets are used for internal tooling and editorial workflows.</li>
+  <li>Store APIs are used for customer-facing data delivery.</li>
+  <li>Storefront modules keep presentation logic grouped by feature.</li>
+  <li>Custom backend modules isolate business rules that would otherwise leak across the codebase.</li>
 </ul>
 
-<h3>3.8 OpenAPI 文档</h3>
+<p>When adding new functionality, the most reliable approach is usually:</p>
+<ol>
+  <li>Model the business logic in a backend module.</li>
+  <li>Expose the required admin or storefront API endpoints.</li>
+  <li>Extend the admin interface if internal users need new controls.</li>
+  <li>Extend the storefront if customers need a new buying or content experience.</li>
+  <li>Cover the change with unit, integration, or end-to-end tests as appropriate.</li>
+</ol>
+
+<h3>3.4 Testing and Debugging</h3>
+<p>The platform supports multiple levels of validation.</p>
+
+<p>Backend testing options include:</p>
 <pre><code>cd my-store
+npm run test:unit
+npm run test:integration:http</code></pre>
 
-# 预览 Store API 文档
-npm run spec:preview:store   # 访问 http://localhost:8080
+<p>Storefront end-to-end testing is handled with Playwright:</p>
+<pre><code>cd my-store-storefront
+npm run test:e2e</code></pre>
 
-# 预览 Admin API 文档
-npm run spec:preview:admin   # 访问 http://localhost:8081</code></pre>
+<p>For interactive debugging:</p>
+<pre><code>npm run test:e2e:ui</code></pre>
+
+<p>This layered testing approach is useful because many of the platform’s most important behaviors span multiple surfaces, such as checkout, digital delivery, course access, and authenticated storefront flows.</p>
+
+<h3>3.5 API Documentation During Development</h3>
+<p>OpenAPI specs are part of the backend workflow, which helps teams review and validate custom endpoints as the system evolves.</p>
+
+<pre><code>cd my-store
+npm run spec:preview:store
+npm run spec:preview:admin
+npm run spec:bundle</code></pre>
 
 <hr />
 
-<h2>四、部署流程介绍</h2>
+<h2>4. Deployment Workflow</h2>
 
-<h3>4.1 架构概览</h3>
-<p>生产环境使用 Docker Compose 编排，整体服务拓扑：</p>
-<pre><code>Internet
-   │
-   ▼
-[ Nginx ]  ← 反向代理，负责 HTTPS 终结、域名路由
-   │
-   ├──→ [ Storefront (Next.js) ]  前台商城
-   ├──→ [ Backend (MedusaJS) ]   API + Admin 后台
-   │          │
-   │          ├──→ [ PostgreSQL ]  主数据库
-   │          └──→ [ Redis ]       缓存与队列
-   │
-   └──→ [ Uploads Volume ]  静态文件/上传存储（共享挂载卷）</code></pre>
+<h3>4.1 Production Architecture</h3>
+<p>The platform is designed to be deployed as a multi-service application. In production, the most common setup includes:</p>
 
-<h3>4.2 构建 Docker 镜像</h3>
-<pre><code># 构建后端镜像
-docker build -t my-store:latest ./my-store
+<ul>
+  <li>A reverse proxy layer.</li>
+  <li>The Medusa backend and admin application.</li>
+  <li>The Next.js storefront.</li>
+  <li>PostgreSQL for persistent data.</li>
+  <li>Redis for caching, queue support, and related backend needs.</li>
+  <li>Shared storage or a file-delivery layer for uploaded assets.</li>
+</ul>
 
-# 构建前台镜像
+<p>This architecture keeps operational responsibilities clear and makes it easier to scale the storefront and backend independently if traffic grows.</p>
+
+<h3>4.2 Container-Based Deployment</h3>
+<p>The repository includes Docker-based deployment assets so the system can be packaged and run in a repeatable way across environments.</p>
+
+<p>Typical deployment steps:</p>
+<ol>
+  <li>Build the backend image.</li>
+  <li>Build the storefront image.</li>
+  <li>Prepare environment variables for the target environment.</li>
+  <li>Start the service stack with the production compose file.</li>
+  <li>Run database migrations.</li>
+  <li>Create or restore the required operational data.</li>
+  <li>Verify health checks and application access.</li>
+</ol>
+
+<pre><code>docker build -t my-store:latest ./my-store
 docker build -t my-store-storefront:latest ./my-store-storefront</code></pre>
 
-<h3>4.3 配置生产环境变量</h3>
-<p>在服务器部署目录创建 <code>.env</code> 文件，填写所有生产环境变量：</p>
-
-<p><strong>后端关键变量：</strong></p>
-<pre><code>DATABASE_URL=postgres://user:password@postgres:5432/dbname
-REDIS_URL=redis://:password@redis:6379
-JWT_SECRET=&lt;强随机字符串&gt;
-COOKIE_SECRET=&lt;强随机字符串&gt;
-STORE_CORS=https://your-storefront-domain
-ADMIN_CORS=https://your-admin-domain
-AUTH_CORS=https://your-storefront-domain,https://your-admin-domain
-UPLOAD_DIR=/app/uploads
-BACKEND_URL=https://your-api-domain
-
-# PayPal（可选）
-PAYPAL_CLIENT_ID=...
-PAYPAL_CLIENT_SECRET=...
-PAYPAL_CONFIG_ENCRYPTION_KEY=&lt;随机密钥&gt;
-
-# S3 课程视频存储（可选）
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-COURSE_MEDIA_S3_BUCKET=...
-COURSE_MEDIA_S3_REGION=...</code></pre>
-
-<p><strong>前台关键变量：</strong></p>
-<pre><code>NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://your-api-domain
-NEXT_PUBLIC_BASE_URL=https://your-storefront-domain
-NEXT_PUBLIC_DEFAULT_REGION=us
-MEDUSA_BACKEND_URL=https://your-api-domain
-REVALIDATE_SECRET=&lt;随机字符串&gt;</code></pre>
-
-<h3>4.4 启动生产服务</h3>
 <pre><code>cd deploy
+docker compose --env-file ../.env -f docker-compose.yml up -d</code></pre>
 
-# 启动所有服务
-docker compose --env-file ../.env -f docker-compose.yml up -d
+<h3>4.3 Environment and Secrets Strategy</h3>
+<p>For security and portability, environment-specific values should be injected at deploy time rather than hard-coded in the repository.</p>
 
-# 查看服务状态
-docker compose ps
-
-# 查看日志
-docker compose logs -f backend
-docker compose logs -f storefront</code></pre>
-
-<h3>4.5 数据库初始化（首次部署）</h3>
-<pre><code># 执行数据库迁移
-docker compose exec backend npx medusa db:migrate
-
-# （可选）初始化演示数据
-docker compose exec backend npx medusa exec ./src/scripts/seed.ts
-
-# 创建管理员账户
-docker compose exec backend npx medusa user -e admin@example.com -p your_password</code></pre>
-
-<h3>4.6 Nginx 配置说明</h3>
-<p><code>deploy/nginx/</code> 目录存放 Nginx 配置，主要职责：</p>
+<p>That typically includes:</p>
 <ul>
-  <li><strong>HTTPS 终结</strong>：SSL 证书配置在 <code>deploy/nginx/ssl/</code> 目录。</li>
-  <li><strong>路由转发</strong>：按域名将请求代理到前台（端口 8000）和后端（端口 9000）。</li>
-  <li><strong>静态文件服务</strong>：<code>/uploads/</code> 路径直接映射到上传文件卷，不经过 Node.js。</li>
-  <li><strong>Gzip 压缩</strong>：启用响应压缩，降低带宽消耗。</li>
+  <li>Database connection settings.</li>
+  <li>Redis connection settings.</li>
+  <li>Authentication secrets.</li>
+  <li>Cross-origin settings.</li>
+  <li>Payment-provider credentials.</li>
+  <li>File-storage credentials.</li>
+  <li>Revalidation or cache-invalidation secrets.</li>
 </ul>
 
-<h3>4.7 更新部署</h3>
-<pre><code># 拉取最新代码
-git pull
+<p>The important operational principle is to keep development, staging, and production values separated while preserving the same deployment structure across environments.</p>
 
-# 重新构建并替换容器
-docker compose build backend storefront
-docker compose up -d --no-deps backend storefront
+<h3>4.4 Database and Application Initialization</h3>
+<p>After the containers are running, the backend should apply schema updates before the system is opened to traffic.</p>
 
-# 若有数据库变更，执行迁移
-docker compose exec backend npx medusa db:migrate</code></pre>
+<p>Typical initialization tasks include:</p>
+<ul>
+  <li>Running migrations.</li>
+  <li>Seeding baseline data when needed.</li>
+  <li>Creating the first admin user.</li>
+  <li>Verifying that upload storage and content paths are accessible.</li>
+</ul>
 
-<h3>4.8 数据备份与恢复</h3>
-<p><strong>备份：</strong></p>
-<pre><code>docker compose exec postgres pg_dump -U $POSTGRES_USER $POSTGRES_DB &gt; backup_$(date +%Y%m%d).sql</code></pre>
+<h3>4.5 Reverse Proxy and Static Asset Delivery</h3>
+<p>The deployment setup assumes a reverse proxy in front of the application services. In practice, this layer is responsible for:</p>
 
-<p><strong>恢复：</strong></p>
-<pre><code>cat backup_20260101.sql | docker compose exec -T postgres psql -U $POSTGRES_USER $POSTGRES_DB</code></pre>
+<ul>
+  <li>TLS termination.</li>
+  <li>Request routing.</li>
+  <li>Static asset delivery.</li>
+  <li>Compression and network-level optimization.</li>
+</ul>
 
-<h3>4.9 健康检查</h3>
-<table>
-  <thead>
-    <tr><th>服务</th><th>检查方式</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>后端 API</td><td><code>GET /health</code> → <code>{"status":"ok"}</code></td></tr>
-    <tr><td>Admin 后台</td><td><code>GET /app</code> → HTTP 200</td></tr>
-    <tr><td>前台</td><td><code>GET /</code> → HTTP 200</td></tr>
-    <tr><td>PostgreSQL</td><td><code>pg_isready</code></td></tr>
-    <tr><td>Redis</td><td><code>redis-cli ping</code> → <code>PONG</code></td></tr>
-  </tbody>
-</table>
+<p>For file-heavy platforms, serving uploaded assets efficiently is especially important because course media, blog images, and downloadables can create a very different traffic profile from a standard catalog storefront.</p>
+
+<h3>4.6 Ongoing Updates and Operations</h3>
+<p>Once the platform is in production, the update process is straightforward:</p>
+
+<ol>
+  <li>Pull the latest code.</li>
+  <li>Rebuild the affected services.</li>
+  <li>Restart the updated containers.</li>
+  <li>Run migrations if the release includes schema changes.</li>
+  <li>Perform smoke tests on admin, storefront, and checkout.</li>
+</ol>
+
+<p>This workflow supports steady iteration without forcing the team into a complicated release process.</p>
+
+<h3>4.7 Backup and Recovery</h3>
+<p>Any production rollout should include a backup plan for both application data and uploaded assets.</p>
+
+<p>At a minimum, the operations model should cover:</p>
+<ul>
+  <li>Scheduled database backups.</li>
+  <li>Asset-storage backups or durable object storage.</li>
+  <li>Recovery verification.</li>
+  <li>Health checks for the backend, storefront, and infrastructure services.</li>
+</ul>
+
+<p>For a platform that sells digital goods, backups are not just a compliance concern. They are also part of customer trust, because purchased access and protected content need to remain available even after operational incidents.</p>
+
+<hr />
+
+<h2>Closing Notes</h2>
+<p>What makes this platform valuable is not just that it can sell products. It brings together commerce, digital delivery, structured learning, content publishing, and internal operations in one cohesive system.</p>
+
+<p>That combination makes it a strong fit for businesses that want to sell software, resources, and education under a single brand while keeping full control over both the buying journey and the post-purchase experience.</p>
