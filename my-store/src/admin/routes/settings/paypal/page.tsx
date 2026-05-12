@@ -66,18 +66,18 @@ export default function PayPalSettingsPage() {
         }
       })
       .catch((err) => {
-        toast.error("加载 PayPal 配置失败", { description: err.message })
+        toast.error("Failed to load PayPal configuration", { description: err.message })
       })
       .finally(() => setLoading(false))
   }, [])
 
   const handleSave = async () => {
     if (!clientId.trim()) {
-      toast.error("请填写 Client ID")
+      toast.error("Please enter your Client ID")
       return
     }
     if (!clientSecret.trim() || clientSecret === "••••••••") {
-      toast.error("请填写 Client Secret（完整密钥）")
+      toast.error("Please enter a valid Client Secret")
       return
     }
     setSaving(true)
@@ -92,9 +92,9 @@ export default function PayPalSettingsPage() {
         }),
       })
       setHasExistingConfig(true)
-      toast.success("PayPal 配置已保存")
+      toast.success("PayPal configuration saved successfully")
     } catch (err: any) {
-      toast.error("保存失败", { description: err.message })
+      toast.error("Failed to save configuration", { description: err.message })
     } finally {
       setSaving(false)
     }
@@ -102,7 +102,7 @@ export default function PayPalSettingsPage() {
 
   const handleTestConnection = async () => {
     if (!hasExistingConfig) {
-      toast.warning("请先保存配置，再测试连接")
+      toast.warning("Please save your configuration before testing the connection")
       return
     }
     setTesting(true)
@@ -112,12 +112,12 @@ export default function PayPalSettingsPage() {
         { method: "POST" }
       )
       if (result.success) {
-        toast.success(`PayPal 连接成功（${result.environment === "live" ? "正式环境" : "沙盒环境"}）`)
+        toast.success(`PayPal connection successful (${result.environment === "live" ? "Live" : "Sandbox"} environment)`)
       } else {
-        toast.error("PayPal 连接失败", { description: result.error })
+        toast.error("PayPal connection failed", { description: result.error })
       }
     } catch (err: any) {
-      toast.error("测试失败", { description: err.message })
+      toast.error("Connection test failed", { description: err.message })
     } finally {
       setTesting(false)
     }
@@ -126,7 +126,7 @@ export default function PayPalSettingsPage() {
   if (loading) {
     return (
       <Container>
-        <Text className="text-ui-fg-subtle">加载中…</Text>
+        <Text className="text-ui-fg-subtle">Loading...</Text>
       </Container>
     )
   }
@@ -135,9 +135,9 @@ export default function PayPalSettingsPage() {
     <Container>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Heading level="h1">PayPal 支付配置</Heading>
+          <Heading level="h1">PayPal Payment Configuration</Heading>
           <Text className="text-ui-fg-subtle mt-1">
-            配置 PayPal 商业账号的 API 密钥，支持沙盒与正式环境切换
+            Configure your PayPal business account API credentials. Supports both Sandbox and Live environments.
           </Text>
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function PayPalSettingsPage() {
         <div className="mb-6 flex items-center gap-3 rounded-lg border border-orange-300 bg-orange-50 p-4">
           <div className="h-2 w-2 rounded-full bg-orange-500 flex-shrink-0" />
           <Text className="text-orange-800 font-medium">
-            ⚠️ 当前为正式环境 (Live) — 配置变更将直接影响真实支付交易，请谨慎操作
+            ⚠️ Live environment is active — changes will affect real payment transactions. Proceed with caution.
           </Text>
         </div>
       )}
@@ -155,7 +155,7 @@ export default function PayPalSettingsPage() {
       <div className="space-y-6 border border-ui-border-base rounded-lg p-6">
         {/* Mode selector */}
         <div className="flex flex-col gap-2">
-          <Label>支付环境</Label>
+          <Label>Payment Environment</Label>
           <div className="flex gap-3">
             <button
               type="button"
@@ -166,7 +166,7 @@ export default function PayPalSettingsPage() {
                   : "border-ui-border-base text-ui-fg-base hover:bg-ui-bg-subtle"
               }`}
             >
-              沙盒环境 (Sandbox)
+              Sandbox
             </button>
             <button
               type="button"
@@ -177,13 +177,13 @@ export default function PayPalSettingsPage() {
                   : "border-ui-border-base text-ui-fg-base hover:bg-ui-bg-subtle"
               }`}
             >
-              正式环境 (Live)
+              Live
             </button>
           </div>
           <Text className="text-ui-fg-muted text-sm">
             {mode === "sandbox"
-              ? "使用沙盒密钥进行测试，不产生真实交易"
-              : "使用正式密钥处理真实支付，请确保已完成沙盒测试"}
+              ? "Use Sandbox credentials for testing — no real transactions will occur."
+              : "Use Live credentials to process real payments. Ensure Sandbox testing is complete before switching."}
           </Text>
         </div>
 
@@ -193,12 +193,12 @@ export default function PayPalSettingsPage() {
           <Input
             id="client-id"
             type="text"
-            placeholder={`PayPal ${mode === "sandbox" ? "沙盒" : "正式"} Client ID`}
+            placeholder={`PayPal ${mode === "sandbox" ? "Sandbox" : "Live"} Client ID`}
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
           />
           <Text className="text-ui-fg-muted text-sm">
-            来自 PayPal 开发者后台 → My Apps &amp; Credentials → {mode === "sandbox" ? "Sandbox" : "Live"} → App Details
+            Found in the PayPal Developer Dashboard &rarr; My Apps &amp; Credentials &rarr; {mode === "sandbox" ? "Sandbox" : "Live"} &rarr; App Details
           </Text>
         </div>
 
@@ -209,7 +209,7 @@ export default function PayPalSettingsPage() {
             <Input
               id="client-secret"
               type={showSecret ? "text" : "password"}
-              placeholder="输入新的 Client Secret（留空则保持原有密钥不变）"
+              placeholder="Enter new Client Secret (leave blank to keep existing secret)"
               value={clientSecret}
               onChange={(e) => setClientSecret(e.target.value)}
               className="flex-1"
@@ -220,12 +220,12 @@ export default function PayPalSettingsPage() {
               type="button"
               onClick={() => setShowSecret(!showSecret)}
             >
-              {showSecret ? "隐藏" : "显示"}
+              {showSecret ? "Hide" : "Show"}
             </Button>
           </div>
           {hasExistingConfig && (
             <Text className="text-ui-fg-muted text-sm">
-              已有配置（掩码显示）。如需更新密钥，请在上方输入新的完整 Secret。
+              A secret is already saved (shown masked). To update it, enter the new full Client Secret above.
             </Text>
           )}
         </div>
@@ -233,9 +233,9 @@ export default function PayPalSettingsPage() {
         {/* Credit Card Fields toggle */}
         <div className="flex items-center justify-between p-4 border border-ui-border-base rounded-lg">
           <div>
-            <Text weight="plus">信用卡支付表单</Text>
+            <Text weight="plus">Credit Card Hosted Fields</Text>
             <Text className="text-ui-fg-subtle text-sm mt-1">
-              启用 PayPal 托管信用卡表单（需要在 PayPal 后台开启 Advanced Credit and Debit Card Payments）
+              Enable PayPal-hosted credit card fields (requires Advanced Credit and Debit Card Payments to be enabled in your PayPal account)
             </Text>
           </div>
           <Switch
@@ -247,14 +247,14 @@ export default function PayPalSettingsPage() {
         {/* Action buttons */}
         <div className="flex items-center gap-3 pt-2">
           <Button onClick={handleSave} isLoading={saving}>
-            保存配置
+            Save Configuration
           </Button>
           <Button
             variant="secondary"
             onClick={handleTestConnection}
             isLoading={testing}
           >
-            测试连接
+            Test Connection
           </Button>
         </div>
       </div>
@@ -263,6 +263,6 @@ export default function PayPalSettingsPage() {
 }
 
 export const config = defineRouteConfig({
-  label: "PayPal 支付",
+  label: "PayPal Payments",
   icon: CreditCard,
 })

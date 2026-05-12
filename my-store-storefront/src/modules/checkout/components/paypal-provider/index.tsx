@@ -11,11 +11,11 @@ type PayPalConfig = {
 }
 
 const PayPalConfigContext = createContext<PayPalConfig>({ enabled: false })
+// loading: undefined = still fetching, false = done
+const PayPalLoadingContext = createContext<boolean>(true)
 
 export const usePayPalConfig = () => useContext(PayPalConfigContext)
-
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+export const usePayPalLoading = () => useContext(PayPalLoadingContext)
 
 type PayPalProviderProps = {
   currencyCode?: string
@@ -31,10 +31,9 @@ export default function PayPalProvider({
   const currency = (currencyCode || "USD").toUpperCase()
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/store/paypal/config`, {
-      credentials: "include",
-      headers: { "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "" },
-    })
+    // Use the Next.js API proxy route instead of calling Medusa backend directly.
+    // In production, /store/* is routed by nginx to Next.js, not to the Medusa backend.
+    fetch("/api/paypal-config", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : { enabled: false }))
       .then((data) => setConfig(data))
       .catch(() => setConfig({ enabled: false }))
@@ -43,9 +42,11 @@ export default function PayPalProvider({
 
   if (loading || !config.enabled || !config.client_id) {
     return (
-      <PayPalConfigContext.Provider value={config}>
-        {children}
-      </PayPalConfigContext.Provider>
+      <PayPalLoadingContext.Provider value={loading}>
+        <PayPalConfigContext.Provider value={config}>
+          {children}
+        </PayPalConfigContext.Provider>
+      </PayPalLoadingContext.Provider>
     )
   }
 
@@ -62,9 +63,11 @@ export default function PayPalProvider({
         ...(config.mode === "sandbox" ? { "data-client-token": undefined } : {}),
       }}
     >
-      <PayPalConfigContext.Provider value={config}>
-        {children}
-      </PayPalConfigContext.Provider>
+      <PayPalLoadingContext.Provider value={loading}>
+        <PayPalConfigContext.Provider value={config}>
+          {children}
+        </PayPalConfigContext.Provider>
+      </PayPalLoadingContext.Provider>
     </PayPalScriptProvider>
   )
 }

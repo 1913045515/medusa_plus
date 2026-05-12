@@ -77,6 +77,11 @@ export default defineMiddlewares({
         authenticate("user", ["bearer", "session"]),
       ],
     },
+    // PayPal: store config endpoint is fully public (returns only the public client_id)
+    {
+      matcher: "/store/paypal/config",
+      middlewares: [],
+    },
     // File Assets: admin management routes require admin authentication
     {
       matcher: "/admin/file-assets*",

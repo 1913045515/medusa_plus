@@ -45,10 +45,10 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>博客</title>
+    <title>Blog</title>
     <link>${SITE_URL}/blog</link>
-    <description>最新博客文章和资讯</description>
-    <language>zh-CN</language>
+    <description>Latest blog posts and updates</description>
+    <language>en</language>
     <atom:link href="${SITE_URL}/feed/rss.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${items}

@@ -83,20 +83,20 @@ export default function BlogListTemplate({
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-neutral-900">{pageTitle || (dict?.pageTitle ?? "博客")}</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">{pageTitle || (dict?.pageTitle ?? "Blog")}</h1>
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
-            placeholder={dict?.searchPlaceholder ?? "搜索文章..."}
+            placeholder={dict?.searchPlaceholder ?? "Search articles..."}
             className="border border-neutral-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
           >
-            {dict?.searchButton ?? "搜索"}
+            {dict?.searchButton ?? "Search"}
           </button>
         </form>
       </div>
@@ -107,7 +107,7 @@ export default function BlogListTemplate({
           {/* Pinned Posts */}
           {pinnedPosts.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide mb-4">{dict?.pinnedPosts ?? "置顶文章"}</h2>
+              <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide mb-4">{dict?.pinnedPosts ?? "Pinned Posts"}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {pinnedPosts.map((post) => (
                   <BlogPostCard key={post.id} post={post} pinned dict={dict} />
@@ -124,14 +124,14 @@ export default function BlogListTemplate({
           </div>
 
           {posts.length === 0 && (
-            <div className="text-center py-16 text-neutral-400">{dict?.noPosts ?? "暂无文章"}</div>
+            <div className="text-center py-16 text-neutral-400">{dict?.noPosts ?? "No posts yet"}</div>
           )}
 
           {/* Infinite Scroll Sentinel */}
           <div ref={sentinelRef} className="h-8 flex items-center justify-center mt-6">
-            {loading && <span className="text-sm text-neutral-400">{dict?.loadingMore ?? "加载中..."}</span>}
+            {loading && <span className="text-sm text-neutral-400">{dict?.loadingMore ?? "Loading..."}</span>}
             {!hasMore && posts.length > 0 && (
-              <span className="text-sm text-neutral-400">{dict?.showingAll ? dict.showingAll.replace("{{n}}", String(total)) : `已显示全部 ${total} 篇文章`}</span>
+              <span className="text-sm text-neutral-400">{dict?.showingAll ? dict.showingAll.replace("{{n}}", String(total)) : `Showing all ${total} posts`}</span>
             )}
           </div>
         </main>
@@ -141,7 +141,7 @@ export default function BlogListTemplate({
           {/* Categories */}
           {categories.length > 0 && (
             <div className="mb-6">
-              <h3 className="font-semibold text-neutral-800 mb-3">{dict?.categories ?? "分类"}</h3>
+              <h3 className="font-semibold text-neutral-800 mb-3">{dict?.categories ?? "Categories"}</h3>
               <ul className="space-y-1">
                 {categories.map((cat) => (
                   <li key={cat.id}>
@@ -163,7 +163,7 @@ export default function BlogListTemplate({
           {/* Tags */}
           {tags.length > 0 && (
             <div>
-              <h3 className="font-semibold text-neutral-800 mb-3">{dict?.tags ?? "标签"}</h3>
+              <h3 className="font-semibold text-neutral-800 mb-3">{dict?.tags ?? "Tags"}</h3>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <a

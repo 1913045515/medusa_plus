@@ -6,8 +6,8 @@ import { getBlogDictionary } from "@lib/i18n/dictionaries"
 import BlogListTemplate from "@modules/blog/templates/blog-list"
 
 export const metadata: Metadata = {
-  title: "博客",
-  description: "浏览我们的最新文章和资讯",
+  title: "Blog",
+  description: "Browse our latest articles and updates",
 }
 
 type Props = {

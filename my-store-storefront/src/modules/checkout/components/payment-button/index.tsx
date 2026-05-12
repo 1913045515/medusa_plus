@@ -9,7 +9,7 @@ import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 import PayPalPaymentButton from "@modules/checkout/components/paypal-button"
-import { usePayPalConfig } from "@modules/checkout/components/paypal-provider"
+import { usePayPalConfig, usePayPalLoading } from "@modules/checkout/components/paypal-provider"
 import PayPalCardFields from "@modules/checkout/components/paypal-card-fields"
 
 type PaymentButtonProps = {
@@ -72,11 +72,20 @@ const PayPalButtonGroup = ({
   "data-testid"?: string
 }) => {
   const config = usePayPalConfig()
+  const loading = usePayPalLoading()
+
+  if (loading) {
+    return (
+      <div className="p-4 text-sm text-ui-fg-subtle text-center">
+        Loading PayPal...
+      </div>
+    )
+  }
 
   if (!config.enabled) {
     return (
       <div className="p-4 border border-ui-border-base rounded-lg text-sm text-ui-fg-subtle">
-        PayPal 支付暂不可用，请选择其他付款方式或联系客服。
+        PayPal is temporarily unavailable. Please choose a different payment method or contact our support team.
       </div>
     )
   }
@@ -95,7 +104,7 @@ const PayPalButtonGroup = ({
         <PayPalCardFields cart={cart} notReady={notReady} />
       ) : (
         <p className="text-xs text-ui-fg-muted text-center">
-          如需信用卡付款，请联系客服或使用 PayPal 账号付款。
+          To pay with a credit card, please use your PayPal account or contact our support team for assistance.
         </p>
       )}
     </div>

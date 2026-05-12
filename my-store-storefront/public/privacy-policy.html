@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | Wolzq</title>
+  <meta name="description" content="Privacy Policy for Wolzq, including data collection, use, disclosures, cookies, U.S. state privacy rights, and security safeguards." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #059669;
+      --primary-dark: #065f46;
+      --text: #111827;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f9fafb;
+      --bg-card: #ffffff;
+      --accent: #ecfdf5;
+      --accent-border: #34d399;
+      --radius: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .site-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .site-header .inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: #059669; text-decoration: none; }
+    .logo span { color: var(--text); }
+    .header-nav a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .header-nav a:hover { color: var(--primary); }
+
+    .hero {
+      background: linear-gradient(135deg, #065f46 0%, #059669 60%, #10b981 100%);
+      color: #fff;
+      padding: 64px 24px 56px;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 800; letter-spacing: -0.5px; }
+    .hero .meta {
+      margin-top: 12px;
+      font-size: 13px;
+      opacity: .75;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      padding: 3px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+
+    .toc {
+      position: sticky;
+      top: 80px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .toc h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .toc a {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      transition: all .15s;
+    }
+    .toc a:hover { background: var(--bg); color: var(--primary); }
+
+    .content { min-width: 0; }
+
+    .notice-box {
+      background: var(--accent);
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      color: #065f46;
+    }
+    .notice-box strong { color: #064e3b; }
+
+    section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    section h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    section h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    section h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 20px 0 8px;
+      color: var(--text);
+    }
+    section p { margin-bottom: 12px; color: #374151; }
+    section ul, section ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+    section li { margin-bottom: 6px; color: #374151; }
+    section a { color: var(--primary); text-decoration: none; }
+    section a:hover { text-decoration: underline; }
+
+    .highlight-box {
+      background: #ecfdf5;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .info-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .info-card .icon { font-size: 22px; margin-bottom: 8px; }
+    .info-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .info-card p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      background: #f3f4f6;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    td { padding: 9px 14px; border: 1px solid var(--border); }
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    .rights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .rights-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+    .rights-card .rights-title {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .rights-card p { margin: 0; color: var(--text-secondary); }
+
+    .site-footer {
+      background: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+    }
+    .site-footer a { color: #6b7280; text-decoration: none; }
+    .site-footer a:hover { color: #d1d5db; }
+    .site-footer .links { margin-bottom: 10px; }
+    .site-footer .links a { margin: 0 10px; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="logo">Wolzq<span>.com</span></a>
+    <nav class="header-nav">
+      <a href="/">Home</a>
+      <a href="/terms-of-use.html">Terms of Use</a>
+      <a href="/store">Store</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="badge">Legal</div>
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last Updated: May 11, 2026 &nbsp;|&nbsp; Effective Date: May 11, 2026</div>
+</div>
+
+<div class="page-wrap">
+  <aside class="toc">
+    <h4>Contents</h4>
+    <a href="#scope">1. Scope</a>
+    <a href="#collect">2. Information We Collect</a>
+    <a href="#sources">3. Sources of Information</a>
+    <a href="#use">4. How We Use Information</a>
+    <a href="#disclose">5. Disclosures to Third Parties</a>
+    <a href="#cookies">6. Cookies and Tracking Technologies</a>
+    <a href="#security">7. Security Safeguards</a>
+    <a href="#retention">8. Data Retention</a>
+    <a href="#rights">9. U.S. Privacy Rights</a>
+    <a href="#children">10. Children's Privacy</a>
+    <a href="#transfers">11. International Transfers</a>
+    <a href="#signals">12. Do Not Track and Sale/Sharing Disclosures</a>
+    <a href="#changes">13. Changes to This Policy</a>
+    <a href="#contact">14. Contact Us</a>
+  </aside>
+
+  <main class="content">
+    <div class="notice-box">
+      <strong>Your privacy matters.</strong> This Privacy Policy explains how Wolzq collects, uses, discloses, and protects personal information when you use <a href="https://www.wolzq.com" style="color:#065f46">www.wolzq.com</a> and related services.
+    </div>
+
+    <section id="scope">
+      <h2><span class="num">1</span>Scope</h2>
+      <p>
+        This Privacy Policy applies to personal information we collect through our website, storefront, support channels, digital product delivery systems,
+        customer accounts, and related interactions with Wolzq.
+      </p>
+      <p>
+        It does not apply to third-party websites, payment providers, hosting partners, or services that maintain their own privacy notices.
+      </p>
+    </section>
+
+    <section id="collect">
+      <h2><span class="num">2</span>Information We Collect</h2>
+      <h3>2.1 Information You Provide Directly</h3>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="icon">👤</div>
+          <h4>Account Information</h4>
+          <p>Name, email address, password hash, and related account profile details.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">🛒</div>
+          <h4>Transaction Information</h4>
+          <p>Orders, payment status, billing country or region, course purchases, and delivery records.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">📬</div>
+          <h4>Support Communications</h4>
+          <p>Messages you send to support, questions about purchases, and related attachments.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">🎓</div>
+          <h4>Learning Activity</h4>
+          <p>Lesson access records, course progress data, and related gated-content access logs.</p>
+        </div>
+      </div>
+      <h3>2.2 Information Collected Automatically</h3>
+      <ul>
+        <li>IP address, approximate location inferred from IP, browser type, device type, and operating system.</li>
+        <li>Pages viewed, referring URLs, timestamps, interactions with storefront pages, and error logs.</li>
+        <li>Session and authentication data stored through secure cookies or similar technologies, including account session state.</li>
+        <li>Technical information required to secure downloads, gated course playback, and account access.</li>
+      </ul>
+      <h3>2.3 Payment Information</h3>
+      <div class="highlight-box">
+        Payment transactions are processed by third-party payment providers such as PayPal. Wolzq does not store full credit card numbers, card security codes, or bank account passwords on its own servers.
+      </div>
+    </section>
+
+    <section id="sources">
+      <h2><span class="num">3</span>Sources of Information</h2>
+      <p>We collect personal information from the following sources:</p>
+      <ul>
+        <li>Directly from you when you create an account, place an order, contact support, or access paid content.</li>
+        <li>Automatically from your browser, device, and interactions with our Services.</li>
+        <li>From payment processors regarding transaction status, fraud screening, and order confirmation.</li>
+        <li>From infrastructure and security providers that help us host, secure, and monitor the Services.</li>
+      </ul>
+    </section>
+
+    <section id="use">
+      <h2><span class="num">4</span>How We Use Information</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Purpose</th><th>Examples</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Provide the Services</td><td>Create accounts, process orders, provision course access, and deliver digital goods.</td></tr>
+            <tr><td>Maintain security</td><td>Authenticate users, detect abuse, investigate suspicious activity, and protect digital assets.</td></tr>
+            <tr><td>Customer support</td><td>Respond to inquiries, resolve billing or access issues, and maintain support records.</td></tr>
+            <tr><td>Operations and analytics</td><td>Understand site performance, improve navigation, and optimize product pages and learning flows.</td></tr>
+            <tr><td>Legal and compliance</td><td>Meet tax, accounting, fraud prevention, and legal obligations.</td></tr>
+            <tr><td>Communications</td><td>Send transactional emails, important policy notices, security alerts, and product access updates.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        We do not use personal information for cross-context behavioral advertising, and we do not sell personal information for monetary consideration.
+      </p>
+    </section>
+
+    <section id="disclose">
+      <h2><span class="num">5</span>Disclosures to Third Parties</h2>
+      <p>
+        We disclose personal information only as reasonably necessary to operate the Services, comply with law, and protect our legitimate business interests.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Recipient</th><th>Purpose</th><th>Types of Data</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Payment providers</td><td>Process payments and manage transaction risk</td><td>Order details, email address, transaction identifiers</td></tr>
+            <tr><td>Hosting and infrastructure providers</td><td>Run the storefront, backend, database, and CDN services</td><td>System logs, IP address, usage data, stored content</td></tr>
+            <tr><td>Email and support tools</td><td>Send service emails and manage support requests</td><td>Email address, message content, support metadata</td></tr>
+            <tr><td>Security and fraud prevention providers</td><td>Detect abuse, secure accounts, and investigate incidents</td><td>IP address, device signals, account activity</td></tr>
+            <tr><td>Authorities or legal process</td><td>Comply with law or protect rights and safety</td><td>Information required by law or valid request</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        We do not knowingly disclose personal information to data brokers.
+      </p>
+    </section>
+
+    <section id="cookies">
+      <h2><span class="num">6</span>Cookies and Tracking Technologies</h2>
+      <p>
+        We use cookies and similar technologies to maintain session state, protect accounts, preserve cart state, support secure checkout,
+        and understand how the site is used.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Example</th><th>Type</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Authentication cookie</td><td>Strictly necessary</td><td>Maintains customer sign-in session and gated-content access.</td></tr>
+            <tr><td>Cart identifier</td><td>Functional</td><td>Preserves cart contents between page loads and sessions.</td></tr>
+            <tr><td>Security or anti-abuse token</td><td>Strictly necessary</td><td>Helps validate requests and protect the site from misuse.</td></tr>
+            <tr><td>Payment-provider cookies</td><td>Third-party</td><td>Support the checkout and payment confirmation process.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        You can control cookies through your browser settings. If you disable strictly necessary cookies, some site functionality may not work properly.
+      </p>
+    </section>
+
+    <section id="security">
+      <h2><span class="num">7</span>Security Safeguards</h2>
+      <p>
+        We maintain a written and operational security approach designed to protect personal information and digital assets from unauthorized access,
+        disclosure, alteration, and destruction.
+      </p>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="icon">🔐</div>
+          <h4>Encrypted Transport</h4>
+          <p>HTTPS and TLS are used to protect data in transit between your browser and our Services.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">🔑</div>
+          <h4>Credential Protection</h4>
+          <p>Passwords are stored in hashed form and administrative access is restricted on a least-privilege basis.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">🛡️</div>
+          <h4>Monitoring and Logging</h4>
+          <p>We log authentication and system events to support fraud detection, incident response, and system integrity.</p>
+        </div>
+        <div class="info-card">
+          <div class="icon">📁</div>
+          <h4>Controlled Delivery</h4>
+          <p>Protected files and course media may be served through gated routes, signed URLs, or access-controlled delivery patterns.</p>
+        </div>
+      </div>
+      <p>
+        No method of transmission or storage is completely secure. If you believe your account has been compromised, contact us immediately at <a href="mailto:security@wolzq.com">security@wolzq.com</a>.
+      </p>
+    </section>
+
+    <section id="retention">
+      <h2><span class="num">8</span>Data Retention</h2>
+      <p>
+        We retain personal information only for as long as reasonably necessary for the purposes described in this Policy, including legal, accounting,
+        fraud prevention, dispute resolution, and operational needs.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Category</th><th>Typical Retention Basis</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Account records</td><td>For the life of the account and a reasonable period afterward for support, audit, and security needs.</td></tr>
+            <tr><td>Order and billing records</td><td>As required for tax, accounting, chargeback, and legal compliance.</td></tr>
+            <tr><td>Support messages</td><td>As needed to resolve requests, track recurring issues, and document service history.</td></tr>
+            <tr><td>Security and access logs</td><td>As needed for system integrity, fraud prevention, and incident review.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="rights">
+      <h2><span class="num">9</span>U.S. Privacy Rights</h2>
+      <p>
+        Depending on where you live, including California and other states with applicable privacy laws, you may have rights regarding your personal information.
+      </p>
+      <div class="rights-grid">
+        <div class="rights-card">
+          <span class="rights-title">Right to Know</span>
+          <p>Request information about the categories of personal information we collect, use, disclose, and retain.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Access</span>
+          <p>Request a copy of specific personal information we hold about you, subject to legal exceptions.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Delete</span>
+          <p>Ask us to delete personal information we collected from you, subject to applicable exceptions.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Correct</span>
+          <p>Request correction of inaccurate personal information we maintain about you.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Portability</span>
+          <p>Request a portable copy of certain data in a commonly used format where required by law.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Opt Out</span>
+          <p>We do not sell personal information or share it for cross-context behavioral advertising as those terms are defined under certain state laws.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Right to Non-Discrimination</span>
+          <p>We will not discriminate against you for exercising applicable privacy rights.</p>
+        </div>
+        <div class="rights-card">
+          <span class="rights-title">Authorized Agent</span>
+          <p>Where permitted by law, you may designate an authorized agent to submit a request on your behalf.</p>
+        </div>
+      </div>
+      <h3>9.1 How to Submit a Request</h3>
+      <p>
+        To submit a privacy request, email <a href="mailto:privacy@wolzq.com">privacy@wolzq.com</a>. We may verify your identity before processing your request.
+        If we deny your request where an appeal right applies, we will explain how to appeal.
+      </p>
+    </section>
+
+    <section id="children">
+      <h2><span class="num">10</span>Children's Privacy</h2>
+      <p>
+        Our Services are not directed to children under 13, and we do not knowingly collect personal information from children under 13 in a manner subject to the Children's Online Privacy Protection Act (COPPA).
+      </p>
+      <p>
+        If you believe a child under 13 has provided personal information to us, contact <a href="mailto:privacy@wolzq.com">privacy@wolzq.com</a> and we will take appropriate steps to review and delete the information where required.
+      </p>
+    </section>
+
+    <section id="transfers">
+      <h2><span class="num">11</span>International Transfers</h2>
+      <p>
+        Wolzq may store or process information in the United States or in other jurisdictions where our service providers operate.
+        By using the Services, you understand that your information may be transferred to and processed in countries other than your own, subject to applicable safeguards and legal requirements.
+      </p>
+    </section>
+
+    <section id="signals">
+      <h2><span class="num">12</span>Do Not Track and Sale/Sharing Disclosures</h2>
+      <p>
+        Our site does not currently respond to browser-based "Do Not Track" signals in a standardized way because no consistent industry standard has been adopted.
+      </p>
+      <p>
+        Wolzq does not sell personal information for monetary consideration and does not share personal information for cross-context behavioral advertising.
+        We also do not knowingly process sensitive personal information for purposes that would trigger a state-law right to limit such use, except as necessary to provide the Services.
+      </p>
+    </section>
+
+    <section id="changes">
+      <h2><span class="num">13</span>Changes to This Policy</h2>
+      <p>
+        We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, legal requirements, or business operations.
+        The updated version will be posted on this page with a revised effective date.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2><span class="num">14</span>Contact Us</h2>
+      <p>If you have questions about this Privacy Policy or our data practices, contact us below.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Contact Method</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Privacy</td><td><a href="mailto:privacy@wolzq.com">privacy@wolzq.com</a></td></tr>
+            <tr><td>Security</td><td><a href="mailto:security@wolzq.com">security@wolzq.com</a></td></tr>
+            <tr><td>Support</td><td><a href="mailto:support@wolzq.com">support@wolzq.com</a></td></tr>
+            <tr><td>Website</td><td><a href="https://www.wolzq.com" target="_blank" rel="noopener">www.wolzq.com</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="links">
+    <a href="/">Home</a>
+    <a href="/terms-of-use.html">Terms of Use</a>
+    <a href="/privacy-policy.html">Privacy Policy</a>
+    <a href="mailto:privacy@wolzq.com">Contact</a>
+  </div>
+  <p>© 2026 Wolzq. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

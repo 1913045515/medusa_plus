@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Use | Wolzq</title>
+  <meta name="description" content="Terms of Use for Wolzq, including digital product access, payment, account security, intellectual property, and legal terms." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --text: #111827;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f9fafb;
+      --bg-card: #ffffff;
+      --accent: #fef3c7;
+      --accent-border: #f59e0b;
+      --radius: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .site-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .site-header .inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; }
+    .logo span { color: var(--text); }
+    .header-nav a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .header-nav a:hover { color: var(--primary); }
+
+    .hero {
+      background: linear-gradient(135deg, #1e429f 0%, #1a56db 60%, #2563eb 100%);
+      color: #fff;
+      padding: 64px 24px 56px;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 800; letter-spacing: -0.5px; }
+    .hero .meta {
+      margin-top: 12px;
+      font-size: 13px;
+      opacity: .75;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      padding: 3px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+
+    .toc {
+      position: sticky;
+      top: 80px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .toc h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .toc a {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      transition: all .15s;
+    }
+    .toc a:hover { background: var(--bg); color: var(--primary); }
+
+    .content { min-width: 0; }
+
+    .notice-box {
+      background: var(--accent);
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    .notice-box strong { color: #92400e; }
+
+    section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    section h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    section h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    section h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 20px 0 8px;
+      color: var(--text);
+    }
+    section p { margin-bottom: 12px; color: #374151; }
+    section ul, section ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+    section li { margin-bottom: 6px; color: #374151; }
+    section a { color: var(--primary); text-decoration: none; }
+    section a:hover { text-decoration: underline; }
+
+    .highlight-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      background: #f3f4f6;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    td { padding: 9px 14px; border: 1px solid var(--border); }
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    .site-footer {
+      background: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+    }
+    .site-footer a { color: #6b7280; text-decoration: none; }
+    .site-footer a:hover { color: #d1d5db; }
+    .site-footer .links { margin-bottom: 10px; }
+    .site-footer .links a { margin: 0 10px; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="logo">Wolzq<span>.com</span></a>
+    <nav class="header-nav">
+      <a href="/">Home</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/store">Store</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="badge">Legal</div>
+  <h1>Terms of Use</h1>
+  <div class="meta">Last Updated: May 11, 2026 &nbsp;|&nbsp; Effective Date: May 11, 2026</div>
+</div>
+
+<div class="page-wrap">
+  <aside class="toc">
+    <h4>Contents</h4>
+    <a href="#acceptance">1. Acceptance of Terms</a>
+    <a href="#eligibility">2. Eligibility and Accounts</a>
+    <a href="#services">3. Services and Digital Products</a>
+    <a href="#orders">4. Orders, Pricing, and Payment</a>
+    <a href="#license">5. License and Permitted Use</a>
+    <a href="#restrictions">6. Prohibited Conduct</a>
+    <a href="#security">7. Security and Account Protection</a>
+    <a href="#ip">8. Intellectual Property and DMCA</a>
+    <a href="#ugc">9. Feedback and User Submissions</a>
+    <a href="#disclaimers">10. Disclaimers</a>
+    <a href="#liability">11. Limitation of Liability</a>
+    <a href="#indemnity">12. Indemnification</a>
+    <a href="#termination">13. Suspension and Termination</a>
+    <a href="#law">14. Governing Law</a>
+    <a href="#changes">15. Changes to These Terms</a>
+    <a href="#contact">16. Contact Us</a>
+  </aside>
+
+  <main class="content">
+    <div class="notice-box">
+      <strong>Important:</strong> By accessing or using Wolzq, you agree to these Terms of Use. If you do not agree, do not access or use the site or any related services.
+    </div>
+
+    <section id="acceptance">
+      <h2><span class="num">1</span>Acceptance of Terms</h2>
+      <p>
+        These Terms of Use govern your access to and use of the website located at <a href="https://www.wolzq.com">www.wolzq.com</a>, any related storefront pages,
+        customer account features, and digital products or services offered by Wolzq, including source code packages, learning resources, downloadable materials,
+        and video-based courses (collectively, the "Services").
+      </p>
+      <p>
+        By visiting the site, creating an account, placing an order, or otherwise using the Services, you agree to be bound by these Terms and by our
+        <a href="/privacy-policy.html">Privacy Policy</a>. If you are using the Services on behalf of a business entity, you represent that you have authority to bind that entity.
+      </p>
+    </section>
+
+    <section id="eligibility">
+      <h2><span class="num">2</span>Eligibility and Accounts</h2>
+      <h3>2.1 Eligibility</h3>
+      <p>
+        You must be at least 18 years old, or the age of majority in your jurisdiction, to purchase paid products or create an account without parental or legal guardian involvement.
+      </p>
+      <h3>2.2 Account Accuracy</h3>
+      <p>
+        You agree to provide current, complete, and accurate account information and to keep that information updated.
+      </p>
+      <h3>2.3 Account Responsibility</h3>
+      <ul>
+        <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+        <li>You are responsible for all activity occurring under your account.</li>
+        <li>You must notify us promptly at <a href="mailto:support@wolzq.com">support@wolzq.com</a> if you suspect unauthorized access.</li>
+      </ul>
+      <h3>2.4 No Account Sharing</h3>
+      <p>
+        Accounts are licensed to a single end user unless we expressly authorize otherwise in writing. Sharing login credentials, redistributing access, or enabling multiple users to use a single paid account is prohibited.
+      </p>
+    </section>
+
+    <section id="services">
+      <h2><span class="num">3</span>Services and Digital Products</h2>
+      <p>
+        Wolzq operates a digital-first commerce platform. Products may include downloadable software-related materials, structured educational content,
+        and video courses delivered through a gated online learning experience.
+      </p>
+      <div class="highlight-box">
+        Unless expressly stated otherwise on a product page, products sold through Wolzq are digital goods or access rights to digital content. No physical shipment is required for delivery.
+      </div>
+      <h3>3.1 Course Access</h3>
+      <p>
+        Certain courses may include free preview lessons. Access to protected lessons or premium materials is granted only after successful payment and order confirmation.
+      </p>
+      <h3>3.2 Availability</h3>
+      <p>
+        We may modify, update, suspend, or discontinue any part of the Services at any time, including content, features, or supported payment methods, provided that doing so does not violate applicable law.
+      </p>
+    </section>
+
+    <section id="orders">
+      <h2><span class="num">4</span>Orders, Pricing, and Payment</h2>
+      <h3>4.1 Orders</h3>
+      <p>
+        When you place an order, you agree that the information you provide is accurate and that you are authorized to use the selected payment method.
+        We may reject or cancel orders where fraud, abuse, pricing error, or compliance concerns are reasonably suspected.
+      </p>
+      <h3>4.2 Pricing</h3>
+      <p>
+        Prices are listed in the currency shown at checkout. We may change prices prospectively at any time, but a price change will not affect an order that has already been accepted and paid.
+      </p>
+      <h3>4.3 Taxes</h3>
+      <p>
+        You are responsible for applicable sales, use, value-added, or similar taxes associated with your order, except for taxes based on Wolzq's net income. Taxes, where required, will be displayed at checkout.
+      </p>
+      <h3>4.4 Payment Processing</h3>
+      <p>
+        Payment processing is handled by third-party providers, including PayPal. Your payment details are submitted directly to the payment provider and are governed by that provider's terms and privacy practices.
+        Wolzq does not store full payment card numbers or card security codes on its own servers.
+      </p>
+      <h3>4.5 Digital Delivery and Refunds</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Topic</th><th>Policy</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Delivery</td><td>Digital access is typically activated shortly after payment confirmation.</td></tr>
+            <tr><td>Refunds</td><td>Because products are digital and may be consumed immediately, all sales are generally final, except where required by law or where Wolzq expressly approves a refund.</td></tr>
+            <tr><td>Duplicate Charges</td><td>If you are charged more than once for the same order, contact us and we will review and correct verified duplicate billing.</td></tr>
+            <tr><td>Technical Failure</td><td>If access cannot be provisioned due to a platform error, we may provide access, credit, or a refund at our discretion and as required by law.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="license">
+      <h2><span class="num">5</span>License and Permitted Use</h2>
+      <p>
+        Subject to your compliance with these Terms and any product-specific license terms, Wolzq grants you a limited, non-exclusive, non-transferable,
+        revocable license to access and use purchased digital content for your own internal business or personal educational use.
+      </p>
+      <h3>5.1 You May</h3>
+      <ul>
+        <li>Access purchased courses and materials through your authorized account.</li>
+        <li>Use course knowledge, examples, and ideas in your own projects, subject to any product-specific license included with the product.</li>
+        <li>Download files only where a product page or delivery flow expressly allows downloads.</li>
+      </ul>
+      <h3>5.2 You May Not</h3>
+      <ul>
+        <li>Resell, sublicense, rent, lease, or redistribute protected course videos or gated files unless the product license expressly permits it.</li>
+        <li>Record, scrape, mirror, copy, or mass-export protected content from the Services.</li>
+        <li>Remove notices, branding, or technical protection measures from delivered materials.</li>
+      </ul>
+    </section>
+
+    <section id="restrictions">
+      <h2><span class="num">6</span>Prohibited Conduct</h2>
+      <p>You agree not to:</p>
+      <ul>
+        <li>Use the Services for unlawful, fraudulent, deceptive, or abusive purposes.</li>
+        <li>Attempt to probe, scan, or test the vulnerability of the site or related infrastructure without written authorization.</li>
+        <li>Bypass authentication, rate limits, access controls, signed URLs, or other security mechanisms.</li>
+        <li>Use bots, scrapers, or automated tools to extract protected content, pricing, or customer data.</li>
+        <li>Upload malware, malicious code, or content that interferes with system integrity or availability.</li>
+        <li>Impersonate another person or misrepresent your affiliation with a company or organization.</li>
+      </ul>
+    </section>
+
+    <section id="security">
+      <h2><span class="num">7</span>Security and Account Protection</h2>
+      <p>
+        Wolzq maintains administrative, technical, and physical safeguards designed to protect the Services and customer accounts. These safeguards include encrypted transport,
+        controlled administrative access, logging, and monitoring designed to detect misuse or unauthorized access.
+      </p>
+      <div class="highlight-box">
+        You are responsible for using a strong password, protecting your account credentials, and signing out from shared devices. We may suspend access where activity appears to present a security risk.
+      </div>
+      <p>
+        You may not interfere with or disable any protective measures we use to secure digital assets, gated downloads, or course media.
+      </p>
+    </section>
+
+    <section id="ip">
+      <h2><span class="num">8</span>Intellectual Property and DMCA</h2>
+      <h3>8.1 Ownership</h3>
+      <p>
+        The Services, including software, page design, trademarks, videos, written materials, graphics, course structure, and related content, are owned by Wolzq or its licensors and are protected by U.S. and international intellectual property laws.
+      </p>
+      <h3>8.2 DMCA Notices</h3>
+      <p>
+        If you believe content on the Services infringes your copyright, send a notice to <a href="mailto:copyright@wolzq.com">copyright@wolzq.com</a> with sufficient detail to identify the work, the allegedly infringing material, your contact information, and a statement made under penalty of perjury as required by the Digital Millennium Copyright Act.
+      </p>
+      <p>
+        We may remove or disable access to allegedly infringing material and may terminate repeat infringers where appropriate.
+      </p>
+    </section>
+
+    <section id="ugc">
+      <h2><span class="num">9</span>Feedback and User Submissions</h2>
+      <p>
+        If you submit comments, suggestions, ideas, support requests, reviews, or other feedback to Wolzq, you grant us a non-exclusive, worldwide, royalty-free license to use,
+        reproduce, adapt, publish, and display that feedback for the purpose of operating, improving, and promoting the Services, unless prohibited by law.
+      </p>
+      <p>
+        Do not submit confidential information you do not want us to use. You remain responsible for ensuring your submissions do not violate the rights of any third party.
+      </p>
+    </section>
+
+    <section id="disclaimers">
+      <h2><span class="num">10</span>Disclaimers</h2>
+      <p>
+        THE SERVICES ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS TO THE MAXIMUM EXTENT PERMITTED BY LAW. WOLZQ DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED,
+        STATUTORY, OR OTHERWISE, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+      </p>
+      <p>
+        We do not guarantee that the Services will be uninterrupted, error-free, secure at all times, or compatible with every device, browser, workflow, or integration.
+        Educational materials are provided for informational purposes and do not constitute legal, tax, accounting, or professional advice.
+      </p>
+    </section>
+
+    <section id="liability">
+      <h2><span class="num">11</span>Limitation of Liability</h2>
+      <p>
+        TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, WOLZQ AND ITS AFFILIATES, OFFICERS, DIRECTORS, EMPLOYEES, LICENSORS, AND SERVICE PROVIDERS WILL NOT BE LIABLE FOR ANY INDIRECT,
+        INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, GOODWILL, OR BUSINESS INTERRUPTION, ARISING OUT OF OR RELATED TO THE SERVICES.
+      </p>
+      <p>
+        TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE TOTAL LIABILITY OF WOLZQ FOR ALL CLAIMS ARISING OUT OF OR RELATING TO THE SERVICES WILL NOT EXCEED THE GREATER OF ONE HUNDRED U.S. DOLLARS (US$100)
+        OR THE AMOUNT YOU PAID TO WOLZQ FOR THE RELEVANT PRODUCT OR SERVICE DURING THE TWELVE (12) MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM.
+      </p>
+      <p>
+        Some states do not allow certain limitations, so portions of this section may not apply to you.
+      </p>
+    </section>
+
+    <section id="indemnity">
+      <h2><span class="num">12</span>Indemnification</h2>
+      <p>
+        You agree to defend, indemnify, and hold harmless Wolzq and its affiliates, personnel, and service providers from and against claims, liabilities, damages, judgments, awards,
+        losses, costs, expenses, and reasonable attorneys' fees arising out of or relating to your misuse of the Services, your violation of these Terms, or your infringement of any third-party rights.
+      </p>
+    </section>
+
+    <section id="termination">
+      <h2><span class="num">13</span>Suspension and Termination</h2>
+      <p>
+        We may suspend, restrict, or terminate your access to the Services at any time if we reasonably believe you violated these Terms, created a security risk, engaged in fraud,
+        or used the Services in a manner that could harm Wolzq, other users, or third parties.
+      </p>
+      <p>
+        Upon termination, the rights granted to you under these Terms will end immediately, but sections that by their nature should survive will remain in effect,
+        including sections regarding intellectual property, disclaimers, limitations of liability, indemnification, and governing law.
+      </p>
+    </section>
+
+    <section id="law">
+      <h2><span class="num">14</span>Governing Law</h2>
+      <p>
+        These Terms are governed by the laws of the United States and the laws of the state in which Wolzq maintains its principal place of business, without regard to conflict of laws principles,
+        except to the extent superseded by applicable federal law or non-waivable consumer protection law.
+      </p>
+      <p>
+        Any dispute arising out of or relating to these Terms or the Services will be brought in the state or federal courts having jurisdiction over Wolzq's principal place of business,
+        and you consent to personal jurisdiction and venue in those courts, subject to any rights you may have under mandatory consumer laws.
+      </p>
+    </section>
+
+    <section id="changes">
+      <h2><span class="num">15</span>Changes to These Terms</h2>
+      <p>
+        We may update these Terms from time to time. The revised version will be posted on this page with an updated effective date.
+        If changes are material, we may provide additional notice, such as by email or by a notice on the site.
+      </p>
+      <p>
+        Your continued use of the Services after the updated Terms take effect means you accept the revised Terms.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2><span class="num">16</span>Contact Us</h2>
+      <p>If you have questions about these Terms of Use, contact us using the details below.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Contact Method</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Support</td><td><a href="mailto:support@wolzq.com">support@wolzq.com</a></td></tr>
+            <tr><td>Copyright / DMCA</td><td><a href="mailto:copyright@wolzq.com">copyright@wolzq.com</a></td></tr>
+            <tr><td>Website</td><td><a href="https://www.wolzq.com" target="_blank" rel="noopener">www.wolzq.com</a></td></tr>
+            <tr><td>Response Time</td><td>Typically within 1 to 2 business days</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="links">
+    <a href="/">Home</a>
+    <a href="/terms-of-use.html">Terms of Use</a>
+    <a href="/privacy-policy.html">Privacy Policy</a>
+    <a href="mailto:support@wolzq.com">Contact</a>
+  </div>
+  <p>© 2026 Wolzq. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

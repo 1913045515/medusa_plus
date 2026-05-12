@@ -9,7 +9,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const page = await getContentPage(slug)
-  if (!page) return { title: "页面未找到" }
+  if (!page) return { title: "Page not found" }
   return {
     title: page.seo_title || page.title,
     description: page.seo_description || undefined,
@@ -33,7 +33,7 @@ export default async function ContentPageRoute({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: page.body }}
         />
       ) : (
-        <p className="text-ui-fg-subtle">此页面暂无内容。</p>
+        <p className="text-ui-fg-subtle">This page has no content yet.</p>
       )}
     </div>
   )

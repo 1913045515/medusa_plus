@@ -12,8 +12,8 @@ type PayPalPaymentButtonProps = {
   "data-testid"?: string
 }
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+// Use the Next.js API proxy route to avoid nginx routing issues in production
+const PAYPAL_CAPTURE_URL = "/api/paypal-capture"
 
 export default function PayPalPaymentButton({
   cart,
@@ -61,13 +61,9 @@ export default function PayPalPaymentButton({
     try {
       // The backend will capture on our side via the payment session
       // We update the payment session data with the approved order ID
-      await fetch(`${BACKEND_URL}/store/paypal/capture`, {
+      await fetch(PAYPAL_CAPTURE_URL, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           paypal_order_id: data.orderID,
           cart_id: cart.id,
@@ -81,11 +77,11 @@ export default function PayPalPaymentButton({
 
   const handleCancel = () => {
     setCancelled(true)
-    setErrorMessage("付款已取消，请重试。")
+    setErrorMessage("Payment cancelled. Please try again.")
   }
 
   const handleError = (err: Record<string, unknown>) => {
-    setErrorMessage("PayPal 付款出错，请重试。")
+    setErrorMessage("An error occurred with PayPal. Please try again.")
   }
 
   if (isPending || notReady) {

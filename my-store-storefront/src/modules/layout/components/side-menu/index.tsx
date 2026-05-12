@@ -128,14 +128,14 @@ function MenuItemRow({ item, close, hasUnread }: { item: MenuItemData; close: ()
         >
           {item.title}
           {isSupport && hasUnread && (
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 mb-auto mt-2" title="有未读消息" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 mb-auto mt-2" title="Unread messages" />
           )}
         </LocalizedClientLink>
         {hasChildren && (
           <button
             onClick={() => setExpanded((v) => !v)}
             className="rounded-full p-2 transition-colors hover:bg-[#efe1ce]"
-            aria-label="展开子菜单"
+            aria-label="Expand submenu"
           >
             <ChevronDown className={clx("h-4 w-4 text-[#7d6750] transition-transform duration-200", expanded ? "rotate-180" : "")} />
           </button>
@@ -154,7 +154,7 @@ function MenuItemRow({ item, close, hasUnread }: { item: MenuItemData; close: ()
               >
                 {child.title}
                 {(child.href?.includes("/support") || child.href?.includes("/ticket")) && hasUnread && (
-                  <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" title="有未读消息" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" title="Unread messages" />
                 )}
               </LocalizedClientLink>
             </li>

@@ -19,8 +19,8 @@ type PayPalCardFieldsProps = {
   notReady: boolean
 }
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+// Use the Next.js API proxy route to avoid nginx routing issues in production
+const PAYPAL_CAPTURE_URL = "/api/paypal-capture"
 
 function SubmitButton({
   notReady,
@@ -52,7 +52,7 @@ function SubmitButton({
       isLoading={submitting}
       onClick={handleClick}
     >
-      立即付款（信用卡）
+      Pay Now (Credit Card)
     </Button>
   )
 }
@@ -66,13 +66,9 @@ export default function PayPalCardFields({
 
   const handleApprove = async (data: { orderID: string }) => {
     try {
-      await fetch(`${BACKEND_URL}/store/paypal/capture`, {
+      await fetch(PAYPAL_CAPTURE_URL, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           paypal_order_id: data.orderID,
           cart_id: cart.id,
@@ -81,12 +77,12 @@ export default function PayPalCardFields({
       setApproved(true)
       await placeOrder()
     } catch (err: any) {
-      setErrorMessage(err.message || "信用卡付款失败，请重试。")
+      setErrorMessage(err.message || "Credit card payment failed. Please try again.")
     }
   }
 
   const handleError = (err: Record<string, unknown>) => {
-    setErrorMessage("信用卡付款出错，请重试或使用其他付款方式。")
+    setErrorMessage("Card payment failed. Please try again or use a different payment method.")
   }
 
   const handleSubmit = async () => {
@@ -105,7 +101,7 @@ export default function PayPalCardFields({
         ) || existingSession
       const paypalOrderId = session?.data?.paypal_order_id as string | undefined
       if (!paypalOrderId) {
-        throw new Error("无法获取 PayPal 订单 ID，请重试。")
+        throw new Error("Unable to get PayPal order ID. Please try again.")
       }
     } catch (err: any) {
       setErrorMessage(err.message)
@@ -115,7 +111,7 @@ export default function PayPalCardFields({
   return (
     <div className="mt-6 border border-ui-border-base rounded-lg p-4">
       <p className="text-sm font-medium text-ui-fg-base mb-4">
-        信用卡付款（Visa / Mastercard / AmEx）
+        Credit Card (Visa / Mastercard / AmEx)
       </p>
       <PayPalCardFieldsProvider
         onApprove={handleApprove}
@@ -139,14 +135,14 @@ export default function PayPalCardFields({
       >
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-ui-fg-subtle mb-1">持卡人姓名</label>
+            <label className="block text-xs text-ui-fg-subtle mb-1">Cardholder Name</label>
             <PayPalNameField
               className="w-full border border-ui-border-base rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ui-border-interactive"
               style={{ input: { "font-size": "14px" } }}
             />
           </div>
           <div>
-            <label className="block text-xs text-ui-fg-subtle mb-1">卡号</label>
+            <label className="block text-xs text-ui-fg-subtle mb-1">Card Number</label>
             <PayPalNumberField
               className="w-full border border-ui-border-base rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ui-border-interactive"
               style={{ input: { "font-size": "14px" } }}
@@ -154,7 +150,7 @@ export default function PayPalCardFields({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-ui-fg-subtle mb-1">有效期</label>
+              <label className="block text-xs text-ui-fg-subtle mb-1">Expiry Date</label>
               <PayPalExpiryField
                 className="w-full border border-ui-border-base rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ui-border-interactive"
                 style={{ input: { "font-size": "14px" } }}

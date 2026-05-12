@@ -36,7 +36,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       },
     }
   } catch {
-    return { title: "文章详情" }
+    return { title: "Post" }
   }
 }
 

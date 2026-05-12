@@ -8,7 +8,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   let configs: any[]
   try {
     configs = await service.listPaypalConfigs()
-  } catch {
+  } catch (err: any) {
+    console.error("[PayPal] Failed to load PayPal config:", err?.message ?? err)
     return res.json({ enabled: false })
   }
 
