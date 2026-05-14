@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 
+export const dynamic = "force-dynamic"
+
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || process.env.MEDUSA_BACKEND_URL
 
@@ -8,6 +10,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_STORE_URL || "https://localhost:8000"
 export const revalidate = 600 // 10 minutes
 
 export async function GET() {
+  if (!BACKEND_URL) {
+    return new NextResponse("Backend URL not configured", { status: 503 })
+  }
   const key =
     process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
     process.env.MEDUSA_PUBLISHABLE_KEY ||
