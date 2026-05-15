@@ -1,6 +1,7 @@
 import React, { Suspense } from "react"
 
 import ImageCarousel from "@modules/products/components/image-carousel"
+import { normalizeImageUrl } from "@lib/util/normalize-image-url"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import ProductTabs from "@modules/products/components/product-tabs"
@@ -62,7 +63,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       const meta = metaMap.get(img.id)
       return {
         id: img.id,
-        url: img.url?.trim() ?? "",
+        url: normalizeImageUrl(img.url?.trim()) ?? "",
         is_main: meta?.is_main ?? (idx === 0 && !imagesMeta?.length),
         sort_order: meta?.sort_order ?? idx,
       }

@@ -3,6 +3,7 @@ import Image from "next/image"
 import React from "react"
 
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
+import { normalizeImageUrl } from "@lib/util/normalize-image-url"
 
 type ThumbnailProps = {
   thumbnail?: string | null
@@ -24,7 +25,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   className,
   "data-testid": dataTestid,
 }) => {
-  const initialImage = thumbnail || images?.[0]?.url
+  const initialImage = normalizeImageUrl(thumbnail || images?.[0]?.url)
 
   return (
     <Container
