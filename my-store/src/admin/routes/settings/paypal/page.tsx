@@ -105,12 +105,12 @@ export default function PayPalSettingsPage() {
       toast.warning("Please save your configuration before testing the connection")
       return
     }
-    setTesting(true)
-    try {
-      const result = await apiFetch<TestConnectionResponse>(
-        "/paypal/test-connection",
-        { method: "POST" }
-      )
+      setTesting(true)
+      try {
+        const result = await apiFetch<TestConnectionResponse>("/paypal", {
+          method: "POST",
+          body: JSON.stringify({ action: "test-connection" }),
+        })
       if (result.success) {
         toast.success(`PayPal connection successful (${result.environment === "live" ? "Live" : "Sandbox"} environment)`)
       } else {

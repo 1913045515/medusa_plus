@@ -66,6 +66,7 @@ services:
       STORE_CORS: ${STORE_CORS}
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
+      PAYPAL_CONFIG_ENCRYPTION_KEY: ${PAYPAL_CONFIG_ENCRYPTION_KEY}
       # 本地文件上传：写入挂载卷 /app/uploads，nginx 从 /uploads/ 对外服务
       UPLOAD_DIR: /app/uploads
       BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
@@ -113,7 +114,6 @@ services:
       NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-us}
       NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
-      # 产品图片媒体基础 URL：替换数据库中存储的 localhost:9000/static 地址
       NEXT_PUBLIC_MEDIA_BASE_URL: ${NEXT_PUBLIC_MEDIA_BASE_URL:-https://admin.wolzq.com/uploads}
     depends_on:
       admin:
