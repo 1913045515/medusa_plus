@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderLineItemImage } from "@lib/util/order-line-item-image"
 import { HttpTypes } from "@medusajs/types"
 
 type OrderCardProps = {
@@ -44,6 +45,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
       </div>
       <div className="grid grid-cols-2 small:grid-cols-4 gap-3">
         {order.items?.slice(0, 3).map((i) => {
+          const image = getOrderLineItemImage(i)
+
           return (
             <div
               key={i.id}
@@ -51,7 +54,11 @@ const OrderCard = ({ order }: OrderCardProps) => {
               data-testid="order-item"
             >
               <div className="rounded overflow-hidden border border-gray-100">
-                <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
+                <Thumbnail
+                  thumbnail={image.thumbnail}
+                  images={image.images}
+                  size="full"
+                />
               </div>
               <div className="flex items-center text-small-regular text-ui-fg-base flex-wrap gap-x-1">
                 <span

@@ -11,6 +11,7 @@ import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
+import { getOrderLineItemImage } from "@lib/util/order-line-item-image"
 
 const FILE_ASSET_PROXY_BASE = "/api/file-assets"
 
@@ -161,6 +162,7 @@ type ItemProps = {
 
 const Item = ({ item, orderId, currencyCode, dict }: ItemProps) => {
   const virtualFulfillment = readVirtualOrderFulfillment((item.metadata ?? null) as Record<string, unknown> | null)
+  const image = getOrderLineItemImage(item as HttpTypes.StoreOrderLineItem)
 
   return (
     <div
@@ -169,7 +171,7 @@ const Item = ({ item, orderId, currencyCode, dict }: ItemProps) => {
     >
       <div className="w-16 shrink-0">
         <div className="flex w-16 overflow-hidden rounded-[18px]">
-          <Thumbnail thumbnail={item.thumbnail} size="square" />
+          <Thumbnail thumbnail={image.thumbnail} images={image.images} size="square" />
         </div>
       </div>
 
