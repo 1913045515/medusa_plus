@@ -33,19 +33,24 @@ module.exports = defineConfig({
     disable: false,
   },
   modules: [
-    // 文件上传模块：backend_url 控制生成的图片 URL 前缀
-    // 本地开发（默认）：upload_dir="static"，Medusa dev server 自动在 /static 下提供静态文件服务
-    // Docker 生产环境：通过 UPLOAD_DIR=/app/uploads 将文件写入挂载卷，nginx 从 /uploads/ 对外服务
+    // 文件上传模块：使用公有 S3 桶存储产品主图，与博客图片使用同一公有桶
+    // 上传后直接返回 S3 公有 URL，不经过网站服务器，节省带宽
     {
       resolve: "@medusajs/file",
       options: {
         providers: [
           {
-            resolve: "@medusajs/file-local",
-            id: "local",
+            resolve: "@medusajs/file-s3",
+            id: "s3",
             options: {
-              upload_dir: process.env.UPLOAD_DIR || "static",
-              backend_url: process.env.BACKEND_URL || "http://localhost:9000/static",
+              file_url: process.env.FILE_S3_URL ||
+                `https://${process.env.BLOG_MEDIA_S3_BUCKET || process.env.COURSE_MEDIA_S3_BUCKET}.s3.${process.env.BLOG_MEDIA_S3_REGION || process.env.COURSE_MEDIA_S3_REGION || 'ap-southeast-1'}.amazonaws.com`,
+              access_key_id: process.env.BLOG_MEDIA_S3_ACCESS_KEY_ID || process.env.COURSE_MEDIA_S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.BLOG_MEDIA_S3_SECRET_ACCESS_KEY || process.env.COURSE_MEDIA_S3_SECRET_ACCESS_KEY,
+              region: process.env.BLOG_MEDIA_S3_REGION || process.env.COURSE_MEDIA_S3_REGION || 'ap-southeast-1',
+              bucket: process.env.BLOG_MEDIA_S3_BUCKET || process.env.COURSE_MEDIA_S3_BUCKET,
+              prefix: "products/",
+              cache_control: "public, max-age=31536000",
             },
           },
         ],

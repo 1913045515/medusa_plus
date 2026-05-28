@@ -67,9 +67,8 @@ services:
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
       PAYPAL_CONFIG_ENCRYPTION_KEY: ${PAYPAL_CONFIG_ENCRYPTION_KEY}
-      # 本地文件上传：写入挂载卷 /app/uploads，nginx 从 /uploads/ 对外服务
-      UPLOAD_DIR: /app/uploads
-      BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
+      # 产品主图 S3 文件 URL（与博客公有桶相同，上传后直接返回 S3 地址）
+      FILE_S3_URL: ${FILE_S3_URL:-}
       # Server-side storefront notification after menu changes (no browser CORS issues)
       STOREFRONT_INTERNAL_URL: http://storefront:8000
       # Public-facing storefront URL used in order confirmation and registration emails

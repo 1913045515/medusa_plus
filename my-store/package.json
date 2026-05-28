@@ -38,6 +38,7 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@medusajs/admin-sdk": "2.13.1",
     "@medusajs/cli": "2.13.1",
+    "@medusajs/file-s3": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
     "@tiptap/core": "^3.22.3",
