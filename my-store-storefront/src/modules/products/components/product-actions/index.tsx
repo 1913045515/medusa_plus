@@ -1,7 +1,7 @@
 "use client"
 
 import { Dialog, Transition } from "@headlessui/react"
-import { addToCart } from "@lib/data/cart"
+import { addToCart, buyNowCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -156,9 +156,21 @@ export default function ProductActions({
   }
 
   const handleBuyNow = async () => {
-    const ok = await handleAddToCart()
-    if (ok) {
+    if (!selectedVariant?.id) return
+
+    setIsAdding(true)
+    try {
+      await buyNowCart({
+        variantId: selectedVariant.id,
+        quantity: 1,
+        countryCode,
+        isVirtualProduct: product.metadata?.is_virtual === true,
+      })
       router.push(`/${countryCode}/checkout?step=address`)
+    } catch {
+      // error is non-fatal; user stays on page
+    } finally {
+      setIsAdding(false)
     }
   }
 

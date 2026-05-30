@@ -242,6 +242,27 @@ export async function addToCart({
     .catch(medusaError)
 }
 
+/**
+ * "Buy Now" version of addToCart: clears any existing cart first so that
+ * every click starts a fresh checkout with exactly `quantity` of the chosen
+ * variant, preventing quantity accumulation across repeated clicks.
+ */
+export async function buyNowCart({
+  variantId,
+  quantity,
+  countryCode,
+  isVirtualProduct = false,
+}: {
+  variantId: string
+  quantity: number
+  countryCode: string
+  isVirtualProduct?: boolean
+}) {
+  // Remove the existing cart cookie so getOrSetCart creates a brand-new cart
+  await removeCartId()
+  await addToCart({ variantId, quantity, countryCode, isVirtualProduct })
+}
+
 export async function updateLineItem({
   lineId,
   quantity,
