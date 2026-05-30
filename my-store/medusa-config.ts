@@ -40,15 +40,25 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: "@medusajs/file-s3",
+            resolve: "./src/providers/public-s3-file",
             id: "s3",
             options: {
-              file_url: process.env.FILE_S3_URL ||
+              file_url:
+                process.env.FILE_S3_URL ||
                 `https://${process.env.BLOG_MEDIA_S3_BUCKET || process.env.COURSE_MEDIA_S3_BUCKET}.s3.${process.env.BLOG_MEDIA_S3_REGION || process.env.COURSE_MEDIA_S3_REGION || 'ap-southeast-1'}.amazonaws.com`,
-              access_key_id: process.env.BLOG_MEDIA_S3_ACCESS_KEY_ID || process.env.COURSE_MEDIA_S3_ACCESS_KEY_ID,
-              secret_access_key: process.env.BLOG_MEDIA_S3_SECRET_ACCESS_KEY || process.env.COURSE_MEDIA_S3_SECRET_ACCESS_KEY,
-              region: process.env.BLOG_MEDIA_S3_REGION || process.env.COURSE_MEDIA_S3_REGION || 'ap-southeast-1',
-              bucket: process.env.BLOG_MEDIA_S3_BUCKET || process.env.COURSE_MEDIA_S3_BUCKET,
+              access_key_id:
+                process.env.BLOG_MEDIA_S3_ACCESS_KEY_ID ||
+                process.env.COURSE_MEDIA_S3_ACCESS_KEY_ID,
+              secret_access_key:
+                process.env.BLOG_MEDIA_S3_SECRET_ACCESS_KEY ||
+                process.env.COURSE_MEDIA_S3_SECRET_ACCESS_KEY,
+              region:
+                process.env.BLOG_MEDIA_S3_REGION ||
+                process.env.COURSE_MEDIA_S3_REGION ||
+                'ap-southeast-1',
+              bucket:
+                process.env.BLOG_MEDIA_S3_BUCKET ||
+                process.env.COURSE_MEDIA_S3_BUCKET,
               prefix: "products/",
               cache_control: "public, max-age=31536000",
             },
