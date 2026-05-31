@@ -54,6 +54,80 @@
     @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6;
   }
 
+  /* Rich HTML content renderer — used for TipTap-generated content */
+  .rich-content {
+    @apply text-[15px] leading-[1.8] text-neutral-700;
+  }
+  .rich-content p {
+    @apply mb-4 last:mb-0;
+  }
+  .rich-content br {
+    @apply block;
+  }
+  .rich-content h1 {
+    @apply text-3xl font-bold text-neutral-900 mt-8 mb-4;
+  }
+  .rich-content h2 {
+    @apply text-2xl font-semibold text-neutral-900 mt-7 mb-3;
+  }
+  .rich-content h3 {
+    @apply text-xl font-semibold text-neutral-800 mt-6 mb-3;
+  }
+  .rich-content h4 {
+    @apply text-lg font-medium text-neutral-800 mt-5 mb-2;
+  }
+  .rich-content ul {
+    @apply list-disc pl-6 mb-4 space-y-1.5;
+  }
+  .rich-content ol {
+    @apply list-decimal pl-6 mb-4 space-y-1.5;
+  }
+  .rich-content li {
+    @apply text-neutral-700;
+  }
+  .rich-content a {
+    @apply text-neutral-900 underline underline-offset-2 hover:text-neutral-600 transition-colors;
+  }
+  .rich-content strong {
+    @apply font-semibold text-neutral-900;
+  }
+  .rich-content em {
+    @apply italic;
+  }
+  .rich-content u {
+    @apply underline;
+  }
+  .rich-content s {
+    @apply line-through;
+  }
+  .rich-content blockquote {
+    @apply border-l-4 border-neutral-200 pl-5 italic text-neutral-500 my-6;
+  }
+  .rich-content pre {
+    @apply bg-neutral-100 rounded-lg px-4 py-3 overflow-x-auto text-sm font-mono mb-4;
+  }
+  .rich-content code {
+    @apply bg-neutral-100 rounded px-1.5 py-0.5 text-sm font-mono;
+  }
+  .rich-content pre code {
+    @apply bg-transparent p-0;
+  }
+  .rich-content hr {
+    @apply border-0 border-t border-neutral-200 my-8;
+  }
+  .rich-content img {
+    @apply max-w-full h-auto rounded-lg my-6 mx-auto;
+  }
+  .rich-content table {
+    @apply w-full border-collapse text-sm mb-6;
+  }
+  .rich-content th {
+    @apply border border-neutral-200 bg-neutral-50 px-4 py-2 text-left font-semibold text-neutral-900;
+  }
+  .rich-content td {
+    @apply border border-neutral-200 px-4 py-2 text-neutral-700;
+  }
+
   .contrast-btn {
     @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
   }
