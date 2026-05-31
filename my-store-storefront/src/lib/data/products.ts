@@ -4,7 +4,7 @@ import { sdk } from "@lib/config"
 import { sortProducts } from "@lib/util/sort-products"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
 export const listProducts = async ({
@@ -49,11 +49,6 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    revalidate: 300, // 5 min – ensures price changes from admin propagate within 5 minutes
-    ...(await getCacheOptions("products")),
-  }
-
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       `/store/products`,
@@ -68,7 +63,7 @@ export const listProducts = async ({
           ...queryParams,
         },
         headers,
-        next,
+        cache: "no-store",
       }
     )
     .then(({ products, count }) => {
