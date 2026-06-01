@@ -66,13 +66,28 @@ services:
       STORE_CORS: ${STORE_CORS}
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
-      PAYPAL_CONFIG_ENCRYPTION_KEY: ${PAYPAL_CONFIG_ENCRYPTION_KEY}
       # 产品主图 S3 文件 URL（与博客公有桶相同，上传后直接返回 S3 地址）
       FILE_S3_URL: ${FILE_S3_URL:-}
+      # 本地文件上传：写入挂载卷 /app/uploads，nginx 从 /uploads/ 对外服务
+      # UPLOAD_DIR: /app/uploads
+      BACKEND_URL: ${BACKEND_URL:-https://admin.wolzq.com/uploads}
       # Server-side storefront notification after menu changes (no browser CORS issues)
       STOREFRONT_INTERNAL_URL: http://storefront:8000
       # Public-facing storefront URL used in order confirmation and registration emails
       STORE_FRONTEND_URL: ${NEXT_PUBLIC_BASE_URL}
+      PAYPAL_CONFIG_ENCRYPTION_KEY: ${PAYPAL_CONFIG_ENCRYPTION_KEY}
+      # ── 微信支付 APIv3 ──
+      WECHATPAY_APP_ID: ${WECHATPAY_APP_ID}
+      WECHATPAY_MCH_ID: ${WECHATPAY_MCH_ID}
+      WECHATPAY_API_V3_KEY: ${WECHATPAY_API_V3_KEY}
+      WECHATPAY_NOTIFY_URL: ${WECHATPAY_NOTIFY_URL}
+      WECHATPAY_MERCHANT_PRIVATE_KEY_PATH: ${WECHATPAY_MERCHANT_PRIVATE_KEY_PATH:-/app/wechatpay/apiclient_key.pem}
+      WECHATPAY_MERCHANT_CERT_SERIAL_NO: ${WECHATPAY_MERCHANT_CERT_SERIAL_NO}
+      WECHATPAY_PUBLIC_KEY_ID: ${WECHATPAY_PUBLIC_KEY_ID}
+      WECHATPAY_PUBLIC_KEY_PATH: ${WECHATPAY_PUBLIC_KEY_PATH:-/app/wechatpay/wechatpay_public_key.pem}
+      WECHATPAY_PAY_TYPE: ${WECHATPAY_PAY_TYPE:-native}
+      WECHATPAY_CURRENCY: ${WECHATPAY_CURRENCY:-CNY}
+      WECHATPAY_API_BASE_URL: ${WECHATPAY_API_BASE_URL:-https://api.mch.weixin.qq.com}
       # 课程媒体 S3（私有桶，视频/附件用签名 URL）
       COURSE_MEDIA_S3_BUCKET: ${COURSE_MEDIA_S3_BUCKET}
       COURSE_MEDIA_S3_REGION: ${COURSE_MEDIA_S3_REGION:-ap-southeast-1}
@@ -85,6 +100,11 @@ services:
       BLOG_MEDIA_S3_SECRET_ACCESS_KEY: ${BLOG_MEDIA_S3_SECRET_ACCESS_KEY}
     volumes:
       - ./uploads:/app/uploads
+      # 微信支付证书/密钥（请通过 deploy/wechatpay/ 目录提供）
+      # 期望文件：
+      #   apiclient_key.pem            商户私钥（必须）
+      #   wechatpay_public_key.pem     微信支付公钥（必须，APIv3 新版公钥模式）
+      - ./wechatpay:/app/wechatpay:ro
     depends_on:
       postgres:
         condition: service_healthy

@@ -82,6 +82,20 @@ export default defineMiddlewares({
       matcher: "/store/paypal/config",
       middlewares: [],
     },
+    // 微信支付：回调 + 客户端接口完全公开（不需要 publishable key / 鉴权）
+    // 回调签名验证在路由内部完成
+    {
+      matcher: "/store/wechat-pay/notify",
+      middlewares: [],
+    },
+    {
+      matcher: "/store/wechat-pay/qrcode",
+      middlewares: [],
+    },
+    {
+      matcher: "/store/wechat-pay/query",
+      middlewares: [],
+    },
     // File Assets: admin management routes require admin authentication
     {
       matcher: "/admin/file-assets*",

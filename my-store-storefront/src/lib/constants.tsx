@@ -4,6 +4,7 @@ import { CreditCard } from "@medusajs/icons"
 import Ideal from "@modules/common/icons/ideal"
 import Bancontact from "@modules/common/icons/bancontact"
 import PayPal from "@modules/common/icons/paypal"
+import WeChatPay from "@modules/common/icons/wechat-pay"
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
 export const paymentInfoMap: Record<
@@ -34,6 +35,14 @@ export const paymentInfoMap: Record<
     title: "PayPal",
     icon: <PayPal />,
   },
+  pp_wechat_wechat: {
+    title: "微信支付",
+    icon: <WeChatPay />,
+  },
+  pp_wechat: {
+    title: "微信支付",
+    icon: <WeChatPay />,
+  },
   pp_system_default: {
     title: "Manual Payment",
     icon: <CreditCard />,
@@ -50,6 +59,9 @@ export const isStripeLike = (providerId?: string) => {
 
 export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
+}
+export const isWeChatPay = (providerId?: string) => {
+  return providerId?.startsWith("pp_wechat")
 }
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")

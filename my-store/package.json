@@ -17,6 +17,7 @@
     "seed": "medusa exec ./src/scripts/seed.ts",
     "seed:courses": "medusa exec ./src/scripts/seed-courses.ts",
     "seed:menu": "medusa exec ./src/scripts/seed-menu.ts",
+    "setup:cn-region": "medusa exec ./src/scripts/setup-cn-region.ts",
     "start": "medusa start",
     "dev": "medusa develop",
     "test:integration:http": "cross-env TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",

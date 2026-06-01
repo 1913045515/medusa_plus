@@ -1,0 +1,4 @@
+# 默认忽略所有私钥，避免误提交
+apiclient_key.pem
+wechatpay_public_key.pem
+*.key

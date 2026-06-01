@@ -9,6 +9,21 @@ if (!process.env.PAYPAL_CONFIG_ENCRYPTION_KEY) {
   )
 }
 
+// 微信支付：只有在必要 env 均存在时才启用，避免本地开发环境在未填配置时反复报错。
+// 如需强制关闭，可设 WECHATPAY_DISABLED=true。
+const wechatPayEnabled =
+  process.env.WECHATPAY_DISABLED !== 'true' &&
+  !!process.env.WECHATPAY_APP_ID &&
+  !!process.env.WECHATPAY_MCH_ID &&
+  !!process.env.WECHATPAY_API_V3_KEY
+
+if (!wechatPayEnabled) {
+  console.warn(
+    '[WechatPay] 已禁用微信支付提供方（未检测到必要 env）。' +
+    '请配置 WECHATPAY_APP_ID / WECHATPAY_MCH_ID / WECHATPAY_API_V3_KEY 后重启。'
+  )
+}
+
 process.env.COURSE_MEDIA_S3_REGION =
   process.env.COURSE_MEDIA_S3_REGION || process.env.AWS_REGION || 'ap-southeast-1'
 process.env.COURSE_MEDIA_S3_MAX_FILE_SIZE_BYTES =
@@ -108,7 +123,7 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/file-asset",
     },
-    // PayPal Payment Provider
+    // 支付提供方：PayPal + 微信支付 APIv3（微信仅在 env 齐备时注册）
     {
       resolve: "@medusajs/payment",
       options: {
@@ -117,6 +132,14 @@ module.exports = defineConfig({
             resolve: "./src/modules/paypal/paypal-payment-provider",
             id: "paypal",
           },
+          ...(wechatPayEnabled
+            ? [
+                {
+                  resolve: "./src/modules/wechatpay/wechatpay-payment-provider",
+                  id: "wechat",
+                },
+              ]
+            : []),
         ],
       },
     },

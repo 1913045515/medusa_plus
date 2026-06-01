@@ -1,6 +1,6 @@
 "use client"
 
-import { isManual, isPaypal, isStripeLike } from "@lib/constants"
+import { isManual, isPaypal, isStripeLike, isWeChatPay } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { isVirtualOnlyCart } from "@lib/util/virtual-fulfillment"
 import { HttpTypes } from "@medusajs/types"
@@ -11,6 +11,7 @@ import ErrorMessage from "../error-message"
 import PayPalPaymentButton from "@modules/checkout/components/paypal-button"
 import { usePayPalConfig, usePayPalLoading } from "@modules/checkout/components/paypal-provider"
 import PayPalCardFields from "@modules/checkout/components/paypal-card-fields"
+import WeChatPayButton from "@modules/checkout/components/wechatpay-button"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -44,6 +45,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     case isPaypal(paymentSession?.provider_id):
       return (
         <PayPalButtonGroup
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
+      )
+    case isWeChatPay(paymentSession?.provider_id):
+      return (
+        <WeChatPayButton
           notReady={notReady}
           cart={cart}
           data-testid={dataTestId}
