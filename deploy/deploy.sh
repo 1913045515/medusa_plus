@@ -95,9 +95,35 @@ if [[ $REDIS_READY -eq 0 ]]; then
 fi
 info "Redis 已就绪 ✓"
 
+# ── 辅助函数：重建指定 compose 服务容器 ───────────────────
+# 用法：recreate_service <service_name>
+# - 容器正在运行 → 停止 → 删除 → 重新启动
+# - 容器已停止   → 删除 → 重新启动
+# - 容器不存在   → 直接启动
+recreate_service() {
+  local svc="$1"
+  local cid
+  cid=$($COMPOSE ps -q "${svc}" 2>/dev/null || true)
+  if [[ -n "${cid}" ]]; then
+    local state
+    state=$(docker inspect --format='{{.State.Status}}' "${cid}" 2>/dev/null || echo "")
+    if [[ "${state}" == "running" ]]; then
+      info "${svc} 容器正在运行，停止并删除..."
+      docker stop "${cid}"
+      docker rm "${cid}"
+    else
+      info "${svc} 容器已停止，直接删除..."
+      docker rm "${cid}"
+    fi
+  else
+    info "${svc} 容器不存在，直接创建..."
+  fi
+  $COMPOSE up -d "${svc}"
+}
+
 # ── 启动 Admin ──────────────────────────────────────────────
-info "启动 Admin 服务..."
-$COMPOSE up -d admin
+info "重建 Admin 服务..."
+recreate_service admin
 
 info "等待 Admin 容器启动..."
 sleep 5
@@ -118,8 +144,8 @@ else
 fi
 
 # ── 启动 Storefront ─────────────────────────────────────────
-info "启动 Storefront 服务..."
-$COMPOSE up -d storefront
+info "重建 Storefront 服务..."
+recreate_service storefront
 
 info "等待 Storefront 就绪..."
 SFRONT_READY=0

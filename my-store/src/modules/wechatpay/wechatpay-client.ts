@@ -1,8 +1,12 @@
 import {
-  createSign,
-  createVerify,
+  sign as cryptoSign,
+  verify as cryptoVerify,
   createDecipheriv,
+  createPrivateKey,
+  createPublicKey,
   randomBytes,
+  constants as cryptoConstants,
+  KeyObject,
 } from "node:crypto"
 import type { WechatPayConfig } from "./config"
 
@@ -78,7 +82,16 @@ export interface DecryptedTransaction {
 }
 
 export class WechatPayClient {
-  constructor(private readonly cfg: WechatPayConfig) {}
+  private readonly privateKey: KeyObject
+  private readonly publicKey: KeyObject
+
+  constructor(private readonly cfg: WechatPayConfig) {
+    // 在构造时预解析密钥，避免每次请求重复解析；
+    // createPrivateKey/createPublicKey 在 OpenSSL 3（含 Alpine 精简版）上比直接
+    // 向 sign()/verify() 传原始 PEM 字符串更可靠。
+    this.privateKey = createPrivateKey(cfg.merchantPrivateKey)
+    this.publicKey = createPublicKey(cfg.publicKey)
+  }
 
   // ──────────────────── 签名 ────────────────────
 
@@ -92,9 +105,13 @@ export class WechatPayClient {
     const timestamp = Math.floor(Date.now() / 1000).toString()
     const message = `${method}\n${urlPath}\n${timestamp}\n${nonceStr}\n${body}\n`
 
-    const signer = createSign("RSA-SHA256")
-    signer.update(message, "utf8")
-    const signature = signer.sign(this.cfg.merchantPrivateKey, "base64")
+    // 使用 crypto.sign() + 显式 KeyObject + PKCS1 v1.5 padding，
+    // 在 node:20-alpine (OpenSSL 3 精简版) 上更可靠
+    const sigBuf = cryptoSign("sha256", Buffer.from(message, "utf8"), {
+      key: this.privateKey,
+      padding: cryptoConstants.RSA_PKCS1_PADDING,
+    })
+    const signature = sigBuf.toString("base64")
 
     return (
       `WECHATPAY2-SHA256-RSA2048 ` +
@@ -121,9 +138,14 @@ export class WechatPayClient {
       return false
     }
     const message = `${timestamp}\n${nonce}\n${body}\n`
-    const verifier = createVerify("RSA-SHA256")
-    verifier.update(message, "utf8")
-    return verifier.verify(this.cfg.publicKey, signature, "base64")
+    // 使用 crypto.verify() + 显式 KeyObject + PKCS1 v1.5 padding，
+    // 在 node:20-alpine (OpenSSL 3 精简版) 上比 createVerify().verify(pemStr) 更可靠
+    return cryptoVerify(
+      "sha256",
+      Buffer.from(message, "utf8"),
+      { key: this.publicKey, padding: cryptoConstants.RSA_PKCS1_PADDING },
+      Buffer.from(signature, "base64")
+    )
   }
 
   // ──────────────────── HTTP ────────────────────
